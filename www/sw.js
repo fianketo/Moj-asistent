@@ -1,6 +1,6 @@
 // Service worker (web verzija): instalacija, rad bez interneta i klik na obaveštenje.
-const CACHE = 'asistent-v2';
-const SHELL = ['./', './index.html', './style.css', './app.js', './vendor/capacitor.js', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
+const CACHE = 'asistent-v3';
+const SHELL = ['./', './index.html', './style.css', './app.js', './catalog.js', './vendor/capacitor.js', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)));

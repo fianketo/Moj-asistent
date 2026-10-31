@@ -71,6 +71,10 @@ function defaults() {
 let S;
 try { S = Object.assign(defaults(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { S = defaults(); }
 if (!S.lists.length) S.lists = defaults().lists;
+for (const l of S.lists) for (const i of l.items) if (typeof i.qty === 'string') { // stara verzija: količina kao tekst
+  const m = i.qty.match(/(\d+(?:[.,]\d+)?)\s*(kg|g|l|ml|kom|pak)?/i);
+  i.qty = m ? parseFloat(m[1].replace(',', '.')) : null; i.unit = m && m[2] ? m[2].toLowerCase() : 'kom';
+}
 if (!S.activeList || !S.lists.find((l) => l.id === S.activeList)) S.activeList = S.lists[0].id;
 
 function save(resync = true) {
@@ -268,73 +272,196 @@ function editReminder(r) {
 }
 
 // ================================================================ KUPOVINA
-const COMMON = ['Hleb', 'Mleko', 'Jaja', 'Jogurt', 'Kiselo mleko', 'Pavlaka', 'Sir', 'Kajmak', 'Puter', 'Margarin',
-  'Šunka', 'Pršuta', 'Kobasica', 'Piletina', 'Mleveno meso', 'Svinjetina', 'Junetina', 'Riba', 'Tuna konzerva',
-  'Krompir', 'Crni luk', 'Beli luk', 'Paradajz', 'Krastavac', 'Paprika', 'Šargarepa', 'Kupus', 'Zelena salata',
-  'Jabuke', 'Banane', 'Pomorandže', 'Limun', 'Grožđe', 'Brašno', 'Šećer', 'So', 'Ulje', 'Maslinovo ulje', 'Sirće',
-  'Pirinač', 'Testenina', 'Pasulj', 'Kafa', 'Čaj', 'Kakao', 'Med', 'Džem', 'Eurokrem', 'Čokolada', 'Keks', 'Grickalice',
-  'Voda', 'Kisela voda', 'Sok', 'Pivo', 'Vino', 'Kečap', 'Majonez', 'Senf', 'Začini', 'Vegeta', 'Biber', 'Aleva paprika',
-  'Toalet papir', 'Papirni ubrusi', 'Salvete', 'Deterdžent za veš', 'Omekšivač', 'Deterdžent za sudove', 'Tablete za sudo-mašinu',
-  'Sapun', 'Šampon', 'Pasta za zube', 'Četkica za zube', 'Dezodorans', 'Kese za smeće', 'Sunđeri', 'Hrana za ljubimce', 'Pelene'];
-
+// Artikli dolaze iz catalog.js (CATALOG, CATALOG_INDEX, UNITS) + istorija + online pretraga (Open Food Facts).
 const curList = () => S.lists.find((l) => l.id === S.activeList) || S.lists[0];
+const STEP = { kg: 0.5, g: 100, ml: 250 };
+const stepOf = (u) => STEP[u] || 1;
+const defaultQty = (u) => ({ g: 200, ml: 500 }[u] || 1);
+const fmtNum = (n) => String(Math.round(n * 1000) / 1000).replace('.', ',');
+const fmtQty = (i) => (i.qty ? `${fmtNum(i.qty)} ${i.unit || 'kom'}` : '');
+const catOf = (name) => CATALOG_INDEX.get(name.toLowerCase());
+const unitRe = '(kg|g|l|ml|kom|pak)';
 
-function parseItem(text) { // "2 mleko", "mleko x2", "mleko 2kg"
-  let t = text.trim(), qty = '';
-  let m = t.match(/^(\d+[.,]?\d*\s*(kg|g|l|ml|kom|x)?)\s+(.+)$/i);
-  if (m) { qty = m[1].replace(/x$/i, '').trim(); t = m[3]; }
-  else if ((m = t.match(/^(.+?)\s+[x×]?\s*(\d+[.,]?\d*\s*(kg|g|l|ml|kom)?)$/i))) { t = m[1]; qty = m[2].trim(); }
-  return { name: t.charAt(0).toUpperCase() + t.slice(1), qty };
+function parseItem(text) { // "2 mleko", "mleko x2", "mleko 1,5 kg", "500g sira"
+  let t = text.trim(), qty = null, unit = null, m;
+  if ((m = t.match(new RegExp(`^(\\d+(?:[.,]\\d+)?)\\s*(?:${unitRe}\\b|x)?\\s+(.+)$`, 'i')))) { qty = m[1]; unit = m[2]; t = m[3]; }
+  else if ((m = t.match(new RegExp(`^(.+?)\\s+[x×]?\\s*(\\d+(?:[.,]\\d+)?)\\s*${unitRe}?$`, 'i')))) { t = m[1]; qty = m[2]; unit = m[3]; }
+  const name = t.charAt(0).toUpperCase() + t.slice(1);
+  return { name, qty: qty ? parseFloat(qty.replace(',', '.')) : null, unit: unit ? unit.toLowerCase() : null };
+}
+
+function addToList(name, qty, unit, silent) {
+  const L = curList(), c = catOf(name);
+  unit = unit || (c && c.unit) || 'kom';
+  qty = qty || defaultQty(unit);
+  const ex = L.items.find((i) => !i.done && i.name.toLowerCase() === name.toLowerCase() && (i.unit || 'kom') === unit);
+  if (ex) { ex.qty = (ex.qty || 0) + qty; if (!silent) toast(`${ex.name}: ${fmtQty(ex)}`); }
+  else L.items.unshift({ id: uid(), name, qty, unit, cat: c ? c.cat : '', done: false });
+  S.history = [name, ...S.history.filter((h) => h.toLowerCase() !== name.toLowerCase())].slice(0, 200);
+  save(false);
+  return ex || L.items[0];
 }
 
 function renderShopping() {
   const L = curList();
   const open = L.items.filter((i) => !i.done), bought = L.items.filter((i) => i.done);
-  const suggestions = [...new Set([...S.history, ...COMMON])];
+  const suggestions = [...new Set([...S.history, ...[...CATALOG_INDEX.values()].map((x) => x.name)])];
   let html = `<div class="chips">${S.lists.map((l) => `<button class="chip ${l.id === L.id ? 'on' : ''}" data-list="${l.id}">${esc(l.name)}<span class="count">${l.items.filter((i) => !i.done).length || ''}</span></button>`).join('')}
     <button class="chip" data-act="new-list">+ Nova lista</button></div>
-    <form class="addbar" id="addForm" autocomplete="off">
-      <input class="input" id="itemIn" list="sugg" placeholder="Dodaj proizvod (npr. 2 mleko)" enterkeyhint="done">
-      <button class="btn primary">Dodaj</button>
+    <form class="card block addcard" id="addForm" autocomplete="off">
+      <div class="addbar">
+        <input class="input" id="itemIn" list="sugg" placeholder="Šta kupuješ? (npr. mleko)" enterkeyhint="done">
+        <button class="btn primary">Dodaj</button>
+      </div>
+      <div class="qtybar">
+        <span class="lbl">Količina</span>
+        <div class="stepper big"><button type="button" data-step="-1">−</button>
+          <input id="qtyIn" type="text" inputmode="decimal" value="1"><button type="button" data-step="1">+</button></div>
+        <select class="input" id="unitIn">${UNITS.map((u) => `<option>${u}</option>`).join('')}</select>
+      </div>
     </form>
+    <button class="btn block" data-act="catalog" style="margin-bottom:12px">📋 Izaberi iz kataloga artikala</button>
     <datalist id="sugg">${suggestions.map((s) => `<option value="${esc(s)}">`).join('')}</datalist>`;
   if (!L.items.length) {
-    html += `<div class="empty"><div class="big">🛒</div>Lista „${esc(L.name)}“ je prazna.<br>Upiši šta treba da kupiš.</div>`;
+    html += `<div class="empty"><div class="big">🛒</div>Lista „${esc(L.name)}“ je prazna.<br>Upiši artikal ili ga izaberi iz kataloga.</div>`;
   }
-  html += open.map(itemCard).join('');
-  if (bought.length) {
-    html += `<h2>U korpi (${bought.length})</h2>` + bought.map(itemCard).join('');
+  // grupisano po kategorijama, redosledom kao u prodavnici
+  const order = CATALOG.map((g) => g.cat);
+  const groups = new Map();
+  for (const i of open) { const k = i.cat || 'Ostalo'; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); }
+  const keys = [...groups.keys()].sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99));
+  for (const k of keys) {
+    if (keys.length > 1) { const g = CATALOG.find((x) => x.cat === k); html += `<h2>${g ? g.icon + ' ' : ''}${esc(k)}</h2>`; }
+    html += groups.get(k).map(itemCard).join('');
   }
+  if (bought.length) html += `<h2>U korpi (${bought.length})</h2>` + bought.map(itemCard).join('');
   html += `<div class="row" style="margin-top:16px">
       ${L.items.length ? '<button class="btn small" data-act="share">📤 Pošalji listu</button>' : ''}
       ${bought.length ? '<button class="btn small" data-act="clear-bought">Ukloni kupljeno</button>' : ''}
       <button class="btn small" data-act="list-menu">⋯ Lista</button>
     </div>
-    <p style="font-size:13px;color:var(--muted);margin-top:14px">💰 pored proizvoda otvara pretragu cena na Cenoteci (uporedi Maxi, Idea, Lidl, Univerexport…).</p>`;
+    <p style="font-size:13px;color:var(--muted);margin-top:14px">Dodirni naziv artikla za izmenu. 💰 otvara cene tog artikla na Cenoteci.</p>`;
   $('#view').innerHTML = html;
+
+  const qtyIn = $('#qtyIn'), unitIn = $('#unitIn'), itemIn = $('#itemIn');
+  const getQty = () => parseFloat(qtyIn.value.replace(',', '.')) || 0;
+  $('.qtybar .stepper').addEventListener('click', (e) => {
+    const d = +e.target.dataset.step; if (!d) return;
+    const s = stepOf(unitIn.value);
+    qtyIn.value = fmtNum(Math.max(s, getQty() + d * s));
+  });
+  unitIn.addEventListener('change', () => (qtyIn.value = fmtNum(defaultQty(unitIn.value))));
+  itemIn.addEventListener('input', () => {
+    const c = catOf(itemIn.value.trim());
+    if (c && unitIn.value !== c.unit) { unitIn.value = c.unit; qtyIn.value = fmtNum(defaultQty(c.unit)); }
+  });
   $('#addForm').addEventListener('submit', (e) => {
     e.preventDefault();
-    const v = $('#itemIn').value.trim(); if (!v) return;
+    const v = itemIn.value.trim(); if (!v) return;
     const it = parseItem(v);
-    curList().items.unshift({ id: uid(), name: it.name, qty: it.qty, done: false });
-    S.history = [it.name, ...S.history.filter((h) => h.toLowerCase() !== it.name.toLowerCase())].slice(0, 200);
-    save(false); render();
+    addToList(it.name, it.qty || getQty(), it.unit || unitIn.value);
+    render();
     $('#itemIn').focus();
   });
 }
+
 function itemCard(i) {
-  return `<div class="card ${i.done ? 'done' : ''}" data-item="${i.id}">
+  const q = fmtQty(i);
+  return `<div class="card item ${i.done ? 'done' : ''}" data-item="${i.id}">
     <button class="check ${i.done ? 'on' : ''}" data-act="item-toggle" aria-label="Kupljeno">${i.done ? '✓' : ''}</button>
-    <div class="body" data-act="item-edit"><div class="title">${esc(i.name)}</div>${i.qty ? `<div class="meta">${esc(i.qty)}</div>` : ''}</div>
-    <button class="iconbtn" data-act="price" title="Cene na Cenoteci">💰</button>
-    <button class="iconbtn" data-act="item-del" title="Obriši">✕</button></div>`;
+    <div class="body" data-act="item-edit"><div class="title">${esc(i.name)}</div>${i.done && q ? `<div class="meta">${esc(q)}</div>` : ''}</div>
+    ${i.done ? '' : `<div class="stepper"><button data-act="qty-dec" aria-label="Manje">−</button><span>${esc(q || '–')}</span><button data-act="qty-inc" aria-label="Više">+</button></div>`}
+    <button class="iconbtn" data-act="price" title="Cene na Cenoteci">💰</button></div>`;
 }
+
+function editItem(item) {
+  openSheet(`<h3>Izmeni artikal</h3>
+    <label class="field">Naziv<input class="input" id="eName" value="${esc(item.name)}"></label>
+    <div class="two">
+      <label class="field">Količina<input class="input" id="eQty" inputmode="decimal" value="${item.qty ? fmtNum(item.qty) : ''}"></label>
+      <label class="field">Jedinica<select class="input" id="eUnit">${UNITS.map((u) => `<option ${u === (item.unit || 'kom') ? 'selected' : ''}>${u}</option>`).join('')}</select></label>
+    </div>
+    <button class="btn block" id="ePrice" style="margin-top:12px">💰 Cene na Cenoteci</button>
+    <div class="foot"><button class="btn danger" id="eDel">Obriši</button><button class="btn" onclick="closeSheet()">Otkaži</button><button class="btn primary" id="eSave">Sačuvaj</button></div>`, () => {
+    $('#ePrice').onclick = () => openExternal(cenotekaUrl(item.name));
+    $('#eDel').onclick = () => { curList().items = curList().items.filter((x) => x !== item); save(false); closeSheet(); render(); };
+    $('#eSave').onclick = () => {
+      item.name = $('#eName').value.trim() || item.name;
+      item.qty = parseFloat($('#eQty').value.replace(',', '.')) || null;
+      item.unit = $('#eUnit').value;
+      const c = catOf(item.name); if (c) item.cat = c.cat;
+      save(false); closeSheet(); render();
+    };
+  });
+}
+
+// ---- katalog artikala
+let catSel = CATALOG[0].cat;
+function openCatalog() {
+  openSheet(`<div id="catWrap"><h3>Katalog artikala</h3>
+    <p style="margin:0;color:var(--muted);font-size:13px">Dodirni artikal da ga dodaš (ponovni dodir povećava količinu).</p>
+    <input class="input" id="cSearch" placeholder="🔎 Pretraži (npr. sir, pivo…)" autocomplete="off" style="margin:10px 0 8px">
+    <div class="chips" id="cCats">${CATALOG.map((g) => `<button class="chip ${g.cat === catSel ? 'on' : ''}" data-cat="${esc(g.cat)}">${g.icon} ${esc(g.cat)}</button>`).join('')}</div>
+    <div id="cItems" class="cat-grid"></div>
+    <div id="cOnline"></div>
+    <div class="foot"><button class="btn primary" onclick="closeSheet();render()">Gotovo</button></div></div>`, () => {
+    const draw = () => {
+      const q = $('#cSearch').value.trim().toLowerCase();
+      const inList = new Map(curList().items.filter((i) => !i.done).map((i) => [i.name.toLowerCase(), i]));
+      let items = q
+        ? CATALOG.flatMap((g) => g.items.filter(([n]) => n.toLowerCase().includes(q)))
+        : CATALOG.find((g) => g.cat === catSel).items;
+      $('#cCats').style.display = q ? 'none' : '';
+      $('#cItems').innerHTML = items.length ? items.map(([n, u]) => {
+        const it = inList.get(n.toLowerCase());
+        return `<button class="cat-item ${it ? 'on' : ''}" data-name="${esc(n)}" data-unit="${u}">${esc(n)}${it ? `<b>${esc(fmtQty(it))}</b>` : ''}</button>`;
+      }).join('') : '<p style="color:var(--muted);font-size:14px">Nema u katalogu.</p>';
+      $('#cOnline').innerHTML = q.length >= 3
+        ? `<button class="btn block small" id="cOnBtn" style="margin-top:10px">🌐 Traži „${esc(q)}“ u bazi proizvoda (internet)</button><div id="cOnRes"></div>` : '';
+      if ($('#cOnBtn')) $('#cOnBtn').onclick = () => onlineSearch(q);
+    };
+    $('#cSearch').addEventListener('input', draw);
+    $('#cCats').addEventListener('click', (e) => { const b = e.target.closest('[data-cat]'); if (!b) return; catSel = b.dataset.cat; $$('#cCats .chip').forEach((x) => x.classList.toggle('on', x === b)); draw(); });
+    $('#catWrap').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-name]'); if (!b) return;
+      addToList(b.dataset.name, null, b.dataset.unit || null, true);
+      if (b.classList.contains('cat-item')) draw(); else { b.classList.add('on'); toast('Dodato: ' + b.dataset.name); }
+    });
+    draw();
+  });
+}
+
+async function onlineSearch(q) {
+  const box = $('#cOnRes'); if (!box) return;
+  box.innerHTML = '<p style="color:var(--muted);font-size:14px">Tražim…</p>';
+  const url = 'https://world.openfoodfacts.org/cgi/search.pl?search_simple=1&action=process&json=1&page_size=30'
+    + '&fields=product_name,product_name_sr,brands,quantity&tagtype_0=countries&tag_contains_0=contains&tag_0=serbia'
+    + '&search_terms=' + encodeURIComponent(q);
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const seen = new Set();
+    const prods = (data.products || []).map((p) => {
+      const n = (p.product_name_sr || p.product_name || '').trim(); if (!n) return null;
+      const label = [n, p.brands && !n.toLowerCase().includes(p.brands.split(',')[0].toLowerCase()) ? p.brands.split(',')[0].trim() : '', p.quantity || ''].filter(Boolean).join(' ');
+      if (seen.has(label.toLowerCase())) return null; seen.add(label.toLowerCase());
+      return label;
+    }).filter(Boolean);
+    box.innerHTML = prods.length
+      ? `<div class="cat-grid" style="margin-top:8px">${prods.map((p) => `<button class="cat-item online" data-name="${esc(p)}">${esc(p)}</button>`).join('')}</div>
+         <p style="color:var(--muted);font-size:12px">Izvor: Open Food Facts (otvorena baza proizvoda).</p>`
+      : '<p style="color:var(--muted);font-size:14px">Nema proizvoda iz Srbije za tu pretragu.</p>';
+  } catch {
+    box.innerHTML = '<p style="color:var(--danger);font-size:14px">Pretraga nije uspela – proveri internet.</p>';
+  }
+}
+
 function cenotekaUrl(name) {
   return 'https://www.google.com/search?q=' + encodeURIComponent('site:cenoteka.rs ' + name);
 }
 function listText(L) {
   const open = L.items.filter((i) => !i.done);
-  return `🛒 ${L.name}\n` + (open.length ? open : L.items).map((i) => `• ${i.name}${i.qty ? ' – ' + i.qty : ''}`).join('\n');
+  return `🛒 ${L.name}\n` + (open.length ? open : L.items).map((i) => `• ${i.name}${i.qty ? ' – ' + fmtQty(i) : ''}`).join('\n');
 }
 async function shareList() {
   const L = curList(), text = listText(L);
@@ -552,11 +679,13 @@ $('#view').addEventListener('click', async (e) => {
     case 'clear-done': S.reminders = S.reminders.filter((x) => !x.done); save(); return render();
     case 'item-toggle': item.done = !item.done; save(false); return render();
     case 'item-del': curList().items = curList().items.filter((x) => x !== item); save(false); return render();
-    case 'item-edit': {
-      const v = prompt('Proizvod (npr. „2 mleko“):', (item.qty ? item.qty + ' ' : '') + item.name);
-      if (v && v.trim()) { Object.assign(item, parseItem(v)); save(false); render(); }
-      return;
+    case 'item-edit': return editItem(item);
+    case 'qty-inc': case 'qty-dec': {
+      const s = stepOf(item.unit), d = act === 'qty-inc' ? s : -s;
+      item.qty = Math.max(s, (item.qty || 0) + d); item.unit = item.unit || 'kom';
+      save(false); return render();
     }
+    case 'catalog': return openCatalog();
     case 'price': return openExternal(cenotekaUrl(item.name));
     case 'new-list': {
       const n = prompt('Naziv nove liste (npr. Pijaca, Apoteka):'); if (!n || !n.trim()) return;
