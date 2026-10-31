@@ -25,5 +25,12 @@
   await ev('ADD_REMINDER', `(async () => { S.reminders.push({ id: 'ci', title: 'CI podsetnik', at: toLocal(new Date(Date.now() + 5 * 60000)), before: 0, repeat: '', note: '' }); save(); await new Promise(r => setTimeout(r, 2000)); return diag; })()`);
   await ev('PENDING', `LN.getPending().then(r => r.notifications.map(n => [n.id, n.title, n.schedule && n.schedule.at]))`);
   await ev('STATUS', `notifStatus()`);
+  await ev('GEO_CONFIG', `(async () => { S.parking.plate = 'NS123AB'; S.parking.city = 'novisad'; S.parking.zones = cityZones('novisad'); S.parking.auto = true;
+    S.parking.spots = [{ id: 'cispot', lat: 45.2551, lng: 19.8451, zone: 'ns-crvena' }]; save(false); await pushGeofences(); return 'ok'; })()`);
+  await new Promise((r) => setTimeout(r, 3000));
+  await ev('GEO_STATUS', `Geo.status()`);
+  await ev('GEO_TEST', `Geo.testDwell({ id: 'cispot' }).then(() => 'sent')`);
+  await new Promise((r) => setTimeout(r, 2000));
+  await ev('GEO_STATUS2', `Geo.status()`);
   ws.close();
 })().catch((e) => { console.log('PROBE ERROR', e.message); process.exit(1); });

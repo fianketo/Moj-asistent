@@ -33,6 +33,12 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths"></meta-data>
         </provider>
+        <receiver android:name=".GeofenceReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
     </application>
 
     <!-- Permissions -->
@@ -47,10 +53,14 @@
     <!-- Lokacija parkiranog auta -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Podsetnik za plaćanje kad parkiraš na zapamćenom mestu (i kad je aplikacija zatvorena) -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!-- Otvaranje SMS aplikacije, mapa i pregledača (Android 11+ vidljivost paketa) -->
     <queries>
         <intent><action android:name="android.intent.action.SENDTO" /><data android:scheme="sms" /></intent>
+        <intent><action android:name="android.intent.action.SENDTO" /><data android:scheme="smsto" /></intent>
         <intent><action android:name="android.intent.action.VIEW" /><data android:scheme="https" /></intent>
         <intent><action android:name="android.intent.action.VIEW" /><data android:scheme="geo" /></intent>
     </queries>

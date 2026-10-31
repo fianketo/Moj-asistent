@@ -9,6 +9,7 @@ const Cap = window.Capacitor;
 const IS_NATIVE = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
 const LN = IS_NATIVE ? Cap.registerPlugin('LocalNotifications') : null;
 const Battery = IS_NATIVE ? Cap.registerPlugin('Battery') : null;
+const Geo = IS_NATIVE ? Cap.registerPlugin('ParkingGeofence') : null;
 const BUILD = '__BUILD__'; // CI upisuje broj verzije
 const APK_URL = 'https://github.com/fianketo/Moj-asistent/releases/latest/download/moj-asistent.apk';
 const WEB_URL = 'https://fianketo.github.io/Moj-asistent/';
@@ -51,13 +52,22 @@ function hashId(str) { // stabilan pozitivan int32 za ID obaveštenja
 
 // ---------------------------------------------------------------- podaci
 const KEY = 'asistent.v1';
-const DEFAULT_ZONES = [
-  { id: 'bg-crvena', name: 'Crvena zona', color: '#dc2626', sms: '9111', maxMin: 60 },
-  { id: 'bg-zuta', name: 'Žuta zona', color: '#eab308', sms: '9112', maxMin: 120 },
-  { id: 'bg-zelena', name: 'Zelena zona', color: '#16a34a', sms: '9113', maxMin: 180 },
-  { id: 'bg-plava', name: 'Plava zona', color: '#2563eb', sms: '9114', maxMin: 120 },
-  { id: 'garaza', name: 'Garaža / ostalo', color: '#64748b', sms: '', maxMin: 0 },
-];
+const GARAZA = { id: 'garaza', name: 'Garaža / ostalo', color: '#64748b', sms: '', maxMin: 0 };
+// SMS brojevi i ograničenja – proveri na tabli zone, gradovi ih menjaju.
+const CITIES = {
+  beograd: { name: 'Beograd', hours: { wd: [7, 21], sat: [7, 21] }, zones: [
+    { id: 'bg-crvena', name: 'Crvena zona', color: '#dc2626', sms: '9111', maxMin: 60 },
+    { id: 'bg-zuta', name: 'Žuta zona', color: '#eab308', sms: '9112', maxMin: 120 },
+    { id: 'bg-zelena', name: 'Zelena zona', color: '#16a34a', sms: '9113', maxMin: 180 },
+    { id: 'bg-plava', name: 'Plava zona', color: '#2563eb', sms: '9114', maxMin: 120 }, GARAZA] },
+  novisad: { name: 'Novi Sad', hours: { wd: [7, 21], sat: [7, 14] }, zones: [
+    { id: 'ns-ekstra', name: 'Ekstra zona', color: '#ca8a04', sms: '8210', maxMin: 60 },
+    { id: 'ns-crvena', name: 'Crvena zona', color: '#dc2626', sms: '8211', maxMin: 120 },
+    { id: 'ns-plava', name: 'Plava zona', color: '#2563eb', sms: '8212', maxMin: 0 },
+    { id: 'ns-bela', name: 'Bela zona', color: '#94a3b8', sms: '8218', maxMin: 0 }, GARAZA] },
+};
+const cityZones = (c) => CITIES[c].zones.map((z) => ({ ...z }));
+const DEFAULT_ZONES = CITIES.beograd.zones;
 
 function defaults() {
   return {
@@ -65,13 +75,15 @@ function defaults() {
     lists: [{ id: uid(), name: 'Prodavnica', items: [] }],
     activeList: null,
     history: [],
-    parking: { plate: '', warnMin: 10, zones: DEFAULT_ZONES.map((z) => ({ ...z })), lastZone: 'bg-zelena', lastDur: 60, active: null },
+    parking: { plate: '', warnMin: 10, zones: DEFAULT_ZONES.map((z) => ({ ...z })), lastZone: 'bg-zelena', lastDur: 60, active: null,
+      city: 'beograd', hours: { ...CITIES.beograd.hours }, spots: [], auto: false },
     fired: {},
   };
 }
 let S;
 try { S = Object.assign(defaults(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { S = defaults(); }
 if (!S.lists.length) S.lists = defaults().lists;
+S.parking = Object.assign({ city: 'beograd', hours: { ...CITIES.beograd.hours }, spots: [], auto: false }, S.parking);
 for (const l of S.lists) for (const i of l.items) if (typeof i.qty === 'string') { // stara verzija: količina kao tekst
   const m = i.qty.match(/(\d+(?:[.,]\d+)?)\s*(kg|g|l|ml|kom|pak)?/i);
   i.qty = m ? parseFloat(m[1].replace(',', '.')) : null; i.unit = m && m[2] ? m[2].toLowerCase() : 'kom';
@@ -507,9 +519,50 @@ function listMenu() {
 let parkTimer = null;
 const zoneById = (id) => S.parking.zones.find((z) => z.id === id);
 
+// ---- prepoznavanje zone po zapamćenim mestima
+let detect = { at: 0, spot: null, dist: 0 };
+function distM(a, b) {
+  const R = 6371000, toR = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * toR, dLng = (b.lng - a.lng) * toR;
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * toR) * Math.cos(b.lat * toR) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(x));
+}
+function nearestSpot(loc, maxM) {
+  let best = null, bd = Infinity;
+  for (const sp of S.parking.spots) { const d = distM(loc, sp); if (d < bd) { bd = d; best = sp; } }
+  return best && bd <= maxM ? { spot: best, dist: Math.round(bd) } : null;
+}
+async function detectZone() {
+  detect.at = Date.now();
+  if (!S.parking.spots.length) return;
+  const loc = await getLocation(); if (!loc) return;
+  const n = nearestSpot(loc, 150);
+  detect.spot = n ? n.spot : null; detect.dist = n ? n.dist : 0;
+  if (n && zoneById(n.spot.zone)) { S.parking.lastZone = n.spot.zone; if (tab === 'parking' && !S.parking.active) render(); }
+}
+function learnSpot(loc, zoneId) {
+  if (zoneId === 'garaza') return;
+  const n = nearestSpot(loc, 80);
+  if (n) Object.assign(n.spot, { zone: zoneId, lat: (n.spot.lat + loc.lat) / 2, lng: (n.spot.lng + loc.lng) / 2 });
+  else S.parking.spots.push({ id: uid(), lat: loc.lat, lng: loc.lng, zone: zoneId });
+  save(false); pushGeofences();
+}
+async function pushGeofences() {
+  if (!Geo) return;
+  const P = S.parking;
+  try {
+    await Geo.configure({
+      enabled: !!P.auto, plate: P.plate || '', dwellMin: 3,
+      hours: { wd: P.hours.wd, sat: P.hours.sat },
+      spots: P.spots.map((sp) => { const z = zoneById(sp.zone) || {}; return { id: sp.id, lat: sp.lat, lng: sp.lng, radius: 100, zone: z.name || 'Parking', sms: z.sms || '' }; }),
+    });
+  } catch (e) { console.warn('geo', e); }
+}
+
 function renderParking() {
   const P = S.parking, A = P.active;
   clearInterval(parkTimer);
+  if (!A && Date.now() - detect.at > 30e3) detectZone();
   if (A) {
     const z = zoneById(A.zone) || { name: A.zoneName || 'Parking', color: '#64748b', sms: A.sms };
     const update = () => {
@@ -539,8 +592,9 @@ function renderParking() {
   const durs = [15, 30, 60, 90, 120, 180, 240];
   $('#view').innerHTML = notifBanner() + `<div class="card block">
       <label class="field" style="margin-top:0">Registarska oznaka
-        <input class="input plate" id="pPlate" value="${esc(P.plate)}" placeholder="BG123AB" autocapitalize="characters"></label>
+        <input class="input plate" id="pPlate" value="${esc(P.plate)}" placeholder="${P.city === 'novisad' ? 'NS123AB' : 'BG123AB'}" autocapitalize="characters"></label>
       <div class="field">Zona</div>
+      ${detect.spot && detect.spot.zone === zone.id ? `<div class="banner" style="margin:6px 0 0"><span>📍 Prepoznata zona: <b>${esc(zone.name)}</b> (zapamćeno mesto, ${detect.dist} m od tebe)</span></div>` : ''}
       <div class="zones" id="pZones">${P.zones.map((z) => `<button class="zone-btn ${z.id === zone.id ? 'on' : ''}" data-zone="${z.id}">
           <span class="dot" style="background:${esc(z.color)}"></span>${esc(z.name)}
           <small>${z.sms ? 'SMS ' + esc(z.sms) : 'bez SMS-a'}${z.maxMin ? ' · max ' + fmtDur(z.maxMin * MIN) : ''}</small></button>`).join('')}</div>
@@ -551,7 +605,7 @@ function renderParking() {
       <label class="switch"><input type="checkbox" id="pLoc" checked> Zapamti gde sam parkirao</label>
       <button class="btn primary block" style="margin-top:16px" data-act="park-start">🅿️ Parkirao sam</button>
     </div>
-    <p style="font-size:13px;color:var(--muted)">SMS brojevi su podešeni za Beograd – proveri broj na tabli zone. Zone menjaš u Podešavanjima.</p>`;
+    <p style="font-size:13px;color:var(--muted)">Zone: ${esc(CITIES[P.city] ? CITIES[P.city].name : '')} – proveri SMS broj na tabli zone. Kad platiš ovde sa uključenom lokacijom, aplikacija zapamti zonu za ovo mesto i sledeći put je sama prepozna${P.auto ? ' i podseti te da platiš' : ''}. Grad i automatski podsetnik menjaš u Podešavanjima.</p>`;
   $('#pZones').addEventListener('click', (e) => {
     const b = e.target.closest('[data-zone]'); if (!b) return;
     P.lastZone = b.dataset.zone; const z = zoneById(P.lastZone);
@@ -580,7 +634,7 @@ async function startParking() {
   render();
   if (wantLoc) {
     const loc = await getLocation();
-    if (loc && S.parking.active) { Object.assign(S.parking.active, loc); save(false); render(); }
+    if (loc && S.parking.active) { Object.assign(S.parking.active, loc); learnSpot(loc, z.id); render(); }
     else if (!loc) toast('Lokacija nije dostupna');
   }
 }
@@ -622,7 +676,26 @@ function renderSettings() {
         <input class="input" data-f="maxMin" value="${z.maxMin || ''}" inputmode="numeric" placeholder="∞">
         <button class="iconbtn" data-act="zone-del">✕</button></div>`).join('')}</div>
       <div class="row" style="margin-top:10px"><button class="btn small" data-act="zone-add">+ Dodaj zonu</button>
-        <button class="btn small" data-act="zone-save">Sačuvaj zone</button><button class="btn small" data-act="zone-reset">Vrati Beograd</button></div>
+        <button class="btn small" data-act="zone-save">Sačuvaj zone</button></div>
+      <label class="field">Grad (postavlja zone i SMS brojeve)
+        <select class="input" id="sCity">${Object.entries(CITIES).map(([k, c]) => `<option value="${k}" ${k === P.city ? 'selected' : ''}>${c.name}</option>`).join('')}</select></label>
+      <div class="two">
+        <label class="field">Naplata radnim danima<input class="input" id="sHwd" value="${P.hours.wd ? P.hours.wd.join('-') : ''}" placeholder="7-21"></label>
+        <label class="field">Subotom<input class="input" id="sHsat" value="${P.hours.sat ? P.hours.sat.join('-') : ''}" placeholder="7-14"></label>
+      </div>
+    </div>
+
+    <h2>Podsetnik da platiš parking</h2>
+    <div class="card">
+      <label class="switch" style="margin-top:0"><input type="checkbox" id="sAuto" ${P.auto ? 'checked' : ''} ${IS_NATIVE ? '' : 'disabled'}> Kad parkiram na zapamćenom mestu, podseti me da platim</label>
+      <p>Mesto se zapamti kad platiš parking u aplikaciji sa uključenom lokacijom. Kad se sledeći put zadržiš tamo ~3 minuta u vreme naplate, stiže obaveštenje sa dugmetom za SMS – i kad je aplikacija zatvorena.</p>
+      ${IS_NATIVE ? '<p id="geoStatus">Proveravam…</p>' : '<p>⚠️ Radi samo u Android aplikaciji.</p>'}
+      <p>📍 Zapamćena mesta: <b>${P.spots.length}</b></p>
+      ${P.spots.map((sp) => { const z = zoneById(sp.zone); return `<div class="row" data-spot="${sp.id}" style="font-size:14px;margin-top:4px">
+        <span class="dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${esc(z ? z.color : '#64748b')}"></span>
+        <span class="grow">${esc(z ? z.name : '?')} · ${sp.lat.toFixed(4)}, ${sp.lng.toFixed(4)}</span>
+        <button class="iconbtn" data-act="spot-map" title="Mapa">🗺️</button><button class="iconbtn" data-act="spot-test" title="Probaj">🔔</button><button class="iconbtn" data-act="spot-del">✕</button></div>`; }).join('')}
+      <div class="row" style="margin-top:8px"><button class="btn small" data-act="spot-here">📍 Zapamti ovo mesto</button></div>
     </div>
 
     <h2>Instalacija i deljenje</h2>
@@ -643,6 +716,7 @@ function renderSettings() {
     <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:24px">Moj Asistent · ${IS_NATIVE ? 'Android' : 'web'} verzija${BUILD.startsWith('__') ? '' : ' · proba ' + BUILD}</p>
   </div>`;
   notifStatus().then((s) => { const el = $('#nStatus'); if (el) el.innerHTML = s; });
+  if (Geo) geoStatus().then((s) => { const el = $('#geoStatus'); if (el) el.innerHTML = s; });
   $('#importFile').addEventListener('change', importData);
 }
 
@@ -702,6 +776,7 @@ $('#view').addEventListener('click', async (e) => {
     case 'perm': await ensurePermission(true); return render();
     case 'test': return testNotification();
     case 'battery': await Battery.request(); return;
+    case 'geo-perm': await toggleAuto(true); return;
     case 'exact': try { await LN.changeExactNotificationSetting(); } catch { /* */ } scheduleSync(); return render();
     case 'zone-add': S.parking.zones.push({ id: uid(), name: 'Nova zona', color: '#7c3aed', sms: '', maxMin: 0 }); save(false); return render();
     case 'zone-del': S.parking.zones = S.parking.zones.filter((z) => z.id !== el.closest('[data-z]').dataset.z);
@@ -715,7 +790,10 @@ $('#view').addEventListener('click', async (e) => {
       });
       S.parking.warnMin = Math.min(60, Math.max(1, +$('#sWarn').value || 10));
       save(); toast('Sačuvano'); return render();
-    case 'zone-reset': if (confirm('Vratiti zone za Beograd?')) { S.parking.zones = DEFAULT_ZONES.map((z) => ({ ...z })); save(false); render(); } return;
+    case 'spot-del': S.parking.spots = S.parking.spots.filter((x) => x.id !== el.closest('[data-spot]').dataset.spot); save(false); pushGeofences(); return render();
+    case 'spot-map': { const sp = S.parking.spots.find((x) => x.id === el.closest('[data-spot]').dataset.spot); return openExternal(`https://www.google.com/maps/search/?api=1&query=${sp.lat},${sp.lng}`); }
+    case 'spot-test': if (Geo) { await pushGeofences(); await Geo.testDwell({ id: el.closest('[data-spot]').dataset.spot }); toast('Probni podsetnik je poslat'); } return;
+    case 'spot-here': return rememberHere();
     case 'apk': return openExternal(APK_URL);
     case 'share-app': {
       const text = `Moj Asistent – podsetnici, kupovina i parking.\nAndroid aplikacija: ${APK_URL}\nWeb (iPhone/računar): ${WEB_URL}`;
@@ -729,7 +807,20 @@ $('#view').addEventListener('click', async (e) => {
 });
 document.addEventListener('change', (e) => {
   if (e.target.id === 'sWarn') { S.parking.warnMin = Math.min(60, Math.max(1, +e.target.value || 10)); save(); }
-  if (e.target.id === 'pPlate') { S.parking.plate = e.target.value.trim().toUpperCase().replace(/[\s-]/g, ''); save(false); }
+  if (e.target.id === 'pPlate') { S.parking.plate = e.target.value.trim().toUpperCase().replace(/[\s-]/g, ''); save(false); pushGeofences(); }
+  if (e.target.id === 'sCity') {
+    const c = e.target.value;
+    if (!confirm(`Postaviti zone za ${CITIES[c].name}? Tvoje izmene zona biće zamenjene.`)) { e.target.value = S.parking.city; return; }
+    S.parking.city = c; S.parking.zones = cityZones(c); S.parking.hours = { ...CITIES[c].hours };
+    S.parking.lastZone = S.parking.zones[1] ? S.parking.zones[1].id : S.parking.zones[0].id;
+    save(false); pushGeofences(); render(); toast('Zone: ' + CITIES[c].name);
+  }
+  if (e.target.id === 'sHwd' || e.target.id === 'sHsat') {
+    const parse = (v) => { const m = v.match(/(\d{1,2})\D+(\d{1,2})/); return m ? [+m[1], +m[2]] : null; };
+    S.parking.hours = { wd: parse($('#sHwd').value), sat: parse($('#sHsat').value) };
+    save(false); pushGeofences();
+  }
+  if (e.target.id === 'sAuto') toggleAuto(e.target.checked);
 });
 
 // ================================================================ OBAVEŠTENJA
@@ -782,6 +873,7 @@ async function exactAllowed() {
 
 async function syncNotifications() {
   if (!IS_NATIVE) return; // web: proverava webTick
+  try { await Geo.setActiveUntil({ until: S.parking.active ? S.parking.active.end : 0 }); } catch { /* */ }
   try {
     const perm = await LN.checkPermissions();
     if (perm.display !== 'granted') { diag.lastError = 'Nema dozvole za obaveštenja'; return; }
@@ -899,6 +991,37 @@ function webTick() { // web verzija: proveri da li je nešto dospelo
   if (changed) { save(false); if (tab === 'podsetnici') render(); }
 }
 
+// ================================================================ automatski parking podsetnik
+async function toggleAuto(on) {
+  if (!Geo) return;
+  if (on) {
+    toast('Dozvoli lokaciju, pa izaberi „Dozvoli uvek“', 5000);
+    const r = await Geo.requestLocation().catch(() => ({}));
+    if (!r.location) { toast('Bez dozvole za lokaciju ne mogu da prepoznam mesto'); S.parking.auto = false; save(false); return render(); }
+    if (!r.background) toast('Izaberi „Dozvoli uvek“ za lokaciju, inače podsetnik radi samo dok je aplikacija otvorena', 6000);
+  }
+  S.parking.auto = on; save(false); await pushGeofences(); render();
+}
+async function geoStatus() {
+  const ok = '<span class="status-ok">✔︎</span>', bad = '<span class="status-bad">✖</span>';
+  try {
+    const st = await Geo.status();
+    const lines = [st.location ? `${ok} Lokacija dozvoljena` : `${bad} Lokacija nije dozvoljena`,
+      st.background ? `${ok} Lokacija „uvek“ (i kad je aplikacija zatvorena)` : `${bad} Lokacija nije „Dozvoli uvek“ <button class="btn small" data-act="geo-perm">Dozvoli</button>`];
+    if (st.lastRegister && st.lastRegister.startsWith('error')) lines.push(`${bad} ${esc(st.lastRegister)}`);
+    return lines.join('<br>');
+  } catch (e) { return `${bad} ${esc(e.message)}`; }
+}
+async function rememberHere() {
+  const loc = await getLocation();
+  if (!loc) return toast('Lokacija nije dostupna – uključi lokaciju');
+  const zoneId = prompt(`Koja zona je ovde?\n${S.parking.zones.filter((x) => x.id !== 'garaza').map((x, i) => `${i + 1} = ${x.name}`).join('\n')}`, '1');
+  const list = S.parking.zones.filter((x) => x.id !== 'garaza');
+  const pick = list[(+zoneId || 0) - 1];
+  if (!pick) return;
+  learnSpot(loc, pick.id); render(); toast('Zapamćeno: ' + pick.name);
+}
+
 // ================================================================ start
 async function initNative() {
   try {
@@ -911,6 +1034,7 @@ async function initNative() {
     if (p.display === 'prompt' || p.display === 'prompt-with-rationale') await ensurePermission();
   } catch (e) { console.warn('init', e); }
   syncNotifications();
+  pushGeofences();
 }
 
 if (IS_NATIVE) initNative();

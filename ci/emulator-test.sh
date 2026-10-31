@@ -4,6 +4,9 @@ set -x
 PKG=com.fianketo.mojasistent
 adb install -r moj-asistent-debug.apk
 adb shell pm grant $PKG android.permission.POST_NOTIFICATIONS || true
+adb shell pm grant $PKG android.permission.ACCESS_FINE_LOCATION || true
+adb shell pm grant $PKG android.permission.ACCESS_BACKGROUND_LOCATION || true
+adb emu geo fix 19.8451 45.2551 || true
 adb logcat -c
 adb shell am start -n $PKG/.MainActivity
 sleep 20
@@ -14,10 +17,13 @@ curl -s localhost:9222/json || true
 node ci/probe.js || echo "PROBE FAILED"
 sleep 15
 echo "===== POSTED ====="
-adb shell dumpsys notification --noredact | grep -iE "NotificationRecord.*mojasistent|android.title=" | head -30
+adb shell dumpsys notification --noredact | grep -iE "NotificationRecord.*mojasistent|android.title=" | head -40
 echo "===== LOGCAT ====="
 adb logcat -d | grep -iE "Capacitor|chromium|LocalNotif|$PKG|AndroidRuntime" | tail -150
 echo "===== NOTIFICATIONS ====="
 adb shell dumpsys notification --noredact | grep -iE -A4 "pkg=$PKG|$PKG" | head -80
+echo "===== GEOFENCES ====="
+adb shell dumpsys activity service com.google.android.gms/.chimera.GmsIntentOperationService 2>/dev/null | grep -i -A3 geofence | head -20
+adb shell dumpsys location | grep -i -B2 -A6 "geofence" | head -40
 echo "===== ALARMS ====="
 adb shell dumpsys alarm | grep -iE -B2 -A3 "$PKG" | head -60
