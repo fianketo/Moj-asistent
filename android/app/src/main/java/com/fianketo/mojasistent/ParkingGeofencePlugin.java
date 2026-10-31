@@ -18,6 +18,10 @@ import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
+import com.google.android.gms.location.ActivityRecognition;
+import com.google.android.gms.location.ActivityTransition;
+import com.google.android.gms.location.ActivityTransitionRequest;
+import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
@@ -35,7 +39,8 @@ import org.json.JSONObject;
     name = "ParkingGeofence",
     permissions = {
         @Permission(alias = "location", strings = { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }),
-        @Permission(alias = "background", strings = { Manifest.permission.ACCESS_BACKGROUND_LOCATION })
+        @Permission(alias = "background", strings = { Manifest.permission.ACCESS_BACKGROUND_LOCATION }),
+        @Permission(alias = "activity", strings = { Manifest.permission.ACTIVITY_RECOGNITION })
     }
 )
 public class ParkingGeofencePlugin extends Plugin {
@@ -51,6 +56,39 @@ public class ParkingGeofencePlugin extends Plugin {
         int flags = PendingIntent.FLAG_UPDATE_CURRENT;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) flags |= PendingIntent.FLAG_MUTABLE;
         return PendingIntent.getBroadcast(ctx, 4711, i, flags);
+    }
+
+    static PendingIntent activityIntent(Context ctx) {
+        Intent i = new Intent(ctx, GeofenceReceiver.class);
+        i.setAction(GeofenceReceiver.ACTION_ACTIVITY);
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) flags |= PendingIntent.FLAG_MUTABLE;
+        return PendingIntent.getBroadcast(ctx, 4712, i, flags);
+    }
+
+    static boolean hasActivity(Context ctx) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return true;
+        return ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    /** Prati izlazak iz vozila – tada se proverava da li si parkirao u zoni naplate. */
+    @SuppressLint("MissingPermission")
+    static String registerActivity(Context ctx) {
+        try {
+            ActivityRecognition.getClient(ctx).removeActivityTransitionUpdates(activityIntent(ctx));
+            SharedPreferences p = prefs(ctx);
+            if (!p.getBoolean("enabled", false)) return "disabled";
+            if (!hasActivity(ctx)) return "no_activity_permission";
+            List<ActivityTransition> t = new ArrayList<>();
+            t.add(new ActivityTransition.Builder().setActivityType(DetectedActivity.IN_VEHICLE).setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER).build());
+            t.add(new ActivityTransition.Builder().setActivityType(DetectedActivity.IN_VEHICLE).setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT).build());
+            ActivityRecognition.getClient(ctx).requestActivityTransitionUpdates(new ActivityTransitionRequest(t), activityIntent(ctx))
+                .addOnSuccessListener(v -> p.edit().putString("lastActivityRegister", "ok:" + System.currentTimeMillis()).apply())
+                .addOnFailureListener(e -> p.edit().putString("lastActivityRegister", "error:" + e.getMessage()).apply());
+            return "ok";
+        } catch (Exception e) {
+            return "error:" + e.getMessage();
+        }
     }
 
     static boolean hasFine(Context ctx) {
@@ -110,9 +148,12 @@ public class ParkingGeofencePlugin extends Plugin {
         JSObject hours = call.getObject("hours", new JSObject());
         e.putString("hours", hours.toString());
         e.putInt("dwellMs", (int) Math.round(call.getDouble("dwellMin", 3.0) * 60000));
+        e.putString("city", call.getString("city", ""));
+        e.putString("cityZones", call.getObject("cityZones", new JSObject()).toString());
         e.apply();
         JSObject ret = new JSObject();
         ret.put("result", register(getContext()));
+        ret.put("activity", registerActivity(getContext()));
         call.resolve(ret);
     }
 
@@ -135,10 +176,31 @@ public class ParkingGeofencePlugin extends Plugin {
         call.resolve();
     }
 
+    /** Probno: ponaša se kao da si upravo izašao iz auta (ignoriše radno vreme i pauzu). */
+    @PluginMethod
+    public void testVehicleExit(PluginCall call) {
+        prefs(getContext()).edit().putLong("lastAutoNotify", 0).apply();
+        Intent i = new Intent(getContext(), GeofenceReceiver.class);
+        i.setAction(GeofenceReceiver.ACTION_TEST_EXIT);
+        getContext().sendBroadcast(i);
+        call.resolve();
+    }
+
+    /** Zona naplate na datoj lokaciji (katastar Novog Sada). */
+    @PluginMethod
+    public void zoneAt(PluginCall call) {
+        ZoneLookup.Hit h = ZoneLookup.find(getContext(), call.getDouble("lat", 0.0), call.getDouble("lng", 0.0), call.getDouble("maxM", 30.0));
+        JSObject r = new JSObject();
+        if (h != null) { r.put("zone", h.zoneKey); r.put("code", h.code); r.put("text", h.text); r.put("dist", h.dist); }
+        call.resolve(r);
+    }
+
     @PluginMethod
     public void status(PluginCall call) {
         SharedPreferences p = prefs(getContext());
         JSObject ret = new JSObject();
+        ret.put("activity", hasActivity(getContext()));
+        ret.put("lastActivityRegister", p.getString("lastActivityRegister", ""));
         ret.put("location", hasFine(getContext()));
         ret.put("background", hasBackground(getContext()));
         ret.put("enabled", p.getBoolean("enabled", false));
@@ -179,10 +241,17 @@ public class ParkingGeofencePlugin extends Plugin {
 
     @PermissionCallback
     private void afterBackground(PluginCall call) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && getPermissionState("activity") != PermissionState.GRANTED && !call.getBoolean("activityAsked", false)) {
+            call.getData().put("activityAsked", true);
+            requestPermissionForAlias("activity", call, "afterBackground");
+            return;
+        }
         register(getContext());
+        registerActivity(getContext());
         JSObject r = new JSObject();
         r.put("location", hasFine(getContext()));
         r.put("background", hasBackground(getContext()));
+        r.put("activity", hasActivity(getContext()));
         call.resolve(r);
     }
 }

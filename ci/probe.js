@@ -32,5 +32,9 @@
   await ev('GEO_TEST', `Geo.testDwell({ id: 'cispot' }).then(() => 'sent')`);
   await new Promise((r) => setTimeout(r, 2000));
   await ev('GEO_STATUS2', `Geo.status()`);
+  await ev('NS_CONFIG', `(async () => { S.parking.city = 'novisad'; S.parking.zones = cityZones('novisad'); S.parking.hours = { ...CITIES.novisad.hours }; save(false); await pushGeofences(); return Geo.zoneAt({ lat: 45.262349, lng: 19.831626 }); })()`);
+  await ev('NS_EXIT', `Geo.testVehicleExit().then(() => 'sent')`);
+  await new Promise((r) => setTimeout(r, 12000));
+  await ev('NS_STATUS', `Geo.status()`);
   ws.close();
 })().catch((e) => { console.log('PROBE ERROR', e.message); process.exit(1); });

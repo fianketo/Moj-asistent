@@ -28,6 +28,8 @@ jobs:
             curl -sSL -A "Mozilla/5.0" -m 60 "https://parkingns.rs/parkiralista/$z/" -o "data/novisad/$z.html" || true
           done
           curl -sSL -A "Mozilla/5.0" -m 60 "https://parkingns.rs/parkiralista/" -o data/novisad/parkiralista.html || true
+          curl -sSL -A "Mozilla/5.0" -m 60 "https://parkingns.rs/nacini-placanja/sms/" -o data/novisad/sms.html || true
+          curl -sSL -A "Mozilla/5.0" -m 60 "https://parkingns.rs/parkiralista/dnevna-karta/" -o data/novisad/dnevna-karta.html || true
           ls -la data/novisad
       - name: Sačuvaj u granu
         run: |

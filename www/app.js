@@ -60,11 +60,12 @@ const CITIES = {
     { id: 'bg-zuta', name: 'Žuta zona', color: '#eab308', sms: '9112', maxMin: 120 },
     { id: 'bg-zelena', name: 'Zelena zona', color: '#16a34a', sms: '9113', maxMin: 180 },
     { id: 'bg-plava', name: 'Plava zona', color: '#2563eb', sms: '9114', maxMin: 120 }, GARAZA] },
+  // Cene i vreme naplate: parkingns.rs (2026). Zone po ulicama: www/zones-ns.json (katastar 26.06.2026).
   novisad: { name: 'Novi Sad', hours: { wd: [7, 21], sat: [7, 14] }, zones: [
-    { id: 'ns-ekstra', name: 'Ekstra zona', color: '#ca8a04', sms: '8210', maxMin: 60 },
-    { id: 'ns-crvena', name: 'Crvena zona', color: '#dc2626', sms: '8211', maxMin: 120 },
-    { id: 'ns-plava', name: 'Plava zona', color: '#2563eb', sms: '8212', maxMin: 0 },
-    { id: 'ns-bela', name: 'Bela zona', color: '#94a3b8', sms: '8218', maxMin: 0 }, GARAZA] },
+    { id: 'ns-ekstra', name: 'Ekstra zona', color: '#a16207', sms: '8210', maxMin: 60, price: 100 },
+    { id: 'ns-crvena', name: 'Crvena zona', color: '#dc2626', sms: '8211', maxMin: 120, price: 60 },
+    { id: 'ns-plava', name: 'Plava zona', color: '#2563eb', sms: '8212', maxMin: 0, price: 50 },
+    { id: 'ns-bela', name: 'Bela zona', color: '#94a3b8', sms: '8218', maxMin: 0, price: 30 }, GARAZA] },
 };
 const cityZones = (c) => CITIES[c].zones.map((z) => ({ ...z }));
 const DEFAULT_ZONES = CITIES.beograd.zones;
@@ -84,6 +85,7 @@ let S;
 try { S = Object.assign(defaults(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { S = defaults(); }
 if (!S.lists.length) S.lists = defaults().lists;
 S.parking = Object.assign({ city: 'beograd', hours: { ...CITIES.beograd.hours }, spots: [], auto: false }, S.parking);
+for (const z of S.parking.zones) { const pz = Object.values(CITIES).flatMap((c) => c.zones).find((x) => x.id === z.id); if (pz && pz.price && !z.price) z.price = pz.price; }
 for (const l of S.lists) for (const i of l.items) if (typeof i.qty === 'string') { // stara verzija: količina kao tekst
   const m = i.qty.match(/(\d+(?:[.,]\d+)?)\s*(kg|g|l|ml|kom|pak)?/i);
   i.qty = m ? parseFloat(m[1].replace(',', '.')) : null; i.unit = m && m[2] ? m[2].toLowerCase() : 'kom';
@@ -532,13 +534,47 @@ function nearestSpot(loc, maxM) {
   for (const sp of S.parking.spots) { const d = distM(loc, sp); if (d < bd) { bd = d; best = sp; } }
   return best && bd <= maxM ? { spot: best, dist: Math.round(bd) } : null;
 }
+// Katastar Parking servisa Novi Sad: tačke duž svih parkirališta sa zonom i šifrom.
+let nsData = null;
+async function loadNs() {
+  if (nsData) return nsData;
+  try {
+    const d = await (await fetch('zones-ns.json')).json();
+    const n = d.pts.length / 4, lat = new Float64Array(n), lng = new Float64Array(n);
+    for (let i = 0; i < n; i++) { lat[i] = d.base[0] + d.pts[i * 4] * d.scale; lng[i] = d.base[1] + d.pts[i * 4 + 1] * d.scale; }
+    nsData = { ...d, lat, lng, n };
+  } catch (e) { console.warn('zones-ns', e); }
+  return nsData;
+}
+async function nsZoneAt(loc, maxM = 30) {
+  const d = await loadNs(); if (!d) return null;
+  const kx = Math.cos(loc.lat * Math.PI / 180) * 111320, ky = 110574;
+  let best = maxM * maxM, bi = -1;
+  for (let i = 0; i < d.n; i++) {
+    const dy = (d.lat[i] - loc.lat) * ky; if (Math.abs(dy) > maxM) continue;
+    const dx = (d.lng[i] - loc.lng) * kx, dd = dx * dx + dy * dy;
+    if (dd < best) { best = dd; bi = i; }
+  }
+  if (bi < 0) return null;
+  const ci = d.pts[bi * 4 + 3];
+  return { zone: d.zones[d.pts[bi * 4 + 2]], code: ci >= 0 ? d.codes[ci][0] : '', text: ci >= 0 ? d.codes[ci][1] : '', dist: Math.round(Math.sqrt(best)) };
+}
 async function detectZone() {
   detect.at = Date.now();
-  if (!S.parking.spots.length) return;
+  const P = S.parking;
+  if (!P.spots.length && P.city !== 'novisad') return;
   const loc = await getLocation(); if (!loc) return;
-  const n = nearestSpot(loc, 150);
-  detect.spot = n ? n.spot : null; detect.dist = n ? n.dist : 0;
-  if (n && zoneById(n.spot.zone)) { S.parking.lastZone = n.spot.zone; if (tab === 'parking' && !S.parking.active) render(); }
+  detect = { at: Date.now(), spot: null, dist: 0, ns: null, none: false };
+  if (P.city === 'novisad') {
+    const h = await nsZoneAt(loc);
+    if (h && zoneById('ns-' + h.zone)) { detect.ns = h; P.lastZone = 'ns-' + h.zone; }
+    else detect.none = true;
+  }
+  if (!detect.ns) {
+    const n = nearestSpot(loc, 150);
+    if (n && zoneById(n.spot.zone)) { detect.spot = n.spot; detect.dist = n.dist; P.lastZone = n.spot.zone; detect.none = false; }
+  }
+  if (tab === 'parking' && !P.active) render();
 }
 function learnSpot(loc, zoneId) {
   if (zoneId === 'garaza') return;
@@ -552,7 +588,8 @@ async function pushGeofences() {
   const P = S.parking;
   try {
     await Geo.configure({
-      enabled: !!P.auto, plate: P.plate || '', dwellMin: 3,
+      enabled: !!P.auto, plate: P.plate || '', dwellMin: 3, city: P.city,
+      cityZones: Object.fromEntries(P.zones.filter((z) => z.id.startsWith('ns-')).map((z) => [z.id.slice(3), { name: z.name, sms: z.sms }])),
       hours: { wd: P.hours.wd, sat: P.hours.sat },
       spots: P.spots.map((sp) => { const z = zoneById(sp.zone) || {}; return { id: sp.id, lat: sp.lat, lng: sp.lng, radius: 100, zone: z.name || 'Parking', sms: z.sms || '' }; }),
     });
@@ -594,10 +631,12 @@ function renderParking() {
       <label class="field" style="margin-top:0">Registarska oznaka
         <input class="input plate" id="pPlate" value="${esc(P.plate)}" placeholder="${P.city === 'novisad' ? 'NS123AB' : 'BG123AB'}" autocapitalize="characters"></label>
       <div class="field">Zona</div>
-      ${detect.spot && detect.spot.zone === zone.id ? `<div class="banner" style="margin:6px 0 0"><span>📍 Prepoznata zona: <b>${esc(zone.name)}</b> (zapamćeno mesto, ${detect.dist} m od tebe)</span></div>` : ''}
+      ${detect.ns && 'ns-' + detect.ns.zone === zone.id ? `<div class="banner" style="margin:6px 0 0"><span>📍 Ovde je <b>${esc(zone.name)}</b>${detect.ns.code ? ` – parkiralište ${esc(detect.ns.code)}${detect.ns.text ? ' (' + esc(detect.ns.text) + ')' : ''}` : ''}</span></div>`
+        : detect.spot && detect.spot.zone === zone.id ? `<div class="banner" style="margin:6px 0 0"><span>📍 Prepoznata zona: <b>${esc(zone.name)}</b> (zapamćeno mesto, ${detect.dist} m od tebe)</span></div>`
+        : detect.none ? `<div class="banner" style="margin:6px 0 0"><span>📍 Ovde nema naplate parkinga (po mapi Parking servisa) – ili izaberi zonu ručno.</span></div>` : ''}
       <div class="zones" id="pZones">${P.zones.map((z) => `<button class="zone-btn ${z.id === zone.id ? 'on' : ''}" data-zone="${z.id}">
           <span class="dot" style="background:${esc(z.color)}"></span>${esc(z.name)}
-          <small>${z.sms ? 'SMS ' + esc(z.sms) : 'bez SMS-a'}${z.maxMin ? ' · max ' + fmtDur(z.maxMin * MIN) : ''}</small></button>`).join('')}</div>
+          <small>${z.sms ? 'SMS ' + esc(z.sms) : 'bez SMS-a'}${z.maxMin ? ' · max ' + fmtDur(z.maxMin * MIN) : ''}${z.price ? ' · ' + z.price + ' din/h' : ''}</small></button>`).join('')}</div>
       <label class="field">Koliko ostaješ?
         <select class="input" id="pDur">${durs.map((m) => `<option value="${m}" ${m === P.lastDur ? 'selected' : ''}>${fmtDur(m * MIN)}</option>`).join('')}</select></label>
       <label class="field">Napomena (sprat, ulica…)<input class="input" id="pNote" placeholder="(nije obavezno)"></label>
@@ -687,8 +726,12 @@ function renderSettings() {
 
     <h2>Podsetnik da platiš parking</h2>
     <div class="card">
-      <label class="switch" style="margin-top:0"><input type="checkbox" id="sAuto" ${P.auto ? 'checked' : ''} ${IS_NATIVE ? '' : 'disabled'}> Kad parkiram na zapamćenom mestu, podseti me da platim</label>
-      <p>Mesto se zapamti kad platiš parking u aplikaciji sa uključenom lokacijom. Kad se sledeći put zadržiš tamo ~3 minuta u vreme naplate, stiže obaveštenje sa dugmetom za SMS – i kad je aplikacija zatvorena.</p>
+      <label class="switch" style="margin-top:0"><input type="checkbox" id="sAuto" ${P.auto ? 'checked' : ''} ${IS_NATIVE ? '' : 'disabled'}> Kad parkiram u zoni naplate, podseti me da platim</label>
+      <p>${P.city === 'novisad'
+        ? 'Novi Sad: kad telefon primeti da si izašao iz auta, proveri lokaciju na mapi zona Parking servisa. Ako si u zoni naplate (radnim danima 7–21, subotom 7–14), stiže obaveštenje sa zonom i dugmetom za SMS – i kad je aplikacija zatvorena.'
+        : 'Mesto se zapamti kad platiš parking u aplikaciji sa uključenom lokacijom. Kad se sledeći put zadržiš tamo ~3 minuta u vreme naplate, stiže obaveštenje sa dugmetom za SMS – i kad je aplikacija zatvorena.'}
+        Potrebno: lokacija „Dozvoli uvek“ i „Fizička aktivnost“.</p>
+      ${IS_NATIVE ? '<div class="row" style="margin-top:6px"><button class="btn small" data-act="geo-test-exit">🔔 Probaj: „upravo sam parkirao ovde“</button></div>' : ''}
       ${IS_NATIVE ? '<p id="geoStatus">Proveravam…</p>' : '<p>⚠️ Radi samo u Android aplikaciji.</p>'}
       <p>📍 Zapamćena mesta: <b>${P.spots.length}</b></p>
       ${P.spots.map((sp) => { const z = zoneById(sp.zone); return `<div class="row" data-spot="${sp.id}" style="font-size:14px;margin-top:4px">
@@ -777,6 +820,7 @@ $('#view').addEventListener('click', async (e) => {
     case 'test': return testNotification();
     case 'battery': await Battery.request(); return;
     case 'geo-perm': await toggleAuto(true); return;
+    case 'geo-test-exit': if (Geo) { if (!S.parking.auto) return toast('Prvo uključi podsetnik iznad'); await pushGeofences(); await Geo.testVehicleExit(); toast('Proveravam lokaciju… obaveštenje stiže ako si u zoni'); setTimeout(render, 6000); } return;
     case 'exact': try { await LN.changeExactNotificationSetting(); } catch { /* */ } scheduleSync(); return render();
     case 'zone-add': S.parking.zones.push({ id: uid(), name: 'Nova zona', color: '#7c3aed', sms: '', maxMin: 0 }); save(false); return render();
     case 'zone-del': S.parking.zones = S.parking.zones.filter((z) => z.id !== el.closest('[data-z]').dataset.z);
@@ -998,7 +1042,8 @@ async function toggleAuto(on) {
     toast('Dozvoli lokaciju, pa izaberi „Dozvoli uvek“', 5000);
     const r = await Geo.requestLocation().catch(() => ({}));
     if (!r.location) { toast('Bez dozvole za lokaciju ne mogu da prepoznam mesto'); S.parking.auto = false; save(false); return render(); }
-    if (!r.background) toast('Izaberi „Dozvoli uvek“ za lokaciju, inače podsetnik radi samo dok je aplikacija otvorena', 6000);
+    if (!r.background) toast('Izaberi „Dozvoli uvek“ za lokaciju, inače podsetnik ne radi kad je aplikacija zatvorena', 6000);
+    else if (r.activity === false) toast('Dozvoli „Fizička aktivnost“ da bi aplikacija znala kad si izašao iz auta', 6000);
   }
   S.parking.auto = on; save(false); await pushGeofences(); render();
 }
@@ -1007,7 +1052,9 @@ async function geoStatus() {
   try {
     const st = await Geo.status();
     const lines = [st.location ? `${ok} Lokacija dozvoljena` : `${bad} Lokacija nije dozvoljena`,
-      st.background ? `${ok} Lokacija „uvek“ (i kad je aplikacija zatvorena)` : `${bad} Lokacija nije „Dozvoli uvek“ <button class="btn small" data-act="geo-perm">Dozvoli</button>`];
+      st.background ? `${ok} Lokacija „uvek“ (i kad je aplikacija zatvorena)` : `${bad} Lokacija nije „Dozvoli uvek“ <button class="btn small" data-act="geo-perm">Dozvoli</button>`,
+      st.activity ? `${ok} Prepoznavanje vožnje (fizička aktivnost)` : `${bad} Nije dozvoljena „Fizička aktivnost“ <button class="btn small" data-act="geo-perm">Dozvoli</button>`];
+    if (st.lastEvent) lines.push(`ℹ️ Poslednji događaj: ${esc(st.lastEvent.replace(/@(\d+)$/, (m, t) => ' · ' + fmtWhen(new Date(+t))))}`);
     if (st.lastRegister && st.lastRegister.startsWith('error')) lines.push(`${bad} ${esc(st.lastRegister)}`);
     return lines.join('<br>');
   } catch (e) { return `${bad} ${esc(e.message)}`; }

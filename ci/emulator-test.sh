@@ -6,7 +6,8 @@ adb install -r moj-asistent-debug.apk
 adb shell pm grant $PKG android.permission.POST_NOTIFICATIONS || true
 adb shell pm grant $PKG android.permission.ACCESS_FINE_LOCATION || true
 adb shell pm grant $PKG android.permission.ACCESS_BACKGROUND_LOCATION || true
-adb emu geo fix 19.8451 45.2551 || true
+adb emu geo fix 19.831626 45.262349 || true
+adb shell pm grant $PKG android.permission.ACTIVITY_RECOGNITION || true
 adb logcat -c
 adb shell am start -n $PKG/.MainActivity
 sleep 20
