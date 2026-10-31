@@ -16,7 +16,7 @@ jobs:
         with: { node-version: 22, cache: npm }
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 21 }
-      - run: npm ci && npm i --no-save playwright@1.49.1
+      - run: npm ci
       - run: npx cap sync android
       - name: Debug APK
         working-directory: android
