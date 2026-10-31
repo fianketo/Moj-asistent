@@ -19,6 +19,10 @@ node ci/probe.js || echo "PROBE FAILED"
 sleep 15
 echo "===== POSTED ====="
 adb shell dumpsys notification --noredact | grep -iE "NotificationRecord.*mojasistent|android.title=" | head -40
+echo "===== DEEP LINK ====="
+adb shell am start -a android.intent.action.VIEW -d "mojasistent://lista?d=WzEsIlBpamFjYSIsW1siUGFyYWRhanoiLDIsImtnIl0sWyJKYWphIiwxMCwia29tIl1dXQ" $PKG
+sleep 4
+node ci/check-import.js || echo "IMPORT CHECK FAILED"
 echo "===== LOGCAT ====="
 adb logcat -d | grep -iE "Capacitor|chromium|LocalNotif|$PKG|AndroidRuntime" | tail -150
 echo "===== NOTIFICATIONS ====="

@@ -10,6 +10,7 @@ const IS_NATIVE = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
 const LN = IS_NATIVE ? Cap.registerPlugin('LocalNotifications') : null;
 const Battery = IS_NATIVE ? Cap.registerPlugin('Battery') : null;
 const Geo = IS_NATIVE ? Cap.registerPlugin('ParkingGeofence') : null;
+const AppP = IS_NATIVE ? Cap.registerPlugin('App') : null;
 const BUILD = '__BUILD__'; // CI upisuje broj verzije
 const APK_URL = 'https://github.com/fianketo/Moj-asistent/releases/latest/download/moj-asistent.apk';
 const WEB_URL = 'https://fianketo.github.io/Moj-asistent/';
@@ -351,7 +352,8 @@ function renderShopping() {
   }
   if (bought.length) html += `<h2>U korpi (${bought.length})</h2>` + bought.map(itemCard).join('');
   html += `<div class="row" style="margin-top:16px">
-      ${L.items.length ? '<button class="btn small" data-act="share">📤 Pošalji listu</button>' : ''}
+      ${L.items.length ? '<button class="btn small primary" data-act="share">📤 Pošalji listu</button>' : ''}
+      <button class="btn small" data-act="paste-import">📥 Primi listu</button>
       ${bought.length ? '<button class="btn small" data-act="clear-bought">Ukloni kupljeno</button>' : ''}
       <button class="btn small" data-act="list-menu">⋯ Lista</button>
     </div>
@@ -374,7 +376,8 @@ function renderShopping() {
     e.preventDefault();
     const v = itemIn.value.trim(); if (!v) return;
     const it = parseItem(v);
-    addToList(it.name, it.qty || getQty(), it.unit || unitIn.value);
+    const cu = catOf(it.name);
+    addToList(it.name, it.qty || getQty(), it.unit || (it.qty && cu ? cu.unit : unitIn.value));
     render();
     $('#itemIn').focus();
   });
@@ -478,11 +481,56 @@ function listText(L) {
   const open = L.items.filter((i) => !i.done);
   return `🛒 ${L.name}\n` + (open.length ? open : L.items).map((i) => `• ${i.name}${i.qty ? ' – ' + fmtQty(i) : ''}`).join('\n');
 }
+
+// ---- deljenje liste linkom (bez servera: cela lista je u linku)
+function b64urlEncode(str) {
+  const bytes = new TextEncoder().encode(str); let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function b64urlDecode(s) {
+  const bin = atob(s.replace(/-/g, '+').replace(/_/g, '/'));
+  return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
+}
+function encodeList(L) {
+  const items = L.items.filter((i) => !i.done);
+  return b64urlEncode(JSON.stringify([1, L.name, (items.length ? items : L.items).map((i) => [i.name, i.qty || 0, i.unit || 'kom'])]));
+}
+function decodeList(d) {
+  const [v, name, items] = JSON.parse(b64urlDecode(d));
+  if (v !== 1 || !Array.isArray(items)) throw new Error('nepoznat format');
+  return { name: String(name || 'Lista'), items: items.map(([n, q, u]) => ({ name: String(n), qty: +q || null, unit: UNITS.includes(u) ? u : 'kom' })) };
+}
+const listLink = (L) => `${WEB_URL}?lista=${encodeList(L)}`;
+function shareText(L) {
+  return `${listText(L)}\n\n📲 Dodaj u Moj Asistent jednim dodirom:\n${listLink(L)}`;
+}
+// Tekst iz poruke → lista (link iz aplikacije ili obične linije „• mleko – 2 l“)
+function parseShared(text) {
+  const m = text.match(/[?&]lista=([A-Za-z0-9_-]+)/) || text.match(/[?&]d=([A-Za-z0-9_-]+)/);
+  if (m) return decodeList(m[1]);
+  let name = 'Lista';
+  const items = [];
+  for (let line of text.split('\n')) {
+    line = line.trim(); if (!line) continue;
+    if (/^🛒/.test(line)) { name = line.replace(/^🛒\s*/, '') || name; continue; }
+    if (/^(📲|https?:)/.test(line)) continue;
+    line = line.replace(/^[•\-*–·\d.)\s]+(?=\D)/, '').trim();
+    const [n, q] = line.split(/\s+[–-]\s+/);
+    if (!n) continue;
+    const it = parseItem(q ? `${q} ${n}` : n);
+    items.push({ name: it.name, qty: it.qty, unit: it.unit || 'kom' });
+  }
+  if (!items.length) throw new Error('nema artikala u tekstu');
+  return { name, items };
+}
+
 async function shareList() {
-  const L = curList(), text = listText(L);
+  const L = curList(), text = shareText(L);
   if (navigator.share && !IS_NATIVE) { try { await navigator.share({ title: L.name, text }); return; } catch (e) { if (e.name === 'AbortError') return; } }
   openSheet(`<h3>Pošalji listu „${esc(L.name)}“</h3>
-    <textarea class="input" readonly style="min-height:140px">${esc(text)}</textarea>
+    <p style="margin:0;color:var(--muted);font-size:13px">Ko ima Moj Asistent, dodirne link u poruci i lista mu se doda u aplikaciju.</p>
+    <textarea class="input" readonly style="min-height:150px">${esc(text)}</textarea>
     <div class="row" style="margin-top:12px">
       <button class="btn" data-to="viber">Viber</button><button class="btn" data-to="wa">WhatsApp</button>
       <button class="btn" data-to="sms">SMS</button><button class="btn" data-to="copy">Kopiraj</button>
@@ -491,23 +539,62 @@ async function shareList() {
       const to = e.target.dataset.to; if (!to) return;
       if (to === 'viber') openExternal('viber://forward?text=' + encodeURIComponent(text));
       if (to === 'wa') openExternal('https://wa.me/?text=' + encodeURIComponent(text));
-      if (to === 'sms') openExternal('sms:?body=' + encodeURIComponent(text));
+      if (to === 'sms') openExternal(smsUrl('', text));
       if (to === 'copy') {
         try { await navigator.clipboard.writeText(text); } catch { $('textarea', sh).select(); document.execCommand('copy'); }
-        toast('Kopirano');
+        toast('Kopirano – nalepi u poruku');
       }
     });
   });
 }
+
+// Prijem liste: pregled, izbor liste u koju se dodaje
+function showImport(data) {
+  const isAndroidWeb = !IS_NATIVE && /Android/i.test(navigator.userAgent);
+  const intentUrl = `intent://lista?d=${encodeList(data)}#Intent;scheme=mojasistent;package=com.fianketo.mojasistent;S.browser_fallback_url=${encodeURIComponent(APK_URL)};end`;
+  openSheet(`<h3>📥 Primljena lista „${esc(data.name)}“</h3>
+    <div class="card block" style="max-height:38vh;overflow:auto;margin-top:8px">${data.items.map((i) => `<div>• ${esc(i.name)}${i.qty ? ` <span style="color:var(--muted)">– ${esc(fmtQty(i))}</span>` : ''}</div>`).join('')}</div>
+    ${isAndroidWeb ? `<a class="btn primary block" style="text-align:center;text-decoration:none;margin-top:8px" href="${esc(intentUrl)}">📱 Otvori u Android aplikaciji</a>
+      <p style="font-size:12px;color:var(--muted);margin:6px 0">Nemaš aplikaciju? Dugme je preuzima. Ili dodaj listu ovde, u web verziji:</p>` : ''}
+    <label class="field">Dodaj u
+      <select class="input" id="impTo"><option value="__new">Novu listu „${esc(data.name)}“</option>${S.lists.map((l) => `<option value="${l.id}" ${l.name.toLowerCase() === data.name.toLowerCase() ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}</select></label>
+    <div class="foot"><button class="btn" onclick="closeSheet()">Otkaži</button><button class="btn primary" id="impOk">Dodaj ${data.items.length} ${data.items.length === 1 ? 'artikal' : 'artikala'}</button></div>`, () => {
+    $('#impOk').onclick = () => {
+      const to = $('#impTo').value;
+      if (to === '__new') { const L = { id: uid(), name: data.name, items: [] }; S.lists.push(L); S.activeList = L.id; }
+      else S.activeList = to;
+      for (const it of data.items) addToList(it.name, it.qty, it.unit, true);
+      save(false); closeSheet(); setTab('kupovina'); toast(`Dodato ${data.items.length} u „${curList().name}“`);
+    };
+  });
+}
+function importFromUrl(url) {
+  try {
+    const m = String(url).match(/[?&](?:lista|d)=([A-Za-z0-9_-]+)/);
+    if (m) showImport(decodeList(m[1]));
+  } catch (e) { toast('Link liste nije ispravan'); }
+}
+function pasteImport() {
+  openSheet(`<h3>📋 Uvezi listu iz poruke</h3>
+    <p style="margin:0;color:var(--muted);font-size:13px">Nalepi poruku sa listom (link iz aplikacije ili običan spisak, svaki artikal u svom redu).</p>
+    <textarea class="input" id="pasteTxt" style="min-height:160px" placeholder="🛒 Prodavnica&#10;• Mleko – 2 l&#10;• Hleb"></textarea>
+    <div class="foot"><button class="btn" onclick="closeSheet()">Otkaži</button><button class="btn primary" id="pasteOk">Dalje</button></div>`, () => {
+    navigator.clipboard?.readText?.().then((t) => { if (t && !$('#pasteTxt').value) $('#pasteTxt').value = t; }).catch(() => {});
+    $('#pasteOk').onclick = () => { try { showImport(parseShared($('#pasteTxt').value)); } catch (e) { toast('Ne mogu da pročitam listu: ' + e.message); } };
+  });
+}
+
 function listMenu() {
   const L = curList();
   openSheet(`<h3>Lista „${esc(L.name)}“</h3>
     <label class="field">Naziv<input class="input" id="lName" value="${esc(L.name)}"></label>
+    <button class="btn block" id="lPaste" style="margin-top:12px">📋 Uvezi listu iz poruke</button>
     <div class="foot">
       ${S.lists.length > 1 ? '<button class="btn danger" id="lDel">Obriši listu</button>' : ''}
       <button class="btn" id="lClear">Isprazni</button>
       <button class="btn primary" id="lSave">Sačuvaj</button>
     </div>`, () => {
+    $('#lPaste').onclick = pasteImport;
     $('#lSave').onclick = () => { L.name = $('#lName').value.trim() || L.name; save(false); closeSheet(); render(); };
     $('#lClear').onclick = () => { if (confirm('Obrisati sve stavke?')) { L.items = []; save(false); closeSheet(); render(); } };
     if ($('#lDel')) $('#lDel').onclick = () => {
@@ -810,6 +897,7 @@ $('#view').addEventListener('click', async (e) => {
       const L = { id: uid(), name: n.trim(), items: [] }; S.lists.push(L); S.activeList = L.id; save(false); return render();
     }
     case 'share': return shareList();
+    case 'paste-import': return pasteImport();
     case 'clear-bought': curList().items = curList().items.filter((x) => !x.done); save(false); return render();
     case 'list-menu': return listMenu();
     case 'park-start': return startParking();
@@ -1082,6 +1170,10 @@ async function initNative() {
   } catch (e) { console.warn('init', e); }
   syncNotifications();
   pushGeofences();
+  try {
+    AppP.addListener('appUrlOpen', (e) => importFromUrl(e.url));
+    const l = await AppP.getLaunchUrl(); if (l && l.url) setTimeout(() => importFromUrl(l.url), 300);
+  } catch (e) { console.warn('app url', e); }
 }
 
 if (IS_NATIVE) initNative();
@@ -1089,6 +1181,7 @@ else {
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
   navigator.serviceWorker?.addEventListener('message', (e) => { if (e.data?.tab && TITLES[e.data.tab]) setTab(e.data.tab); });
   const t = new URLSearchParams(location.search).get('tab'); if (t && TITLES[t]) tab = t;
+  if (/[?&]lista=/.test(location.search)) { const q = location.search; setTimeout(() => importFromUrl(q), 300); history.replaceState(null, '', location.pathname); }
   webTick(); setInterval(webTick, 15e3);
 }
 document.addEventListener('visibilitychange', () => {
