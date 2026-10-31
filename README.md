@@ -1,10 +1,29 @@
 # Moj Asistent
 
-Lični asistent kao web aplikacija (PWA) — jedan HTML fajl, bez servera, potpuno besplatan.
+Besplatni lični asistent: **podsetnici**, **liste za kupovinu** i **parking** – sa obaveštenjima.
 
-- **Obaveze** – naziv, datum, vreme, podsetnik (u trenutku / 5 min … 1 dan ranije), ponavljanje (dnevno, nedeljno, mesečno, godišnje) i napomena. Grupisano na *Kasni / Danas / Sutra / Kasnije / Bez datuma / Završeno*. Kod ponavljajuće obaveze klik na ✓ je pomera na sledeći termin.
-- **Brojevi** – važni brojevi po kategorijama (Parking, Hitno, Porodica…), poziv jednim klikom. Za *Parking* brojeve postoji 💬 dugme koje otvara SMS sa tvojom registarskom tablicom (upiši je u *Podešavanja*).
-- **Obaveštenja** – podsetnik stiže kao obaveštenje na telefonu dok je aplikacija otvorena ili u pozadini. Za obaveze koje ne smeš da propustiš: *📅 Dodaj u kalendar* (ili *Google kalendar*) — alarm onda daje kalendar telefona i radi i kad je aplikacija ugašena.
-- **Podaci** se čuvaju samo na uređaju (`localStorage`); u *Podešavanja* postoji izvoz/uvoz rezervne kopije (JSON).
+## Instalacija
 
-Otvara se na `https://fianketo.github.io/Moj-asistent/` (kad se uključi GitHub Pages: Settings → Pages → Deploy from branch → main / root). Instalacija: Android Chrome → ⋮ → *Instaliraj aplikaciju*; iPhone Safari → Podeli → *Dodaj na početni ekran* (obaveštenja na iPhone-u rade samo tako, iOS 16.4+).
+| Telefon | Kako | Obaveštenja |
+|---|---|---|
+| **Android** (preporučeno) | Preuzmi [moj-asistent.apk](https://github.com/fianketo/Moj-asistent/releases/latest/download/moj-asistent.apk), otvori ga i dozvoli „instalaciju iz nepoznatih izvora“. | Stižu i kad je aplikacija ugašena i posle restarta telefona. |
+| **iPhone / računar** | Otvori <https://fianketo.github.io/Moj-asistent/> → Safari: Podeli → *Dodaj na početni ekran*. | Samo dok je aplikacija otvorena ili u pozadini. |
+
+Za nekog drugog: pošalji mu jedan od ova dva linka (ili u aplikaciji *Podešavanja → Pošalji link*). Svako ima svoje podatke na svom telefonu.
+
+## Šta zna
+
+- **Podsetnici** – naziv, datum/vreme, „podseti me“ (u trenutku … 1 dan ranije), ponavljanje (dnevno, radnim danima, nedeljno, mesečno, godišnje), napomena. Brzi izbor: *za 1 sat, večeras, sutra 9h*.
+- **Kupovina** – više lista (Prodavnica, Pijaca, Apoteka…), predlozi proizvoda, „2 mleko“ upisuje količinu, štikliranje, slanje liste preko Vibera/WhatsApp-a/SMS-a. 💰 otvara pretragu cena tog proizvoda na Cenoteci.
+- **Parking** – izbor zone, plaćanje SMS-om (otvara poruku sa tablicom), odbrojavanje, obaveštenje *X min pre isteka* i *po isteku*, produžavanje, pamćenje lokacije auta. SMS brojevi su podešeni za Beograd i mogu se menjati u Podešavanjima.
+- **Podešavanja** – status obaveštenja, probno obaveštenje, parking zone, izvoz/uvoz rezervne kopije.
+
+## Tehnički
+
+- `www/` – cela aplikacija (HTML/CSS/JS, bez build koraka). Lokalno: `npm run serve` → <http://localhost:8080>.
+- `android/` – Capacitor omotač; obaveštenja zakazuje Android (`@capacitor/local-notifications`, tačni alarmi).
+- GitHub Actions:
+  - `android.yml` – na svaki push pravi APK; sa `main` grane ga objavljuje kao *Release* (link gore uvek vodi na najnoviji).
+  - `pages.yml` – sa `main` grane objavljuje `www/` na `gh-pages` granu (Settings → Pages → *Deploy from a branch* → `gh-pages` / root).
+- APK je potpisan ključem `android/app/asistent.keystore` (u repozitorijumu, da bi se nove verzije instalirale preko starih).
+- Podaci su samo na uređaju (`localStorage`), nema servera ni naloga.

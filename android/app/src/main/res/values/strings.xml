@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Moj Asistent</string>
+    <string name="title_activity_main">Moj Asistent</string>
+    <string name="package_name">com.fianketo.mojasistent</string>
+    <string name="custom_url_scheme">com.fianketo.mojasistent</string>
+</resources>

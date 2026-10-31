@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Moj Asistent</title>
+<meta name="description" content="Podsetnici, liste za kupovinu i parking">
+<meta name="theme-color" content="#4f46e5">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Asistent">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1 id="title">Podsetnici</h1>
+  <span class="date" id="today"></span>
+</header>
+
+<main id="view"></main>
+
+<button class="fab" id="fab" aria-label="Dodaj">+</button>
+
+<nav id="nav">
+  <button data-tab="podsetnici" class="active"><span class="ic">⏰</span>Podsetnici</button>
+  <button data-tab="kupovina"><span class="ic">🛒</span>Kupovina</button>
+  <button data-tab="parking"><span class="ic">🅿️</span>Parking</button>
+  <button data-tab="podesavanja"><span class="ic">⚙️</span>Podešavanja</button>
+</nav>
+
+<div class="sheet-bg" id="sheetBg" hidden>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="vendor/capacitor.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,753 @@
+/* Moj Asistent – podsetnici, liste za kupovinu i parking.
+ * Radi kao web aplikacija (PWA) i kao Android aplikacija (Capacitor).
+ * Na Androidu obaveštenja zakazuje sam sistem, pa stižu i kad je aplikacija ugašena.
+ * U pregledaču obaveštenja stižu dok je aplikacija otvorena / u pozadini. */
+'use strict';
+
+// ---------------------------------------------------------------- platforma
+const Cap = window.Capacitor;
+const IS_NATIVE = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
+const LN = IS_NATIVE ? Cap.registerPlugin('LocalNotifications') : null;
+const APK_URL = 'https://github.com/fianketo/Moj-asistent/releases/latest/download/moj-asistent.apk';
+const WEB_URL = 'https://fianketo.github.io/Moj-asistent/';
+
+// ---------------------------------------------------------------- pomoćne
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const pad = (n) => String(n).padStart(2, '0');
+const DAYS = ['ned', 'pon', 'uto', 'sre', 'čet', 'pet', 'sub'];
+const MONTHS = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'avg', 'sep', 'okt', 'nov', 'dec'];
+const MIN = 60e3, HOUR = 60 * MIN, DAY = 24 * HOUR;
+
+const toLocal = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const parseLocal = (s) => (s ? new Date(s) : null);
+const hm = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const dayDiff = (d) => Math.round((startOfDay(d) - startOfDay(new Date())) / DAY);
+
+function fmtWhen(d) {
+  const diff = dayDiff(d);
+  if (diff === 0) return `danas ${hm(d)}`;
+  if (diff === 1) return `sutra ${hm(d)}`;
+  if (diff === -1) return `juče ${hm(d)}`;
+  const y = d.getFullYear() !== new Date().getFullYear() ? ` ${d.getFullYear()}.` : '';
+  return `${DAYS[d.getDay()]} ${d.getDate()}. ${MONTHS[d.getMonth()]}${y} ${hm(d)}`;
+}
+function fmtDur(ms) {
+  const m = Math.max(0, Math.round(ms / MIN));
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60), r = m % 60;
+  return r ? `${h} h ${r} min` : `${h} h`;
+}
+function hashId(str) { // stabilan pozitivan int32 za ID obaveštenja
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+  return (Math.abs(h) % 2000000000) + 1;
+}
+
+// ---------------------------------------------------------------- podaci
+const KEY = 'asistent.v1';
+const DEFAULT_ZONES = [
+  { id: 'bg-crvena', name: 'Crvena zona', color: '#dc2626', sms: '9111', maxMin: 60 },
+  { id: 'bg-zuta', name: 'Žuta zona', color: '#eab308', sms: '9112', maxMin: 120 },
+  { id: 'bg-zelena', name: 'Zelena zona', color: '#16a34a', sms: '9113', maxMin: 180 },
+  { id: 'bg-plava', name: 'Plava zona', color: '#2563eb', sms: '9114', maxMin: 120 },
+  { id: 'garaza', name: 'Garaža / ostalo', color: '#64748b', sms: '', maxMin: 0 },
+];
+
+function defaults() {
+  return {
+    reminders: [],
+    lists: [{ id: uid(), name: 'Prodavnica', items: [] }],
+    activeList: null,
+    history: [],
+    parking: { plate: '', warnMin: 10, zones: DEFAULT_ZONES.map((z) => ({ ...z })), lastZone: 'bg-zelena', lastDur: 60, active: null },
+    fired: {},
+  };
+}
+let S;
+try { S = Object.assign(defaults(), JSON.parse(localStorage.getItem(KEY) || '{}')); } catch { S = defaults(); }
+if (!S.lists.length) S.lists = defaults().lists;
+if (!S.activeList || !S.lists.find((l) => l.id === S.activeList)) S.activeList = S.lists[0].id;
+
+function save(resync = true) {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Greška pri čuvanju: ' + e.message); }
+  if (resync) scheduleSync();
+}
+
+// ---------------------------------------------------------------- UI osnova
+let tab = 'podsetnici';
+const TITLES = { podsetnici: 'Podsetnici', kupovina: 'Kupovina', parking: 'Parking', podesavanja: 'Podešavanja' };
+
+function toast(msg, ms = 2600) {
+  const t = $('#toast');
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toast._t); toast._t = setTimeout(() => (t.hidden = true), ms);
+}
+function openSheet(html, onMount) {
+  const sh = $('#sheet');
+  sh.innerHTML = html;
+  $('#sheetBg').hidden = false;
+  onMount && onMount(sh);
+}
+function closeSheet() { $('#sheetBg').hidden = true; $('#sheet').innerHTML = ''; }
+$('#sheetBg').addEventListener('click', (e) => { if (e.target.id === 'sheetBg') closeSheet(); });
+
+function openExternal(url) {
+  if (IS_NATIVE || !/^https?:/.test(url)) location.href = url; // Android otvara SMS/mape/pregledač
+  else window.open(url, '_blank', 'noopener');
+}
+function smsUrl(number, body) {
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  return `sms:${number}${ios ? '&' : '?'}body=${encodeURIComponent(body)}`;
+}
+
+function setTab(t) {
+  tab = t;
+  $$('#nav button').forEach((b) => b.classList.toggle('active', b.dataset.tab === t));
+  $('#title').textContent = TITLES[t];
+  $('#fab').hidden = !(t === 'podsetnici');
+  render();
+  window.scrollTo(0, 0);
+}
+$('#nav').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setTab(b.dataset.tab); });
+$('#fab').addEventListener('click', () => { if (tab === 'podsetnici') editReminder(); });
+
+function render() {
+  const d = new Date();
+  $('#today').textContent = `${DAYS[d.getDay()]} ${d.getDate()}. ${MONTHS[d.getMonth()]}`;
+  ({ podsetnici: renderReminders, kupovina: renderShopping, parking: renderParking, podesavanja: renderSettings })[tab]();
+}
+
+// ================================================================ PODSETNICI
+const REPEAT = { '': 'Ne ponavlja se', daily: 'Svaki dan', weekdays: 'Radnim danima', weekly: 'Svake nedelje', monthly: 'Svakog meseca', yearly: 'Svake godine' };
+const BEFORE = { 0: 'U tom trenutku', 5: '5 min ranije', 15: '15 min ranije', 30: '30 min ranije', 60: '1 sat ranije', 120: '2 sata ranije', 1440: '1 dan ranije' };
+
+function addRepeat(d, rep) {
+  const n = new Date(d);
+  if (rep === 'daily') n.setDate(n.getDate() + 1);
+  else if (rep === 'weekdays') { do n.setDate(n.getDate() + 1); while (n.getDay() === 0 || n.getDay() === 6); }
+  else if (rep === 'weekly') n.setDate(n.getDate() + 7);
+  else if (rep === 'monthly') {
+    const day = d.getDate();
+    n.setDate(1); n.setMonth(n.getMonth() + 1);
+    n.setDate(Math.min(day, new Date(n.getFullYear(), n.getMonth() + 1, 0).getDate()));
+  } else if (rep === 'yearly') n.setFullYear(n.getFullYear() + 1);
+  else return null;
+  return n;
+}
+
+function renderReminders() {
+  const now = Date.now();
+  const groups = { late: [], today: [], tomorrow: [], later: [], nodate: [], done: [] };
+  for (const r of S.reminders) {
+    if (r.done) { groups.done.push(r); continue; }
+    const d = parseLocal(r.at);
+    if (!d) groups.nodate.push(r);
+    else if (d.getTime() < now) groups.late.push(r);
+    else if (dayDiff(d) === 0) groups.today.push(r);
+    else if (dayDiff(d) === 1) groups.tomorrow.push(r);
+    else groups.later.push(r);
+  }
+  const byDate = (a, b) => (a.at || '').localeCompare(b.at || '');
+  Object.values(groups).forEach((g) => g.sort(byDate));
+  groups.done.reverse();
+
+  let html = notifBanner();
+  const sec = (key, label, cls = '') => groups[key].length
+    ? `<h2 class="${cls}">${label}</h2>` + groups[key].map((r) => reminderCard(r, key === 'late')).join('') : '';
+  html += sec('late', 'Kasni', 'red') + sec('today', 'Danas') + sec('tomorrow', 'Sutra') + sec('later', 'Kasnije') + sec('nodate', 'Bez datuma');
+  if (groups.done.length) {
+    html += `<h2>Završeno (${groups.done.length})</h2>` + groups.done.slice(0, 15).map((r) => reminderCard(r)).join('');
+    html += `<button class="btn small" data-act="clear-done">Obriši završene</button>`;
+  }
+  if (!S.reminders.length) {
+    html += `<div class="empty"><div class="big">⏰</div>Nemaš podsetnika.<br>Dodaj prvi na dugme <b>+</b> dole desno.</div>`;
+  }
+  $('#view').innerHTML = html;
+}
+
+function reminderCard(r, late) {
+  const d = parseLocal(r.at);
+  const meta = [];
+  if (d) meta.push(late && !r.done ? `<span class="lateTxt">${fmtWhen(d)}</span>` : fmtWhen(d));
+  if (r.repeat) meta.push('🔁 ' + REPEAT[r.repeat]);
+  if (d && r.before) meta.push('🔔 ' + BEFORE[r.before]);
+  return `<div class="card ${late && !r.done ? 'late' : ''} ${r.done ? 'done' : ''}" data-id="${r.id}">
+    <button class="check ${r.done ? 'on' : ''}" data-act="toggle" aria-label="Završeno">${r.done ? '✓' : ''}</button>
+    <div class="body" data-act="edit">
+      <div class="title">${esc(r.title)}</div>
+      ${meta.length ? `<div class="meta">${meta.map((m) => `<span>${m}</span>`).join('')}</div>` : ''}
+      ${r.note ? `<div class="note">${esc(r.note)}</div>` : ''}
+    </div></div>`;
+}
+
+function completeReminder(r) {
+  if (r.done) { r.done = false; return; }
+  const d = parseLocal(r.at);
+  if (r.repeat && d) {
+    let n = addRepeat(d, r.repeat);
+    while (n && n.getTime() < Date.now()) n = addRepeat(n, r.repeat);
+    r.at = toLocal(n);
+    toast('Sledeći put: ' + fmtWhen(n));
+  } else {
+    r.done = true; r.doneAt = Date.now();
+  }
+}
+
+function editReminder(r) {
+  const isNew = !r;
+  r = r || { id: uid(), title: '', at: '', repeat: '', before: 0, note: '' };
+  const d = parseLocal(r.at);
+  const opt = (obj, cur) => Object.entries(obj).map(([v, l]) => `<option value="${v}" ${String(cur) === v ? 'selected' : ''}>${l}</option>`).join('');
+  openSheet(`
+    <h3>${isNew ? 'Novi podsetnik' : 'Izmeni podsetnik'}</h3>
+    <label class="field">Šta treba da uradiš?
+      <input class="input" id="rTitle" value="${esc(r.title)}" placeholder="npr. Platiti račun za struju" autocomplete="off"></label>
+    <div class="chips" style="margin-top:10px">
+      <button class="chip" data-q="1h">Za 1 sat</button>
+      <button class="chip" data-q="eve">Večeras 20h</button>
+      <button class="chip" data-q="tom">Sutra 9h</button>
+      <button class="chip" data-q="week">Za nedelju dana</button>
+      <button class="chip" data-q="none">Bez datuma</button>
+    </div>
+    <div class="two">
+      <label class="field" style="margin:0">Datum<input class="input" type="date" id="rDate" value="${d ? r.at.slice(0, 10) : ''}"></label>
+      <label class="field" style="margin:0">Vreme<input class="input" type="time" id="rTime" value="${d ? r.at.slice(11, 16) : ''}"></label>
+    </div>
+    <div class="two">
+      <label class="field">Podseti me<select class="input" id="rBefore">${opt(BEFORE, r.before || 0)}</select></label>
+      <label class="field">Ponavljanje<select class="input" id="rRepeat">${opt(REPEAT, r.repeat || '')}</select></label>
+    </div>
+    <label class="field">Napomena<textarea class="input" id="rNote" placeholder="(nije obavezno)">${esc(r.note)}</textarea></label>
+    <div class="foot">
+      ${isNew ? '' : '<button class="btn danger" id="rDel">Obriši</button>'}
+      <button class="btn" id="rCancel">Otkaži</button>
+      <button class="btn primary" id="rSave">Sačuvaj</button>
+    </div>`, (sh) => {
+    if (isNew) setTimeout(() => $('#rTitle').focus(), 50);
+    $('.chips', sh).addEventListener('click', (e) => {
+      const q = e.target.closest('[data-q]')?.dataset.q; if (!q) return;
+      const n = new Date(); n.setSeconds(0, 0);
+      if (q === '1h') n.setTime(n.getTime() + HOUR);
+      if (q === 'eve') { n.setHours(20, 0); if (n < new Date()) n.setDate(n.getDate() + 1); }
+      if (q === 'tom') { n.setDate(n.getDate() + 1); n.setHours(9, 0); }
+      if (q === 'week') { n.setDate(n.getDate() + 7); n.setHours(9, 0); }
+      const v = q === 'none' ? '' : toLocal(n);
+      $('#rDate').value = v.slice(0, 10); $('#rTime').value = v.slice(11, 16);
+    });
+    $('#rCancel').onclick = closeSheet;
+    if (!isNew) $('#rDel').onclick = () => {
+      if (!confirm('Obrisati podsetnik?')) return;
+      S.reminders = S.reminders.filter((x) => x.id !== r.id); save(); closeSheet(); render();
+    };
+    $('#rSave').onclick = () => {
+      const title = $('#rTitle').value.trim();
+      if (!title) { $('#rTitle').focus(); return toast('Upiši naziv podsetnika'); }
+      let date = $('#rDate').value, time = $('#rTime').value;
+      if (!date && time) { // samo vreme → danas (ili sutra ako je prošlo)
+        const n = new Date(); const [h, m] = time.split(':');
+        n.setHours(+h, +m, 0, 0); if (n < new Date()) n.setDate(n.getDate() + 1);
+        date = toLocal(n).slice(0, 10);
+      }
+      if (date && !time) time = '09:00';
+      Object.assign(r, {
+        title, at: date ? `${date}T${time}` : '', before: +$('#rBefore').value,
+        repeat: $('#rRepeat').value, note: $('#rNote').value.trim(), done: false,
+      });
+      if (r.repeat && !r.at) return toast('Za ponavljanje izaberi datum');
+      if (isNew) S.reminders.push(r);
+      save(); closeSheet(); render();
+      if (r.at) ensurePermission();
+      toast(r.at ? 'Podsetnik: ' + fmtWhen(parseLocal(r.at)) : 'Sačuvano');
+    };
+  });
+}
+
+// ================================================================ KUPOVINA
+const COMMON = ['Hleb', 'Mleko', 'Jaja', 'Jogurt', 'Kiselo mleko', 'Pavlaka', 'Sir', 'Kajmak', 'Puter', 'Margarin',
+  'Šunka', 'Pršuta', 'Kobasica', 'Piletina', 'Mleveno meso', 'Svinjetina', 'Junetina', 'Riba', 'Tuna konzerva',
+  'Krompir', 'Crni luk', 'Beli luk', 'Paradajz', 'Krastavac', 'Paprika', 'Šargarepa', 'Kupus', 'Zelena salata',
+  'Jabuke', 'Banane', 'Pomorandže', 'Limun', 'Grožđe', 'Brašno', 'Šećer', 'So', 'Ulje', 'Maslinovo ulje', 'Sirće',
+  'Pirinač', 'Testenina', 'Pasulj', 'Kafa', 'Čaj', 'Kakao', 'Med', 'Džem', 'Eurokrem', 'Čokolada', 'Keks', 'Grickalice',
+  'Voda', 'Kisela voda', 'Sok', 'Pivo', 'Vino', 'Kečap', 'Majonez', 'Senf', 'Začini', 'Vegeta', 'Biber', 'Aleva paprika',
+  'Toalet papir', 'Papirni ubrusi', 'Salvete', 'Deterdžent za veš', 'Omekšivač', 'Deterdžent za sudove', 'Tablete za sudo-mašinu',
+  'Sapun', 'Šampon', 'Pasta za zube', 'Četkica za zube', 'Dezodorans', 'Kese za smeće', 'Sunđeri', 'Hrana za ljubimce', 'Pelene'];
+
+const curList = () => S.lists.find((l) => l.id === S.activeList) || S.lists[0];
+
+function parseItem(text) { // "2 mleko", "mleko x2", "mleko 2kg"
+  let t = text.trim(), qty = '';
+  let m = t.match(/^(\d+[.,]?\d*\s*(kg|g|l|ml|kom|x)?)\s+(.+)$/i);
+  if (m) { qty = m[1].replace(/x$/i, '').trim(); t = m[3]; }
+  else if ((m = t.match(/^(.+?)\s+[x×]?\s*(\d+[.,]?\d*\s*(kg|g|l|ml|kom)?)$/i))) { t = m[1]; qty = m[2].trim(); }
+  return { name: t.charAt(0).toUpperCase() + t.slice(1), qty };
+}
+
+function renderShopping() {
+  const L = curList();
+  const open = L.items.filter((i) => !i.done), bought = L.items.filter((i) => i.done);
+  const suggestions = [...new Set([...S.history, ...COMMON])];
+  let html = `<div class="chips">${S.lists.map((l) => `<button class="chip ${l.id === L.id ? 'on' : ''}" data-list="${l.id}">${esc(l.name)}<span class="count">${l.items.filter((i) => !i.done).length || ''}</span></button>`).join('')}
+    <button class="chip" data-act="new-list">+ Nova lista</button></div>
+    <form class="addbar" id="addForm" autocomplete="off">
+      <input class="input" id="itemIn" list="sugg" placeholder="Dodaj proizvod (npr. 2 mleko)" enterkeyhint="done">
+      <button class="btn primary">Dodaj</button>
+    </form>
+    <datalist id="sugg">${suggestions.map((s) => `<option value="${esc(s)}">`).join('')}</datalist>`;
+  if (!L.items.length) {
+    html += `<div class="empty"><div class="big">🛒</div>Lista „${esc(L.name)}“ je prazna.<br>Upiši šta treba da kupiš.</div>`;
+  }
+  html += open.map(itemCard).join('');
+  if (bought.length) {
+    html += `<h2>U korpi (${bought.length})</h2>` + bought.map(itemCard).join('');
+  }
+  html += `<div class="row" style="margin-top:16px">
+      ${L.items.length ? '<button class="btn small" data-act="share">📤 Pošalji listu</button>' : ''}
+      ${bought.length ? '<button class="btn small" data-act="clear-bought">Ukloni kupljeno</button>' : ''}
+      <button class="btn small" data-act="list-menu">⋯ Lista</button>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-top:14px">💰 pored proizvoda otvara pretragu cena na Cenoteci (uporedi Maxi, Idea, Lidl, Univerexport…).</p>`;
+  $('#view').innerHTML = html;
+  $('#addForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = $('#itemIn').value.trim(); if (!v) return;
+    const it = parseItem(v);
+    curList().items.unshift({ id: uid(), name: it.name, qty: it.qty, done: false });
+    S.history = [it.name, ...S.history.filter((h) => h.toLowerCase() !== it.name.toLowerCase())].slice(0, 200);
+    save(false); render();
+    $('#itemIn').focus();
+  });
+}
+function itemCard(i) {
+  return `<div class="card ${i.done ? 'done' : ''}" data-item="${i.id}">
+    <button class="check ${i.done ? 'on' : ''}" data-act="item-toggle" aria-label="Kupljeno">${i.done ? '✓' : ''}</button>
+    <div class="body" data-act="item-edit"><div class="title">${esc(i.name)}</div>${i.qty ? `<div class="meta">${esc(i.qty)}</div>` : ''}</div>
+    <button class="iconbtn" data-act="price" title="Cene na Cenoteci">💰</button>
+    <button class="iconbtn" data-act="item-del" title="Obriši">✕</button></div>`;
+}
+function cenotekaUrl(name) {
+  return 'https://www.google.com/search?q=' + encodeURIComponent('site:cenoteka.rs ' + name);
+}
+function listText(L) {
+  const open = L.items.filter((i) => !i.done);
+  return `🛒 ${L.name}\n` + (open.length ? open : L.items).map((i) => `• ${i.name}${i.qty ? ' – ' + i.qty : ''}`).join('\n');
+}
+async function shareList() {
+  const L = curList(), text = listText(L);
+  if (navigator.share && !IS_NATIVE) { try { await navigator.share({ title: L.name, text }); return; } catch (e) { if (e.name === 'AbortError') return; } }
+  openSheet(`<h3>Pošalji listu „${esc(L.name)}“</h3>
+    <textarea class="input" readonly style="min-height:140px">${esc(text)}</textarea>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" data-to="viber">Viber</button><button class="btn" data-to="wa">WhatsApp</button>
+      <button class="btn" data-to="sms">SMS</button><button class="btn" data-to="copy">Kopiraj</button>
+    </div><div class="foot"><button class="btn" onclick="closeSheet()">Zatvori</button></div>`, (sh) => {
+    $('.row', sh).addEventListener('click', async (e) => {
+      const to = e.target.dataset.to; if (!to) return;
+      if (to === 'viber') openExternal('viber://forward?text=' + encodeURIComponent(text));
+      if (to === 'wa') openExternal('https://wa.me/?text=' + encodeURIComponent(text));
+      if (to === 'sms') openExternal('sms:?body=' + encodeURIComponent(text));
+      if (to === 'copy') {
+        try { await navigator.clipboard.writeText(text); } catch { $('textarea', sh).select(); document.execCommand('copy'); }
+        toast('Kopirano');
+      }
+    });
+  });
+}
+function listMenu() {
+  const L = curList();
+  openSheet(`<h3>Lista „${esc(L.name)}“</h3>
+    <label class="field">Naziv<input class="input" id="lName" value="${esc(L.name)}"></label>
+    <div class="foot">
+      ${S.lists.length > 1 ? '<button class="btn danger" id="lDel">Obriši listu</button>' : ''}
+      <button class="btn" id="lClear">Isprazni</button>
+      <button class="btn primary" id="lSave">Sačuvaj</button>
+    </div>`, () => {
+    $('#lSave').onclick = () => { L.name = $('#lName').value.trim() || L.name; save(false); closeSheet(); render(); };
+    $('#lClear').onclick = () => { if (confirm('Obrisati sve stavke?')) { L.items = []; save(false); closeSheet(); render(); } };
+    if ($('#lDel')) $('#lDel').onclick = () => {
+      if (!confirm(`Obrisati listu „${L.name}“?`)) return;
+      S.lists = S.lists.filter((x) => x.id !== L.id); S.activeList = S.lists[0].id; save(false); closeSheet(); render();
+    };
+  });
+}
+
+// ================================================================ PARKING
+let parkTimer = null;
+const zoneById = (id) => S.parking.zones.find((z) => z.id === id);
+
+function renderParking() {
+  const P = S.parking, A = P.active;
+  clearInterval(parkTimer);
+  if (A) {
+    const z = zoneById(A.zone) || { name: A.zoneName || 'Parking', color: '#64748b', sms: A.sms };
+    const update = () => {
+      const left = A.end - Date.now();
+      const el = $('#parkLeft'); if (!el) return clearInterval(parkTimer);
+      if (left <= 0) { el.textContent = 'ISTEKLO'; el.classList.add('red'); return; }
+      const h = Math.floor(left / HOUR), m = Math.floor((left % HOUR) / MIN), s = Math.floor((left % MIN) / 1000);
+      el.textContent = (h ? h + ':' + pad(m) : m) + ':' + pad(s);
+      el.classList.toggle('red', left < P.warnMin * MIN);
+    };
+    $('#view').innerHTML = notifBanner() + `<div class="card block park-hero">
+        <span class="zone" style="background:${esc(z.color)}">${esc(z.name)}</span>
+        <div class="left" id="parkLeft"></div>
+        <div class="sub">ističe u <b>${hm(new Date(A.end))}</b> · <span class="plate">${esc(A.plate || '')}</span></div>
+        <div class="sub">upozorenje ${P.warnMin} min pre isteka</div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn primary grow" data-act="park-extend">⏱ Produži</button>
+        <button class="btn ok grow" data-act="park-end">✓ Otišao sam</button>
+      </div>
+      ${A.lat ? `<button class="btn block" style="margin-top:8px" data-act="park-map">📍 Gde mi je auto?</button>` : ''}
+      ${A.note ? `<div class="card block" style="margin-top:8px"><div class="note">📝 ${esc(A.note)}</div></div>` : ''}`;
+    update(); parkTimer = setInterval(update, 1000);
+    return;
+  }
+  const zone = zoneById(P.lastZone) || P.zones[0];
+  const durs = [15, 30, 60, 90, 120, 180, 240];
+  $('#view').innerHTML = notifBanner() + `<div class="card block">
+      <label class="field" style="margin-top:0">Registarska oznaka
+        <input class="input plate" id="pPlate" value="${esc(P.plate)}" placeholder="BG123AB" autocapitalize="characters"></label>
+      <div class="field">Zona</div>
+      <div class="zones" id="pZones">${P.zones.map((z) => `<button class="zone-btn ${z.id === zone.id ? 'on' : ''}" data-zone="${z.id}">
+          <span class="dot" style="background:${esc(z.color)}"></span>${esc(z.name)}
+          <small>${z.sms ? 'SMS ' + esc(z.sms) : 'bez SMS-a'}${z.maxMin ? ' · max ' + fmtDur(z.maxMin * MIN) : ''}</small></button>`).join('')}</div>
+      <label class="field">Koliko ostaješ?
+        <select class="input" id="pDur">${durs.map((m) => `<option value="${m}" ${m === P.lastDur ? 'selected' : ''}>${fmtDur(m * MIN)}</option>`).join('')}</select></label>
+      <label class="field">Napomena (sprat, ulica…)<input class="input" id="pNote" placeholder="(nije obavezno)"></label>
+      <label class="switch"><input type="checkbox" id="pSms" ${zone.sms ? 'checked' : ''}> Otvori SMS za plaćanje</label>
+      <label class="switch"><input type="checkbox" id="pLoc" checked> Zapamti gde sam parkirao</label>
+      <button class="btn primary block" style="margin-top:16px" data-act="park-start">🅿️ Parkirao sam</button>
+    </div>
+    <p style="font-size:13px;color:var(--muted)">SMS brojevi su podešeni za Beograd – proveri broj na tabli zone. Zone menjaš u Podešavanjima.</p>`;
+  $('#pZones').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-zone]'); if (!b) return;
+    P.lastZone = b.dataset.zone; const z = zoneById(P.lastZone);
+    $$('.zone-btn').forEach((x) => x.classList.toggle('on', x === b));
+    $('#pSms').checked = !!z.sms;
+    if (z.maxMin && +$('#pDur').value > z.maxMin) $('#pDur').value = String(durs.filter((d) => d <= z.maxMin).pop() || durs[0]);
+  });
+}
+
+function getLocation() {
+  return new Promise((res) => {
+    if (!navigator.geolocation) return res(null);
+    navigator.geolocation.getCurrentPosition((p) => res({ lat: p.coords.latitude, lng: p.coords.longitude }),
+      () => res(null), { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+  });
+}
+async function startParking() {
+  const P = S.parking, z = zoneById(P.lastZone) || P.zones[0];
+  const plate = $('#pPlate').value.trim().toUpperCase().replace(/[\s-]/g, '');
+  const dur = +$('#pDur').value, wantSms = $('#pSms').checked, wantLoc = $('#pLoc').checked;
+  if (wantSms && z.sms && !plate) { $('#pPlate').focus(); return toast('Upiši registarsku oznaku'); }
+  P.plate = plate; P.lastDur = dur;
+  P.active = { zone: z.id, zoneName: z.name, sms: z.sms, plate, start: Date.now(), end: Date.now() + dur * MIN, note: $('#pNote').value.trim() };
+  save(); ensurePermission();
+  if (wantSms && z.sms) openExternal(smsUrl(z.sms, plate));
+  render();
+  if (wantLoc) {
+    const loc = await getLocation();
+    if (loc && S.parking.active) { Object.assign(S.parking.active, loc); save(false); render(); }
+    else if (!loc) toast('Lokacija nije dostupna');
+  }
+}
+function extendParking() {
+  const A = S.parking.active, z = zoneById(A.zone);
+  const sms = (z && z.sms) || A.sms;
+  openSheet(`<h3>Produži parking</h3>
+    <p style="color:var(--muted);font-size:14px">${sms ? `Otvoriće se SMS na <b>${esc(sms)}</b> sa tablicom <b>${esc(A.plate)}</b>. U Beogradu ponovna poruka produžava kartu (proveri pravila zone).` : 'Samo pomera vreme isteka i podsetnike.'}</p>
+    <div class="row" id="extBtns">${[15, 30, 60, 120].map((m) => `<button class="btn" data-m="${m}">+${fmtDur(m * MIN)}</button>`).join('')}</div>
+    <div class="foot"><button class="btn" onclick="closeSheet()">Otkaži</button></div>`, (sh) => {
+    $('#extBtns', sh).addEventListener('click', (e) => {
+      const m = +e.target.dataset.m; if (!m) return;
+      A.end = Math.max(A.end, Date.now()) + m * MIN;
+      save(); closeSheet(); render();
+      if (sms) openExternal(smsUrl(sms, A.plate));
+      toast('Novo vreme isteka: ' + hm(new Date(A.end)));
+    });
+  });
+}
+
+// ================================================================ PODEŠAVANJA
+function renderSettings() {
+  const P = S.parking;
+  $('#view').innerHTML = `<div class="settings">
+    <h2>Obaveštenja</h2>
+    <div class="card"><p id="nStatus">Proveravam…</p>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-act="perm">Uključi obaveštenja</button>
+      <button class="btn small" data-act="test">Probno (za 10 s)</button></div>
+      ${IS_NATIVE ? '' : `<p style="margin-top:10px">ℹ️ U pregledaču obaveštenja stižu samo dok je aplikacija otvorena ili u pozadini. Za pouzdane podsetnike i kad je ugašena, instaliraj Android aplikaciju (dole).</p>`}
+    </div>
+
+    <h2>Parking</h2>
+    <div class="card">
+      <label class="field" style="margin-top:0">Upozori me pre isteka (minuta)
+        <input class="input" type="number" min="1" max="60" id="sWarn" value="${P.warnMin}"></label>
+      <div class="field">Zone (naziv · SMS broj · max minuta)</div>
+      <div id="zoneEdit">${P.zones.map((z) => `<div class="zone-edit" data-z="${z.id}">
+        <input class="input" data-f="name" value="${esc(z.name)}"><input class="input" data-f="sms" value="${esc(z.sms)}" inputmode="numeric" placeholder="SMS">
+        <input class="input" data-f="maxMin" value="${z.maxMin || ''}" inputmode="numeric" placeholder="∞">
+        <button class="iconbtn" data-act="zone-del">✕</button></div>`).join('')}</div>
+      <div class="row" style="margin-top:10px"><button class="btn small" data-act="zone-add">+ Dodaj zonu</button>
+        <button class="btn small" data-act="zone-save">Sačuvaj zone</button><button class="btn small" data-act="zone-reset">Vrati Beograd</button></div>
+    </div>
+
+    <h2>Instalacija i deljenje</h2>
+    <div class="card">
+      ${IS_NATIVE ? `<p>Instalirana Android aplikacija ✔︎</p>` : `<p><b>Android:</b> preuzmi aplikaciju (APK) – pouzdana obaveštenja i kad je ugašena.</p>
+      <button class="btn small primary" data-act="apk">⬇️ Preuzmi Android aplikaciju</button>
+      <p style="margin-top:10px"><b>iPhone:</b> u Safariju Podeli → <i>Dodaj na početni ekran</i>.</p>`}
+      <p style="margin-top:10px">Pošalji nekome link da i on instalira:</p>
+      <button class="btn small" data-act="share-app">📤 Pošalji link</button>
+    </div>
+
+    <h2>Rezervna kopija</h2>
+    <div class="card"><p>Podaci se čuvaju samo na ovom telefonu.</p>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-act="export">Izvezi</button>
+      <button class="btn small" data-act="import">Uvezi</button></div>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+    <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:24px">Moj Asistent · ${IS_NATIVE ? 'Android' : 'web'} verzija</p>
+  </div>`;
+  notifStatus().then((s) => { const el = $('#nStatus'); if (el) el.innerHTML = s; });
+  $('#importFile').addEventListener('change', importData);
+}
+
+function exportData() {
+  const text = JSON.stringify(S, null, 1);
+  if (IS_NATIVE) { // WebView ne preuzima fajlove: kopiraj u clipboard
+    navigator.clipboard.writeText(text).then(() => toast('Kopirano – nalepi u Viber/mejl sebi'), () => toast('Kopiranje nije uspelo'));
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+  a.download = `moj-asistent-${toLocal(new Date()).slice(0, 10)}.json`;
+  a.click();
+}
+function importData(e) {
+  const f = e.target.files[0]; if (!f) return;
+  f.text().then((t) => {
+    const data = JSON.parse(t);
+    if (!data.reminders || !data.lists) throw new Error('nije rezervna kopija');
+    if (!confirm('Zameniti sve trenutne podatke uvezenim?')) return;
+    S = Object.assign(defaults(), data); save(); render(); toast('Uvezeno');
+  }).catch((err) => toast('Greška: ' + err.message));
+}
+
+// ================================================================ klikovi
+$('#view').addEventListener('click', async (e) => {
+  const el = e.target.closest('[data-act],[data-list]'); if (!el) return;
+  if (el.dataset.list) { S.activeList = el.dataset.list; save(false); return render(); }
+  const act = el.dataset.act;
+  const rId = el.closest('[data-id]')?.dataset.id, r = rId && S.reminders.find((x) => x.id === rId);
+  const iId = el.closest('[data-item]')?.dataset.item, item = iId && curList().items.find((x) => x.id === iId);
+  switch (act) {
+    case 'toggle': completeReminder(r); save(); return render();
+    case 'edit': return editReminder(r);
+    case 'clear-done': S.reminders = S.reminders.filter((x) => !x.done); save(); return render();
+    case 'item-toggle': item.done = !item.done; save(false); return render();
+    case 'item-del': curList().items = curList().items.filter((x) => x !== item); save(false); return render();
+    case 'item-edit': {
+      const v = prompt('Proizvod (npr. „2 mleko“):', (item.qty ? item.qty + ' ' : '') + item.name);
+      if (v && v.trim()) { Object.assign(item, parseItem(v)); save(false); render(); }
+      return;
+    }
+    case 'price': return openExternal(cenotekaUrl(item.name));
+    case 'new-list': {
+      const n = prompt('Naziv nove liste (npr. Pijaca, Apoteka):'); if (!n || !n.trim()) return;
+      const L = { id: uid(), name: n.trim(), items: [] }; S.lists.push(L); S.activeList = L.id; save(false); return render();
+    }
+    case 'share': return shareList();
+    case 'clear-bought': curList().items = curList().items.filter((x) => !x.done); save(false); return render();
+    case 'list-menu': return listMenu();
+    case 'park-start': return startParking();
+    case 'park-extend': return extendParking();
+    case 'park-end': if (confirm('Završiti parking?')) { S.parking.active = null; save(); render(); } return;
+    case 'park-map': { const A = S.parking.active; return openExternal(`https://www.google.com/maps/search/?api=1&query=${A.lat},${A.lng}`); }
+    case 'perm': await ensurePermission(true); return render();
+    case 'test': return testNotification();
+    case 'zone-add': S.parking.zones.push({ id: uid(), name: 'Nova zona', color: '#7c3aed', sms: '', maxMin: 0 }); save(false); return render();
+    case 'zone-del': S.parking.zones = S.parking.zones.filter((z) => z.id !== el.closest('[data-z]').dataset.z);
+      if (!S.parking.zones.length) S.parking.zones = DEFAULT_ZONES.map((z) => ({ ...z })); save(false); return render();
+    case 'zone-save':
+      $$('#zoneEdit [data-z]').forEach((row) => {
+        const z = zoneById(row.dataset.z);
+        z.name = $('[data-f=name]', row).value.trim() || z.name;
+        z.sms = $('[data-f=sms]', row).value.replace(/\D/g, '');
+        z.maxMin = +$('[data-f=maxMin]', row).value || 0;
+      });
+      S.parking.warnMin = Math.min(60, Math.max(1, +$('#sWarn').value || 10));
+      save(); toast('Sačuvano'); return render();
+    case 'zone-reset': if (confirm('Vratiti zone za Beograd?')) { S.parking.zones = DEFAULT_ZONES.map((z) => ({ ...z })); save(false); render(); } return;
+    case 'apk': return openExternal(APK_URL);
+    case 'share-app': {
+      const text = `Moj Asistent – podsetnici, kupovina i parking.\nAndroid aplikacija: ${APK_URL}\nWeb (iPhone/računar): ${WEB_URL}`;
+      if (navigator.share && !IS_NATIVE) { try { await navigator.share({ title: 'Moj Asistent', text }); return; } catch { /* nastavi */ } }
+      try { await navigator.clipboard.writeText(text); toast('Link kopiran – nalepi ga u poruku'); } catch { prompt('Kopiraj:', text); }
+      return;
+    }
+    case 'export': return exportData();
+    case 'import': return $('#importFile').click();
+  }
+});
+document.addEventListener('change', (e) => {
+  if (e.target.id === 'sWarn') { S.parking.warnMin = Math.min(60, Math.max(1, +e.target.value || 10)); save(); }
+  if (e.target.id === 'pPlate') { S.parking.plate = e.target.value.trim().toUpperCase().replace(/[\s-]/g, ''); save(false); }
+});
+
+// ================================================================ OBAVEŠTENJA
+function notifBanner() {
+  if (IS_NATIVE) return ''; // native: status se proverava asinhrono, vidi checkNativeBanner
+  if (!('Notification' in window)) return '';
+  if (Notification.permission === 'granted') return '';
+  return `<div class="banner"><span>🔔</span><span class="grow">Uključi obaveštenja da bi ti stizali podsetnici.</span>
+    <button class="btn small primary" data-act="perm">Uključi</button></div>`;
+}
+
+// Svi podsetnici koje treba prikazati u budućnosti.
+function desiredNotifications() {
+  const out = [], now = Date.now(), horizon = now + 60 * DAY;
+  for (const r of S.reminders) {
+    if (r.done || !r.at) continue;
+    let d = parseLocal(r.at), n = 0;
+    while (d && n < 12) {
+      const fire = d.getTime() - (r.before || 0) * MIN;
+      if (fire > horizon) break;
+      if (fire > now - 5 * MIN) {
+        out.push({ key: `r:${r.id}:${d.getTime()}`, at: fire, title: '⏰ ' + r.title,
+          body: (r.before ? `${BEFORE[r.before]} · ` : '') + fmtWhen(d) + (r.note ? '\n' + r.note : ''), tab: 'podsetnici', channel: 'podsetnici' });
+        n++;
+      }
+      if (!r.repeat) break;
+      d = addRepeat(d, r.repeat);
+    }
+  }
+  const A = S.parking.active;
+  if (A) {
+    const warnAt = A.end - S.parking.warnMin * MIN;
+    if (warnAt > now) out.push({ key: `p:warn:${A.end}`, at: warnAt, title: '🅿️ Parking ističe za ' + S.parking.warnMin + ' min',
+      body: `${A.zoneName} · ističe u ${hm(new Date(A.end))}. Otvori aplikaciju da produžiš.`, tab: 'parking', channel: 'parking' });
+    if (A.end > now - 5 * MIN) out.push({ key: `p:end:${A.end}`, at: A.end, title: '🅿️ Parking je istekao!',
+      body: `${A.zoneName} – plati ponovo ili pomeri auto.`, tab: 'parking', channel: 'parking' });
+  }
+  return out.sort((a, b) => a.at - b.at).slice(0, 60);
+}
+
+let syncTimer = null;
+function scheduleSync() { clearTimeout(syncTimer); syncTimer = setTimeout(syncNotifications, 300); }
+
+async function syncNotifications() {
+  if (!IS_NATIVE) return; // web: proverava webTick
+  try {
+    const perm = await LN.checkPermissions();
+    if (perm.display !== 'granted') return;
+    const pending = await LN.getPending();
+    if (pending.notifications.length) await LN.cancel({ notifications: pending.notifications.map((n) => ({ id: n.id })) });
+    const list = desiredNotifications().filter((n) => n.at > Date.now() + 1000);
+    if (!list.length) return;
+    await LN.schedule({
+      notifications: list.map((n) => ({
+        id: hashId(n.key), title: n.title, body: n.body, largeBody: n.body,
+        schedule: { at: new Date(n.at), allowWhileIdle: true },
+        channelId: n.channel, smallIcon: 'ic_stat_notify', extra: { tab: n.tab },
+      })),
+    });
+  } catch (e) { console.warn('sync', e); }
+}
+
+async function ensurePermission(explicit) {
+  if (IS_NATIVE) {
+    let p = await LN.checkPermissions();
+    if (p.display !== 'granted') p = await LN.requestPermissions();
+    if (p.display !== 'granted') { if (explicit) toast('Obaveštenja su isključena – uključi ih u podešavanjima telefona'); return false; }
+    try {
+      const ex = LN.checkExactNotificationSetting && await LN.checkExactNotificationSetting();
+      if (ex && ex.exact_alarm && ex.exact_alarm !== 'granted' && explicit) await LN.changeExactNotificationSetting();
+    } catch { /* starije verzije Androida */ }
+    scheduleSync();
+    return true;
+  }
+  if (!('Notification' in window)) { if (explicit) toast('Ovaj pregledač ne podržava obaveštenja'); return false; }
+  if (Notification.permission === 'default') await Notification.requestPermission();
+  if (Notification.permission !== 'granted' && explicit) toast('Obaveštenja su blokirana u pregledaču');
+  if (tab !== 'podesavanja') render();
+  return Notification.permission === 'granted';
+}
+
+async function notifStatus() {
+  if (IS_NATIVE) {
+    const p = await LN.checkPermissions();
+    let n = 0; try { n = (await LN.getPending()).notifications.length; } catch { /* */ }
+    return p.display === 'granted'
+      ? `<span class="status-ok">✔︎ Uključena</span> · zakazano: ${n}`
+      : '<span class="status-bad">✖ Isključena</span> – dodirni „Uključi obaveštenja“';
+  }
+  if (!('Notification' in window)) return '<span class="status-bad">Pregledač ne podržava obaveštenja</span>';
+  return { granted: '<span class="status-ok">✔︎ Uključena</span>', denied: '<span class="status-bad">✖ Blokirana u pregledaču</span>', default: 'Nisu uključena' }[Notification.permission];
+}
+
+async function testNotification() {
+  if (!(await ensurePermission(true))) return;
+  const at = Date.now() + 10e3;
+  if (IS_NATIVE) {
+    await LN.schedule({ notifications: [{ id: 999, title: '✅ Probno obaveštenje', body: 'Obaveštenja rade!', schedule: { at: new Date(at), allowWhileIdle: true }, channelId: 'podsetnici', smallIcon: 'ic_stat_notify' }] });
+    toast('Stiže za 10 sekundi – možeš i da zatvoriš aplikaciju');
+  } else {
+    setTimeout(() => showWebNotification({ key: 'test', title: '✅ Probno obaveštenje', body: 'Obaveštenja rade!', tab }), 10e3);
+    toast('Stiže za 10 sekundi (ostavi pregledač otvoren)');
+  }
+}
+
+async function showWebNotification(n) {
+  toast(n.title, 5000);
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const opts = { body: n.body, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', tag: n.key, data: { tab: n.tab }, requireInteraction: true, vibrate: [200, 100, 200] };
+  try {
+    const reg = await navigator.serviceWorker?.getRegistration();
+    if (reg) return reg.showNotification(n.title, opts);
+  } catch { /* fallback */ }
+  try { new Notification(n.title, opts); } catch { /* */ }
+}
+
+function webTick() { // web verzija: proveri da li je nešto dospelo
+  const now = Date.now();
+  let changed = false;
+  for (const n of desiredNotifications()) {
+    if (n.at <= now && !S.fired[n.key]) { S.fired[n.key] = now; changed = true; showWebNotification(n); }
+  }
+  for (const k in S.fired) if (S.fired[k] < now - 3 * DAY) { delete S.fired[k]; changed = true; }
+  if (changed) { save(false); if (tab === 'podsetnici') render(); }
+}
+
+// ================================================================ start
+async function initNative() {
+  try {
+    await LN.createChannel({ id: 'podsetnici', name: 'Podsetnici', description: 'Tvoji podsetnici', importance: 5, visibility: 1, vibration: true });
+    await LN.createChannel({ id: 'parking', name: 'Parking', description: 'Istek parkinga', importance: 5, visibility: 1, vibration: true });
+    LN.addListener('localNotificationActionPerformed', (ev) => {
+      const t = ev.notification?.extra?.tab; if (t && TITLES[t]) setTab(t);
+    });
+    const p = await LN.checkPermissions();
+    if (p.display === 'prompt' || p.display === 'prompt-with-rationale') await ensurePermission();
+  } catch (e) { console.warn('init', e); }
+  syncNotifications();
+}
+
+if (IS_NATIVE) initNative();
+else {
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  navigator.serviceWorker?.addEventListener('message', (e) => { if (e.data?.tab && TITLES[e.data.tab]) setTab(e.data.tab); });
+  const t = new URLSearchParams(location.search).get('tab'); if (t && TITLES[t]) tab = t;
+  webTick(); setInterval(webTick, 15e3);
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState !== 'visible') return;
+  if (IS_NATIVE) syncNotifications(); else webTick();
+  if (!$('#sheetBg').hidden) return; render();
+});
+window.closeSheet = closeSheet;
+setTab(tab);

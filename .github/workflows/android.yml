@@ -1,0 +1,48 @@
+name: Android APK
+
+on:
+  push:
+    paths-ignore: ['README.md']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Instaliraj zavisnosti
+        run: npm ci
+      - name: Kopiraj web deo u Android projekat
+        run: npx cap sync android
+      - name: Napravi APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+          cp app/build/outputs/apk/release/app-release.apk ../moj-asistent.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: moj-asistent-apk
+          path: moj-asistent.apk
+      - name: Objavi kao "najnovija" verziju (samo sa main grane)
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-${{ github.run_number }}
+          name: Moj Asistent 1.0.${{ github.run_number }}
+          make_latest: true
+          body: |
+            Instalacija na Android: preuzmi `moj-asistent.apk`, otvori ga i dozvoli instalaciju iz ovog izvora.
+            Nova verzija se instalira preko stare – podaci ostaju.
+          files: moj-asistent.apk
