@@ -8,6 +8,7 @@
 const Cap = window.Capacitor;
 const IS_NATIVE = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
 const LN = IS_NATIVE ? Cap.registerPlugin('LocalNotifications') : null;
+const Battery = IS_NATIVE ? Cap.registerPlugin('Battery') : null;
 const APK_URL = 'https://github.com/fianketo/Moj-asistent/releases/latest/download/moj-asistent.apk';
 const WEB_URL = 'https://fianketo.github.io/Moj-asistent/';
 
@@ -570,6 +571,7 @@ $('#view').addEventListener('click', async (e) => {
     case 'park-map': { const A = S.parking.active; return openExternal(`https://www.google.com/maps/search/?api=1&query=${A.lat},${A.lng}`); }
     case 'perm': await ensurePermission(true); return render();
     case 'test': return testNotification();
+    case 'battery': await Battery.request(); return;
     case 'zone-add': S.parking.zones.push({ id: uid(), name: 'Nova zona', color: '#7c3aed', sms: '', maxMin: 0 }); save(false); return render();
     case 'zone-del': S.parking.zones = S.parking.zones.filter((z) => z.id !== el.closest('[data-z]').dataset.z);
       if (!S.parking.zones.length) S.parking.zones = DEFAULT_ZONES.map((z) => ({ ...z })); save(false); return render();
@@ -682,9 +684,15 @@ async function notifStatus() {
   if (IS_NATIVE) {
     const p = await LN.checkPermissions();
     let n = 0; try { n = (await LN.getPending()).notifications.length; } catch { /* */ }
-    return p.display === 'granted'
+    let bat = '';
+    try {
+      bat = (await Battery.status()).unrestricted
+        ? '<br>🔋 Štednja baterije: <span class="status-ok">isključena ✔︎</span>'
+        : '<br>🔋 Štednja baterije je uključena – obaveštenja mogu da kasne. <button class="btn small" data-act="battery">Isključi</button>';
+    } catch { /* */ }
+    return (p.display === 'granted'
       ? `<span class="status-ok">✔︎ Uključena</span> · zakazano: ${n}`
-      : '<span class="status-bad">✖ Isključena</span> – dodirni „Uključi obaveštenja“';
+      : '<span class="status-bad">✖ Isključena</span> – dodirni „Uključi obaveštenja“') + bat;
   }
   if (!('Notification' in window)) return '<span class="status-bad">Pregledač ne podržava obaveštenja</span>';
   return { granted: '<span class="status-ok">✔︎ Uključena</span>', denied: '<span class="status-bad">✖ Blokirana u pregledaču</span>', default: 'Nisu uključena' }[Notification.permission];
