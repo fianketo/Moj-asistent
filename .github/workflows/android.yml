@@ -55,7 +55,7 @@ jobs:
           tag_name: proba-${{ github.run_number }}
           target_commitish: ${{ github.sha }}
           name: Moj Asistent – proba ${{ github.run_number }}
-          prerelease: true
-          make_latest: false
+          prerelease: false
+          make_latest: true
           body: Probna verzija za testiranje. Preuzmi `moj-asistent.apk` i otvori ga na Android telefonu.
           files: moj-asistent.apk
