@@ -2,7 +2,7 @@
   "version": 0.6,
   "generator": "Overpass API 0.7.62.11 87bfad18",
   "osm3s": {
-    "timestamp_osm_base": "2026-06-01T08:52:28Z",
+    "timestamp_osm_base": "2026-05-31T22:37:44Z",
     "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
   },
   "elements": [
@@ -11953,10 +11953,10 @@
   "type": "way",
   "id": 44073085,
   "bounds": {
-    "minlat": 45.2417513,
+    "minlat": 45.2417259,
     "minlon": 19.8490769,
     "maxlat": 45.2425841,
-    "maxlon": 19.8495870
+    "maxlon": 19.8496060
   },
   "nodes": [
     319618332,
@@ -11966,9 +11966,9 @@
   ],
   "geometry": [
     { "lat": 45.2425841, "lon": 19.8490769 },
-    { "lat": 45.2424926, "lon": 19.8491330 },
+    { "lat": 45.2424794, "lon": 19.8491417 },
     { "lat": 45.2419465, "lon": 19.8494700 },
-    { "lat": 45.2417513, "lon": 19.8495870 }
+    { "lat": 45.2417259, "lon": 19.8496060 }
   ],
   "tags": {
     "highway": "residential",
@@ -114067,7 +114067,7 @@
     { "lat": 45.2424803, "lon": 19.8477213 },
     { "lat": 45.2424839, "lon": 19.8477642 },
     { "lat": 45.2424956, "lon": 19.8479268 },
-    { "lat": 45.2425458, "lon": 19.8486209 },
+    { "lat": 45.2425462, "lon": 19.8486262 },
     { "lat": 45.2425697, "lon": 19.8489413 }
   ],
   "tags": {
@@ -140290,7 +140290,8 @@
     "name:sr": "Трг слободе",
     "name:sr-Latn": "Trg slobode",
     "ref:RS:ulica": "802824100624",
-    "surface": "asphalt"
+    "smoothness": "excellent",
+    "surface": "paving_stones"
   }
 },
 {
