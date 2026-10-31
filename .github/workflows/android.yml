@@ -24,7 +24,9 @@ jobs:
       - name: Instaliraj zavisnosti
         run: npm ci
       - name: Kopiraj web deo u Android projekat
-        run: npx cap sync android
+        run: |
+          sed -i "s/__BUILD__/${{ github.run_number }}/" www/app.js
+          npx cap sync android
       - name: Napravi APK
         working-directory: android
         run: |

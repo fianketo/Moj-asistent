@@ -9,6 +9,7 @@ const Cap = window.Capacitor;
 const IS_NATIVE = !!(Cap && Cap.isNativePlatform && Cap.isNativePlatform());
 const LN = IS_NATIVE ? Cap.registerPlugin('LocalNotifications') : null;
 const Battery = IS_NATIVE ? Cap.registerPlugin('Battery') : null;
+const BUILD = '__BUILD__'; // CI upisuje broj verzije
 const APK_URL = 'https://github.com/fianketo/Moj-asistent/releases/latest/download/moj-asistent.apk';
 const WEB_URL = 'https://fianketo.github.io/Moj-asistent/';
 
@@ -639,7 +640,7 @@ function renderSettings() {
       <button class="btn small" data-act="import">Uvezi</button></div>
       <input type="file" id="importFile" accept="application/json,.json" hidden>
     </div>
-    <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:24px">Moj Asistent · ${IS_NATIVE ? 'Android' : 'web'} verzija</p>
+    <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:24px">Moj Asistent · ${IS_NATIVE ? 'Android' : 'web'} verzija${BUILD.startsWith('__') ? '' : ' · proba ' + BUILD}</p>
   </div>`;
   notifStatus().then((s) => { const el = $('#nStatus'); if (el) el.innerHTML = s; });
   $('#importFile').addEventListener('change', importData);
