@@ -1,0 +1,32 @@
+name: Preuzmi katastar parking zona (Novi Sad)
+
+on:
+  push:
+    branches: [claude/personal-assistant-app-3yx3up]
+    paths: ['.github/workflows/katastar.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preuzmi PDF i izvuci tekst
+        run: |
+          sudo apt-get -qq install -y poppler-utils >/dev/null
+          mkdir -p data/novisad
+          curl -sSL -A "Mozilla/5.0" -o data/novisad/katastar.pdf "https://parkingns.rs/wp-content/uploads/2026/07/SON-Katastar-g260626_1000.pdf"
+          ls -la data/novisad; file data/novisad/katastar.pdf
+          pdfinfo data/novisad/katastar.pdf || true
+          pdftotext -layout data/novisad/katastar.pdf data/novisad/katastar.txt
+          wc -l data/novisad/katastar.txt; head -80 data/novisad/katastar.txt
+      - name: Sačuvaj u granu
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/novisad
+          git commit -m "Podaci: katastar parking zona Novi Sad (PDF + tekst)" || exit 0
+          git push
