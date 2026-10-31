@@ -549,6 +549,7 @@ async function shareList() {
 }
 
 // Prijem liste: pregled, izbor liste u koju se dodaje
+const artikala = (n) => (n % 10 === 1 && n % 100 !== 11 ? 'artikal' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'artikla' : 'artikala');
 function showImport(data) {
   const isAndroidWeb = !IS_NATIVE && /Android/i.test(navigator.userAgent);
   const intentUrl = `intent://lista?d=${encodeList(data)}#Intent;scheme=mojasistent;package=com.fianketo.mojasistent;S.browser_fallback_url=${encodeURIComponent(APK_URL)};end`;
@@ -558,7 +559,7 @@ function showImport(data) {
       <p style="font-size:12px;color:var(--muted);margin:6px 0">Nemaš aplikaciju? Dugme je preuzima. Ili dodaj listu ovde, u web verziji:</p>` : ''}
     <label class="field">Dodaj u
       <select class="input" id="impTo"><option value="__new">Novu listu „${esc(data.name)}“</option>${S.lists.map((l) => `<option value="${l.id}" ${l.name.toLowerCase() === data.name.toLowerCase() ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}</select></label>
-    <div class="foot"><button class="btn" onclick="closeSheet()">Otkaži</button><button class="btn primary" id="impOk">Dodaj ${data.items.length} ${data.items.length === 1 ? 'artikal' : 'artikala'}</button></div>`, () => {
+    <div class="foot"><button class="btn" onclick="closeSheet()">Otkaži</button><button class="btn primary" id="impOk">Dodaj ${data.items.length} ${artikala(data.items.length)}</button></div>`, () => {
     $('#impOk').onclick = () => {
       const to = $('#impTo').value;
       if (to === '__new') { const L = { id: uid(), name: data.name, items: [] }; S.lists.push(L); S.activeList = L.id; }
