@@ -2,7 +2,7 @@ name: Web verzija (GitHub Pages)
 
 on:
   push:
-    branches: [main]
+    branches: [main, claude/personal-assistant-app-3yx3up]
   workflow_dispatch:
 
 permissions:

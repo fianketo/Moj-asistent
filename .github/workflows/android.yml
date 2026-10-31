@@ -46,3 +46,14 @@ jobs:
             Instalacija na Android: preuzmi `moj-asistent.apk`, otvori ga i dozvoli instalaciju iz ovog izvora.
             Nova verzija se instalira preko stare – podaci ostaju.
           files: moj-asistent.apk
+      - name: Probna verzija (sa radne grane)
+        if: github.ref != 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: proba-${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: Moj Asistent – proba ${{ github.run_number }}
+          prerelease: true
+          make_latest: false
+          body: Probna verzija za testiranje. Preuzmi `moj-asistent.apk` i otvori ga na Android telefonu.
+          files: moj-asistent.apk
