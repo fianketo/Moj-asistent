@@ -701,6 +701,7 @@ $('#view').addEventListener('click', async (e) => {
     case 'perm': await ensurePermission(true); return render();
     case 'test': return testNotification();
     case 'battery': await Battery.request(); return;
+    case 'exact': try { await LN.changeExactNotificationSetting(); } catch { /* */ } scheduleSync(); return render();
     case 'zone-add': S.parking.zones.push({ id: uid(), name: 'Nova zona', color: '#7c3aed', sms: '', maxMin: 0 }); save(false); return render();
     case 'zone-del': S.parking.zones = S.parking.zones.filter((z) => z.id !== el.closest('[data-z]').dataset.z);
       if (!S.parking.zones.length) S.parking.zones = DEFAULT_ZONES.map((z) => ({ ...z })); save(false); return render();
@@ -771,23 +772,40 @@ function desiredNotifications() {
 let syncTimer = null;
 function scheduleSync() { clearTimeout(syncTimer); syncTimer = setTimeout(syncNotifications, 300); }
 
+const TEST_IDS = [998, 999];
+let diag = { lastSync: null, lastError: '', scheduled: 0 };
+
+async function exactAllowed() {
+  try { const r = await LN.checkExactNotificationSetting(); return !r || r.exact_alarm !== 'denied'; } catch { return true; }
+}
+
 async function syncNotifications() {
   if (!IS_NATIVE) return; // web: proverava webTick
   try {
     const perm = await LN.checkPermissions();
-    if (perm.display !== 'granted') return;
-    const pending = await LN.getPending();
-    if (pending.notifications.length) await LN.cancel({ notifications: pending.notifications.map((n) => ({ id: n.id })) });
+    if (perm.display !== 'granted') { diag.lastError = 'Nema dozvole za obaveštenja'; return; }
+    const exact = await exactAllowed();
     const list = desiredNotifications().filter((n) => n.at > Date.now() + 1000);
-    if (!list.length) return;
-    await LN.schedule({
-      notifications: list.map((n) => ({
-        id: hashId(n.key), title: n.title, body: n.body, largeBody: n.body,
-        schedule: { at: new Date(n.at), allowWhileIdle: true },
-        channelId: n.channel, smallIcon: 'ic_stat_notify', extra: { tab: n.tab },
-      })),
-    });
-  } catch (e) { console.warn('sync', e); }
+    const want = new Set(list.map((n) => hashId(n.key)));
+    // otkaži samo ono što više ne treba (probna obaveštenja se ne diraju)
+    const pending = (await LN.getPending()).notifications || [];
+    const stale = pending.filter((n) => !want.has(+n.id) && !TEST_IDS.includes(+n.id));
+    if (stale.length) await LN.cancel({ notifications: stale.map((n) => ({ id: +n.id })) });
+    if (list.length) {
+      await LN.schedule({
+        notifications: list.map((n) => ({
+          id: hashId(n.key), title: n.title, body: n.body, largeBody: n.body,
+          schedule: { at: new Date(n.at), allowWhileIdle: true },
+          isExactNotification: exact,
+          channelId: n.channel, smallIcon: 'ic_stat_notify', extra: { tab: n.tab },
+        })),
+      });
+    }
+    diag = { lastSync: Date.now(), lastError: '', scheduled: list.length, exact };
+  } catch (e) {
+    diag.lastError = (e && (e.message || e.code)) || String(e);
+    console.warn('sync', e);
+  }
 }
 
 async function ensurePermission(explicit) {
@@ -811,17 +829,27 @@ async function ensurePermission(explicit) {
 
 async function notifStatus() {
   if (IS_NATIVE) {
-    const p = await LN.checkPermissions();
-    let n = 0; try { n = (await LN.getPending()).notifications.length; } catch { /* */ }
-    let bat = '';
+    const ok = '<span class="status-ok">✔︎</span>', bad = '<span class="status-bad">✖</span>';
+    const lines = [];
+    const p = await LN.checkPermissions().catch((e) => ({ display: 'greška: ' + e.message }));
+    lines.push(p.display === 'granted' ? `${ok} Obaveštenja dozvoljena`
+      : `${bad} Obaveštenja nisu dozvoljena (${esc(p.display)}) <button class="btn small" data-act="perm">Dozvoli</button>`);
     try {
-      bat = (await Battery.status()).unrestricted
-        ? '<br>🔋 Štednja baterije: <span class="status-ok">isključena ✔︎</span>'
-        : '<br>🔋 Štednja baterije je uključena – obaveštenja mogu da kasne. <button class="btn small" data-act="battery">Isključi</button>';
+      const ex = await LN.checkExactNotificationSetting();
+      lines.push(ex.exact_alarm !== 'denied' ? `${ok} Tačni alarmi dozvoljeni`
+        : `${bad} Tačni alarmi nisu dozvoljeni – podsetnici mogu da kasne <button class="btn small" data-act="exact">Dozvoli</button>`);
     } catch { /* */ }
-    return (p.display === 'granted'
-      ? `<span class="status-ok">✔︎ Uključena</span> · zakazano: ${n}`
-      : '<span class="status-bad">✖ Isključena</span> – dodirni „Uključi obaveštenja“') + bat;
+    try {
+      lines.push((await Battery.status()).unrestricted ? `${ok} Štednja baterije isključena`
+        : `⚠️ Štednja baterije uključena <button class="btn small" data-act="battery">Isključi</button>`);
+    } catch { /* */ }
+    try {
+      const pend = ((await LN.getPending()).notifications || []).filter((n) => n.schedule && n.schedule.at);
+      const next = pend.map((n) => new Date(n.schedule.at)).filter((d) => !isNaN(d)).sort((a, b) => a - b)[0];
+      lines.push(`📅 Zakazano: ${pend.length}${next ? ' · sledeće ' + fmtWhen(next) : ''}`);
+    } catch (e) { lines.push(`${bad} Ne mogu da pročitam zakazana: ${esc(e.message)}`); }
+    if (diag.lastError) lines.push(`${bad} Poslednja greška: ${esc(diag.lastError)}`);
+    return lines.join('<br>');
   }
   if (!('Notification' in window)) return '<span class="status-bad">Pregledač ne podržava obaveštenja</span>';
   return { granted: '<span class="status-ok">✔︎ Uključena</span>', denied: '<span class="status-bad">✖ Blokirana u pregledaču</span>', default: 'Nisu uključena' }[Notification.permission];
@@ -831,8 +859,18 @@ async function testNotification() {
   if (!(await ensurePermission(true))) return;
   const at = Date.now() + 10e3;
   if (IS_NATIVE) {
-    await LN.schedule({ notifications: [{ id: 999, title: '✅ Probno obaveštenje', body: 'Obaveštenja rade!', schedule: { at: new Date(at), allowWhileIdle: true }, channelId: 'podsetnici', smallIcon: 'ic_stat_notify' }] });
-    toast('Stiže za 10 sekundi – možeš i da zatvoriš aplikaciju');
+    try {
+      const exact = await exactAllowed();
+      // 1) odmah – proverava da li telefon uopšte prikazuje obaveštenja
+      await LN.schedule({ notifications: [{ id: 998, title: '🔔 Obaveštenja rade', body: 'Za 10 sekundi stiže i zakazano probno obaveštenje.', channelId: 'podsetnici', smallIcon: 'ic_stat_notify' }] });
+      // 2) zakazano – proverava da li alarmi rade i kad je aplikacija zatvorena
+      await LN.schedule({ notifications: [{ id: 999, title: '✅ Zakazano obaveštenje radi', body: 'Podsetnici će ti stizati i kad je aplikacija zatvorena.', schedule: { at: new Date(at), allowWhileIdle: true }, isExactNotification: exact, channelId: 'podsetnici', smallIcon: 'ic_stat_notify' }] });
+      toast('Prvo stiže odmah, drugo za 10 s – zatvori aplikaciju i sačekaj', 5000);
+    } catch (e) {
+      diag.lastError = (e && (e.message || e.code)) || String(e);
+      toast('Greška: ' + diag.lastError, 6000);
+      if (tab === 'podesavanja') render();
+    }
   } else {
     setTimeout(() => showWebNotification({ key: 'test', title: '✅ Probno obaveštenje', body: 'Obaveštenja rade!', tab }), 10e3);
     toast('Stiže za 10 sekundi (ostavi pregledač otvoren)');
