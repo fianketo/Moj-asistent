@@ -14,7 +14,7 @@ Za nekog drugog: pošalji mu jedan od ova dva linka (ili u aplikaciji *Podešava
 ## Šta zna
 
 - **Podsetnici** – naziv, datum/vreme, „podseti me“ (u trenutku … 1 dan ranije), ponavljanje (dnevno, radnim danima, nedeljno, mesečno, godišnje), napomena. Brzi izbor: *za 1 sat, večeras, sutra 9h*.
-- **Kupovina** – više lista, količina i jedinica (kom, kg, g, l, ml, pak) sa +/− dugmićima, katalog od ~400 artikala po kategorijama, online pretraga proizvoda iz Srbije (Open Food Facts), lista grupisana po odeljenjima prodavnice, štikliranje, slanje liste preko Vibera/WhatsApp-a/SMS-a. 💰 otvara pretragu cena tog proizvoda na Cenoteci.
+- **Kupovina** – više lista, količina i jedinica (kom, kg, g, l, ml, pak) sa +/− dugmićima, katalog od preko 330 artikala po kategorijama, online pretraga proizvoda iz Srbije (Open Food Facts), lista grupisana po odeljenjima prodavnice, štikliranje, slanje liste preko Vibera/WhatsApp-a/SMS-a. 💰 otvara pretragu cena tog proizvoda na Cenoteci.
 - **Parking** – izbor zone, plaćanje SMS-om (otvara poruku sa tablicom), odbrojavanje, obaveštenje *X min pre isteka* i *po isteku*, produžavanje, pamćenje lokacije auta. SMS brojevi su podešeni za Beograd i mogu se menjati u Podešavanjima.
 - **Podešavanja** – status obaveštenja, probno obaveštenje, parking zone, izvoz/uvoz rezervne kopije.
 
