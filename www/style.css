@@ -147,3 +147,84 @@ textarea.input { min-height: 70px; resize: vertical; }
 .cat-item { border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 8px 12px; font-size: 14px; cursor: pointer; text-align: left; }
 .cat-item.on { background: var(--ok-soft); border-color: var(--ok); }
 .cat-item b { margin-left: 6px; color: var(--ok); font-size: 12px; }
+
+/* ===== Kupovina – novi izgled ===== */
+body[data-tab="kupovina"] main { padding-bottom: calc(200px + env(safe-area-inset-bottom)); }
+.shop-head { display: flex; align-items: center; gap: 4px; margin: 2px 0 6px; }
+.list-switch { display: flex; align-items: center; gap: 6px; border: 0; background: none; padding: 6px 2px;
+  font-size: 22px; font-weight: 700; cursor: pointer; color: var(--text); max-width: 70%; }
+.list-switch span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list-switch .caret { font-size: 14px; color: var(--muted); }
+.shop-head .iconbtn { font-size: 22px; width: 44px; height: 44px; }
+.progress-row { font-size: 14px; color: var(--muted); margin: 0 2px 6px; }
+.progress-row b { color: var(--text); }
+.progress { height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; margin-bottom: 12px; }
+.progress > div { height: 100%; background: var(--ok); border-radius: 99px; transition: width .3s; }
+
+.grp-h { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .04em; color: var(--muted); margin: 16px 4px 6px; }
+.grp-h > span:not(.grow):not(.link) { background: var(--line); color: var(--text); border-radius: 99px; padding: 0 8px; font-size: 12px; }
+.grp-h .grow { flex: 1; }
+.bought-h { cursor: pointer; padding: 10px 4px; margin-top: 22px; border-top: 1px dashed var(--line); }
+.bought-h .link { color: var(--accent); text-transform: none; letter-spacing: 0; font-weight: 600; }
+.grp { background: var(--card); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+
+.item-row { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 6px 10px 6px 14px;
+  border-bottom: 1px solid var(--line); cursor: pointer; user-select: none; transition: background .15s, opacity .2s; }
+.item-row:last-child { border-bottom: 0; }
+.item-row:active { background: var(--accent-soft); }
+.item-row .tick { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--muted);
+  display: grid; place-items: center; color: #fff; font-size: 15px; font-weight: 700; transition: all .15s; }
+.item-row .nm { flex: 1; min-width: 0; font-size: 17px; font-weight: 500; overflow-wrap: anywhere; }
+.item-row.done .tick, .item-row.checking .tick { background: var(--ok); border-color: var(--ok); }
+.item-row.done .nm { text-decoration: line-through; color: var(--muted); font-weight: 400; }
+.item-row.checking { opacity: .4; }
+.item-row.checking .nm { text-decoration: line-through; }
+.item-row.flash { animation: flash 1.2s; }
+@keyframes flash { 0%, 40% { background: var(--accent-soft); } 100% { background: transparent; } }
+.qty-pill { flex: none; border: 1px solid var(--line); background: var(--bg); color: var(--text); border-radius: 99px;
+  padding: 7px 12px; font-size: 14px; font-weight: 600; cursor: pointer; min-width: 52px; }
+.qty-pill.empty { color: var(--muted); }
+.item-row.done .qty-pill { opacity: .6; }
+
+.shop-empty { padding: 28px 8px; }
+.shop-empty .pop { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0 18px; }
+
+.shopbar { position: fixed; left: 0; right: 0; bottom: calc(57px + env(safe-area-inset-bottom)); z-index: 4;
+  background: var(--bg); border-top: 1px solid var(--line); padding: 8px 12px 10px; box-shadow: 0 -4px 14px rgba(15, 23, 42, .06); }
+.shopbar > * { max-width: 616px; margin-left: auto; margin-right: auto; }
+.sugg-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+.sugg-row:empty { display: none; }
+.sugg-row::-webkit-scrollbar { display: none; }
+.sugg { flex: none; border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 99px;
+  padding: 8px 12px; font-size: 14px; cursor: pointer; white-space: nowrap; }
+.sugg:active { background: var(--accent-soft); }
+.addrow { display: flex; gap: 8px; align-items: center; }
+.addrow .input { margin: 0; flex: 1; background: var(--card); font-size: 16px; padding: 13px 14px; border-radius: 12px; }
+.addrow .cat-btn { width: 48px; height: 48px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+
+/* Prozor za količinu */
+.q-title .q-name { font-size: 20px; font-weight: 700; border: 0; background: none; padding: 4px 0; margin: 0; }
+.q-step { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 14px 0 10px; }
+.q-btn { width: 64px; height: 64px; border-radius: 50%; border: 0; background: var(--accent-soft); color: var(--accent);
+  font-size: 34px; font-weight: 600; cursor: pointer; }
+.q-btn:active { transform: scale(.94); }
+.q-val { display: flex; align-items: baseline; gap: 6px; min-width: 110px; justify-content: center; }
+.q-val input { width: 80px; border: 0; background: none; text-align: right; font-size: 38px; font-weight: 700; color: var(--text); outline: none; }
+.q-val span { font-size: 18px; color: var(--muted); }
+.q-units { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.menu-list { display: grid; gap: 8px; margin-top: 12px; }
+
+/* Izbor liste */
+.lists { display: grid; gap: 6px; margin-top: 10px; }
+.list-pick { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); background: var(--bg);
+  border-radius: 12px; padding: 14px; font-size: 16px; cursor: pointer; text-align: left; color: var(--text); }
+.list-pick.on { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.list-pick .cnt { font-size: 13px; color: var(--muted); }
+
+/* Toast sa dugmetom */
+.toast { display: flex; align-items: center; gap: 12px; width: max-content; max-width: min(92vw, 420px); }
+.toast span { flex: 1; }
+.toast-act { border: 0; background: none; color: #a5b4fc; font-weight: 700; font-size: 14px; cursor: pointer; padding: 4px 2px; }
+body[data-tab="kupovina"] .toast { bottom: calc(190px + env(safe-area-inset-bottom)); }
+.list-pick .grow, .grp-h .grow { flex: 1; }

@@ -102,12 +102,15 @@ function save(resync = true) {
 let tab = 'podsetnici';
 const TITLES = { podsetnici: 'Podsetnici', kupovina: 'Kupovina', parking: 'Parking', podesavanja: 'Podešavanja' };
 
-function toast(msg, ms = 2600) {
+function toast(msg, ms = 2600, action) {
   const t = $('#toast');
-  t.textContent = msg; t.hidden = false;
-  clearTimeout(toast._t); toast._t = setTimeout(() => (t.hidden = true), ms);
+  t.innerHTML = `<span>${esc(msg)}</span>${action ? `<button class="toast-act">${esc(action.label)}</button>` : ''}`;
+  t.hidden = false;
+  if (action) t.querySelector('.toast-act').onclick = () => { t.hidden = true; action.fn(); };
+  clearTimeout(toast._t); toast._t = setTimeout(() => (t.hidden = true), action ? Math.max(ms, 4000) : ms);
 }
 function openSheet(html, onMount) {
+  $('#toast').hidden = true;
   const sh = $('#sheet');
   sh.innerHTML = html;
   $('#sheetBg').hidden = false;
@@ -130,6 +133,7 @@ function setTab(t) {
   $$('#nav button').forEach((b) => b.classList.toggle('active', b.dataset.tab === t));
   $('#title').textContent = TITLES[t];
   $('#fab').hidden = !(t === 'podsetnici');
+  document.body.dataset.tab = t;
   render();
   window.scrollTo(0, 0);
 }
@@ -295,7 +299,12 @@ const stepOf = (u) => STEP[u] || 1;
 const defaultQty = (u) => ({ g: 200, ml: 500 }[u] || 1);
 const fmtNum = (n) => String(Math.round(n * 1000) / 1000).replace('.', ',');
 const fmtQty = (i) => (i.qty ? `${fmtNum(i.qty)} ${i.unit || 'kom'}` : '');
-const catOf = (name) => CATALOG_INDEX.get(name.toLowerCase());
+const catOf = (name) => {
+  const n = name.toLowerCase().trim();
+  if (CATALOG_INDEX.has(n)) return CATALOG_INDEX.get(n);
+  for (const [k, v] of CATALOG_INDEX) if (k.startsWith(n + ' (')) return v; // „kafa“ → „Kafa (mlevena)“
+  return undefined;
+};
 const unitRe = '(kg|g|l|ml|kom|pak)';
 
 function parseItem(text) { // "2 mleko", "mleko x2", "mleko 1,5 kg", "500g sira"
@@ -306,6 +315,7 @@ function parseItem(text) { // "2 mleko", "mleko x2", "mleko 1,5 kg", "500g sira"
   return { name, qty: qty ? parseFloat(qty.replace(',', '.')) : null, unit: unit ? unit.toLowerCase() : null };
 }
 
+let lastAdd = null;
 function addToList(name, qty, unit, silent) {
   const L = curList(), c = catOf(name);
   unit = unit || (c && c.unit) || 'kom';
@@ -313,103 +323,160 @@ function addToList(name, qty, unit, silent) {
   const ex = L.items.find((i) => !i.done && i.name.toLowerCase() === name.toLowerCase() && (i.unit || 'kom') === unit);
   if (ex) { ex.qty = (ex.qty || 0) + qty; if (!silent) toast(`${ex.name}: ${fmtQty(ex)}`); }
   else L.items.unshift({ id: uid(), name, qty, unit, cat: c ? c.cat : '', done: false });
+  lastAdd = { item: ex || L.items[0], qty, wasNew: !ex };
   S.history = [name, ...S.history.filter((h) => h.toLowerCase() !== name.toLowerCase())].slice(0, 200);
   save(false);
   return ex || L.items[0];
 }
 
+let showBought = false;
+const POPULAR = ['Hleb', 'Mleko', 'Jaja', 'Jogurt', 'Banane', 'Jabuke', 'Krompir', 'Paradajz', 'Beli sir', 'Kafa (mlevena)', 'Voda (negazirana)', 'Toalet papir'];
+const catIcon = (cat) => (CATALOG.find((g) => g.cat === cat) || {}).icon || '🛍️';
+
 function renderShopping() {
   const L = curList();
   const open = L.items.filter((i) => !i.done), bought = L.items.filter((i) => i.done);
-  const suggestions = [...new Set([...S.history, ...[...CATALOG_INDEX.values()].map((x) => x.name)])];
-  let html = `<div class="chips">${S.lists.map((l) => `<button class="chip ${l.id === L.id ? 'on' : ''}" data-list="${l.id}">${esc(l.name)}<span class="count">${l.items.filter((i) => !i.done).length || ''}</span></button>`).join('')}
-    <button class="chip" data-act="new-list">+ Nova lista</button></div>
-    <form class="card block addcard" id="addForm" autocomplete="off">
-      <div class="addbar">
-        <input class="input" id="itemIn" list="sugg" placeholder="Šta kupuješ? (npr. mleko)" enterkeyhint="done">
-        <button class="btn primary">Dodaj</button>
-      </div>
-      <div class="qtybar">
-        <span class="lbl">Količina</span>
-        <div class="stepper big"><button type="button" data-step="-1">−</button>
-          <input id="qtyIn" type="text" inputmode="decimal" value="1"><button type="button" data-step="1">+</button></div>
-        <select class="input" id="unitIn">${UNITS.map((u) => `<option>${u}</option>`).join('')}</select>
-      </div>
-    </form>
-    <button class="btn block" data-act="catalog" style="margin-bottom:12px">📋 Izaberi iz kataloga artikala</button>
-    <datalist id="sugg">${suggestions.map((s) => `<option value="${esc(s)}">`).join('')}</datalist>`;
-  if (!L.items.length) {
-    html += `<div class="empty"><div class="big">🛒</div>Lista „${esc(L.name)}“ je prazna.<br>Upiši artikal ili ga izaberi iz kataloga.</div>`;
+  const total = L.items.length, pct = total ? Math.round((bought.length / total) * 100) : 0;
+  let html = `<div class="shop-head">
+      <button class="list-switch" data-act="list-switch"><span>${esc(L.name)}</span><span class="caret">▾</span></button>
+      <div class="grow"></div>
+      ${total ? '<button class="iconbtn" data-act="share" title="Pošalji listu">📤</button>' : ''}
+      <button class="iconbtn" data-act="list-menu" title="Još">⋯</button>
+    </div>
+    ${total ? `<div class="progress-row"><span>${open.length ? `Ostalo <b>${open.length}</b> · u korpi ${bought.length} od ${total}` : '🎉 Sve je u korpi!'}</span></div>
+    <div class="progress"><div style="width:${pct}%"></div></div>` : ''}`;
+
+  if (!total) {
+    html += `<div class="empty shop-empty"><div class="big">🛒</div><b>Lista je prazna</b><br>Upiši šta treba da kupiš dole, ili izaberi:
+      <div class="pop">${POPULAR.map((n) => `<button class="sugg" data-add="${esc(n)}">${catIcon((catOf(n) || {}).cat)} ${esc(n)}</button>`).join('')}</div>
+      <button class="btn" data-act="catalog">📋 Ceo katalog artikala</button>
+      <button class="btn" data-act="paste-import" style="margin-left:6px">📥 Primi listu</button></div>`;
   }
-  // grupisano po kategorijama, redosledom kao u prodavnici
+  // grupisano po odeljenjima, redosledom kao u prodavnici
   const order = CATALOG.map((g) => g.cat);
   const groups = new Map();
   for (const i of open) { const k = i.cat || 'Ostalo'; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); }
   const keys = [...groups.keys()].sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99));
   for (const k of keys) {
-    if (keys.length > 1) { const g = CATALOG.find((x) => x.cat === k); html += `<h2>${g ? g.icon + ' ' : ''}${esc(k)}</h2>`; }
-    html += groups.get(k).map(itemCard).join('');
+    html += `<div class="grp-h">${catIcon(k)} ${esc(k)} <span>${groups.get(k).length}</span></div><div class="grp">${groups.get(k).map(itemRow).join('')}</div>`;
   }
-  if (bought.length) html += `<h2>U korpi (${bought.length})</h2>` + bought.map(itemCard).join('');
-  html += `<div class="row" style="margin-top:16px">
-      ${L.items.length ? '<button class="btn small primary" data-act="share">📤 Pošalji listu</button>' : ''}
-      <button class="btn small" data-act="paste-import">📥 Primi listu</button>
-      ${bought.length ? '<button class="btn small" data-act="clear-bought">Ukloni kupljeno</button>' : ''}
-      <button class="btn small" data-act="list-menu">⋯ Lista</button>
-    </div>
-    <p style="font-size:13px;color:var(--muted);margin-top:14px">Dodirni naziv artikla za izmenu. 💰 otvara cene tog artikla na Cenoteci.</p>`;
+  if (bought.length) {
+    html += `<div class="grp-h bought-h" data-act="toggle-bought">✓ U korpi <span>${bought.length}</span><span class="grow"></span>
+        <span class="link">${showBought ? 'Sakrij' : 'Prikaži'}</span></div>
+      ${showBought ? `<div class="grp">${bought.map(itemRow).join('')}</div>
+        <button class="btn small" data-act="clear-bought" style="margin-top:8px">🧹 Ukloni kupljeno sa liste</button>` : ''}`;
+  }
+  html += `<div class="shopbar" id="shopbar">
+      <div class="sugg-row" id="suggRow"></div>
+      <form class="addrow" id="addForm" autocomplete="off">
+        <input class="input" id="itemIn" placeholder="＋ Dodaj artikal (npr. 2 mleko)" enterkeyhint="done" autocomplete="off">
+        <button type="button" class="iconbtn cat-btn" data-act="catalog" title="Katalog">📋</button>
+      </form>
+    </div>`;
   $('#view').innerHTML = html;
 
-  const qtyIn = $('#qtyIn'), unitIn = $('#unitIn'), itemIn = $('#itemIn');
-  const getQty = () => parseFloat(qtyIn.value.replace(',', '.')) || 0;
-  $('.qtybar .stepper').addEventListener('click', (e) => {
-    const d = +e.target.dataset.step; if (!d) return;
-    const s = stepOf(unitIn.value);
-    qtyIn.value = fmtNum(Math.max(s, getQty() + d * s));
-  });
-  unitIn.addEventListener('change', () => (qtyIn.value = fmtNum(defaultQty(unitIn.value))));
-  itemIn.addEventListener('input', () => {
-    const c = catOf(itemIn.value.trim());
-    if (c && unitIn.value !== c.unit) { unitIn.value = c.unit; qtyIn.value = fmtNum(defaultQty(c.unit)); }
-  });
+  const itemIn = $('#itemIn');
+  const drawSugg = () => {
+    const q = itemIn.value.trim().toLowerCase();
+    const inList = new Set(curList().items.filter((i) => !i.done).map((i) => i.name.toLowerCase()));
+    let names;
+    if (!q) names = [...new Set([...S.history, ...POPULAR])].filter((n) => !inList.has(n.toLowerCase())).slice(0, 12);
+    else {
+      const parsed = parseItem(itemIn.value).name.toLowerCase();
+      const all = [...new Set([...S.history, ...[...CATALOG_INDEX.values()].map((x) => x.name)])];
+      const starts = all.filter((n) => n.toLowerCase().startsWith(parsed));
+      const has = all.filter((n) => !n.toLowerCase().startsWith(parsed) && n.toLowerCase().includes(parsed));
+      names = [...starts, ...has].slice(0, 10);
+    }
+    if (!curList().items.length && !q) { $('#suggRow').innerHTML = ''; return; }
+    $('#suggRow').innerHTML = names.map((n) => `<button type="button" class="sugg" data-add="${esc(n)}">${catIcon((catOf(n) || {}).cat)} ${esc(n)}</button>`).join('');
+  };
+  itemIn.addEventListener('input', drawSugg);
+  drawSugg();
   $('#addForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const v = itemIn.value.trim(); if (!v) return;
-    const it = parseItem(v);
-    const cu = catOf(it.name);
-    addToList(it.name, it.qty || getQty(), it.unit || (it.qty && cu ? cu.unit : unitIn.value));
-    render();
-    $('#itemIn').focus();
+    const it = parseItem(v), cu = catOf(it.name);
+    const added = addToList(it.name, it.qty, it.unit || (cu ? cu.unit : null), true);
+    afterAdd(added);
   });
 }
 
-function itemCard(i) {
+function afterAdd(item) {
+  render();
+  const inp = $('#itemIn'); if (inp) inp.focus();
+  const row = $(`[data-item="${item.id}"]`);
+  if (row) { row.classList.add('flash'); row.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+  const la = lastAdd, L = curList();
+  toast(la && !la.wasNew ? `${item.name}: sada ${fmtQty(item)}` : `Dodato: ${item.name} · ${fmtQty(item)}`, 2600, { label: 'Poništi', fn: () => {
+    if (la && !la.wasNew) item.qty = Math.max(0, (item.qty || 0) - la.qty) || null;
+    else L.items = L.items.filter((x) => x !== item);
+    save(false); render();
+  } });
+}
+
+function itemRow(i) {
   const q = fmtQty(i);
-  return `<div class="card item ${i.done ? 'done' : ''}" data-item="${i.id}">
-    <button class="check ${i.done ? 'on' : ''}" data-act="item-toggle" aria-label="Kupljeno">${i.done ? '✓' : ''}</button>
-    <div class="body" data-act="item-edit"><div class="title">${esc(i.name)}</div>${i.done && q ? `<div class="meta">${esc(q)}</div>` : ''}</div>
-    ${i.done ? '' : `<div class="stepper"><button data-act="qty-dec" aria-label="Manje">−</button><span>${esc(q || '–')}</span><button data-act="qty-inc" aria-label="Više">+</button></div>`}
-    <button class="iconbtn" data-act="price" title="Cene na Cenoteci">💰</button></div>`;
+  return `<div class="item-row ${i.done ? 'done' : ''}" data-item="${i.id}" data-act="item-toggle">
+    <span class="tick">${i.done ? '✓' : ''}</span>
+    <span class="nm">${esc(i.name)}</span>
+    ${q ? `<button class="qty-pill" data-act="item-edit">${esc(q)}</button>` : `<button class="qty-pill empty" data-act="item-edit">＋</button>`}
+  </div>`;
 }
 
 function editItem(item) {
-  openSheet(`<h3>Izmeni artikal</h3>
-    <label class="field">Naziv<input class="input" id="eName" value="${esc(item.name)}"></label>
-    <div class="two">
-      <label class="field">Količina<input class="input" id="eQty" inputmode="decimal" value="${item.qty ? fmtNum(item.qty) : ''}"></label>
-      <label class="field">Jedinica<select class="input" id="eUnit">${UNITS.map((u) => `<option ${u === (item.unit || 'kom') ? 'selected' : ''}>${u}</option>`).join('')}</select></label>
+  const draw = () => `<div id="qWrap"><div class="q-title"><input class="input q-name" id="eName" value="${esc(item.name)}"></div>
+    <div class="q-step">
+      <button class="q-btn" data-q="-1" aria-label="Manje">−</button>
+      <div class="q-val"><input id="eQty" inputmode="decimal" value="${item.qty ? fmtNum(item.qty) : ''}" placeholder="–"><span>${esc(item.unit || 'kom')}</span></div>
+      <button class="q-btn" data-q="1" aria-label="Više">+</button>
     </div>
-    <button class="btn block" id="ePrice" style="margin-top:12px">💰 Cene na Cenoteci</button>
-    <div class="foot"><button class="btn danger" id="eDel">Obriši</button><button class="btn" onclick="closeSheet()">Otkaži</button><button class="btn primary" id="eSave">Sačuvaj</button></div>`, () => {
+    <div class="q-units">${UNITS.map((u) => `<button class="chip ${u === (item.unit || 'kom') ? 'on' : ''}" data-u="${u}">${u}</button>`).join('')}</div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn grow" id="ePrice">💰 Cene (Cenoteka)</button>
+      <button class="btn danger grow" id="eDel">🗑 Obriši</button>
+    </div>
+    <div class="foot"><button class="btn primary" id="eSave">Gotovo</button></div></div>`;
+  const commit = () => {
+    item.name = $('#eName').value.trim() || item.name;
+    const v = parseFloat($('#eQty').value.replace(',', '.'));
+    item.qty = v > 0 ? v : null;
+    const c = catOf(item.name); if (c) item.cat = c.cat;
+    save(false);
+  };
+  const mount = () => {
+    $('#qWrap').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-q],[data-u]'); if (!b) return;
+      commit();
+      if (b.dataset.q) { const s = stepOf(item.unit); item.qty = Math.max(s, (item.qty || 0) + +b.dataset.q * s); }
+      if (b.dataset.u) { item.unit = b.dataset.u; item.qty = defaultQty(item.unit); }
+      save(false); $('#sheet').innerHTML = draw(); mount(); render();
+    });
     $('#ePrice').onclick = () => openExternal(cenotekaUrl(item.name));
-    $('#eDel').onclick = () => { curList().items = curList().items.filter((x) => x !== item); save(false); closeSheet(); render(); };
-    $('#eSave').onclick = () => {
-      item.name = $('#eName').value.trim() || item.name;
-      item.qty = parseFloat($('#eQty').value.replace(',', '.')) || null;
-      item.unit = $('#eUnit').value;
-      const c = catOf(item.name); if (c) item.cat = c.cat;
-      save(false); closeSheet(); render();
+    $('#eDel').onclick = () => { closeSheet(); deleteItem(item); };
+    $('#eSave').onclick = () => { commit(); closeSheet(); render(); };
+  };
+  openSheet(draw(), mount);
+}
+
+function deleteItem(item) {
+  const L = curList(), idx = L.items.indexOf(item);
+  L.items = L.items.filter((x) => x !== item); save(false); render();
+  toast(`Obrisano: ${item.name}`, 4000, { label: 'Poništi', fn: () => { L.items.splice(idx, 0, item); save(false); render(); } });
+}
+
+function listSwitcher() {
+  openSheet(`<h3>Moje liste</h3>
+    <div class="lists">${S.lists.map((l) => { const o = l.items.filter((i) => !i.done).length; return `<button class="list-pick ${l.id === S.activeList ? 'on' : ''}" data-pick="${l.id}">
+      <span class="grow">${esc(l.name)}</span><span class="cnt">${o ? o + ' za kupovinu' : 'prazna'}</span></button>`; }).join('')}</div>
+    <div class="row" style="margin-top:12px"><button class="btn grow" id="lsNew">＋ Nova lista</button><button class="btn grow" id="lsRecv">📥 Primi listu</button></div>
+    <div class="foot"><button class="btn" onclick="closeSheet()">Zatvori</button></div>`, (sh) => {
+    $('.lists', sh).addEventListener('click', (e) => { const b = e.target.closest('[data-pick]'); if (!b) return; S.activeList = b.dataset.pick; save(false); closeSheet(); render(); });
+    $('#lsNew').onclick = () => {
+      const n = prompt('Naziv nove liste (npr. Pijaca, Apoteka):'); if (!n || !n.trim()) return;
+      const L = { id: uid(), name: n.trim(), items: [] }; S.lists.push(L); S.activeList = L.id; save(false); closeSheet(); render();
     };
+    $('#lsRecv').onclick = pasteImport;
   });
 }
 
@@ -589,13 +656,17 @@ function listMenu() {
   const L = curList();
   openSheet(`<h3>Lista „${esc(L.name)}“</h3>
     <label class="field">Naziv<input class="input" id="lName" value="${esc(L.name)}"></label>
-    <button class="btn block" id="lPaste" style="margin-top:12px">📋 Uvezi listu iz poruke</button>
+    <div class="menu-list">
+      <button class="btn block" id="lPaste">📥 Primi listu iz poruke</button>
+      <button class="btn block" id="lCat">📋 Katalog artikala</button>
+    </div>
     <div class="foot">
       ${S.lists.length > 1 ? '<button class="btn danger" id="lDel">Obriši listu</button>' : ''}
       <button class="btn" id="lClear">Isprazni</button>
       <button class="btn primary" id="lSave">Sačuvaj</button>
     </div>`, () => {
     $('#lPaste').onclick = pasteImport;
+    $('#lCat').onclick = () => { closeSheet(); openCatalog(); };
     $('#lSave').onclick = () => { L.name = $('#lName').value.trim() || L.name; save(false); closeSheet(); render(); };
     $('#lClear').onclick = () => { if (confirm('Obrisati sve stavke?')) { L.items = []; save(false); closeSheet(); render(); } };
     if ($('#lDel')) $('#lDel').onclick = () => {
@@ -874,6 +945,8 @@ function importData(e) {
 
 // ================================================================ klikovi
 $('#view').addEventListener('click', async (e) => {
+  const addB = e.target.closest('[data-add]');
+  if (addB) { const it = addToList(addB.dataset.add, null, null, true); return afterAdd(it); }
   const el = e.target.closest('[data-act],[data-list]'); if (!el) return;
   if (el.dataset.list) { S.activeList = el.dataset.list; save(false); return render(); }
   const act = el.dataset.act;
@@ -883,8 +956,14 @@ $('#view').addEventListener('click', async (e) => {
     case 'toggle': completeReminder(r); save(); return render();
     case 'edit': return editReminder(r);
     case 'clear-done': S.reminders = S.reminders.filter((x) => !x.done); save(); return render();
-    case 'item-toggle': item.done = !item.done; save(false); return render();
-    case 'item-del': curList().items = curList().items.filter((x) => x !== item); save(false); return render();
+    case 'item-toggle': {
+      item.done = !item.done; save(false);
+      const row = el.closest('.item-row'); if (row) { row.classList.add(item.done ? 'checking' : 'unchecking'); setTimeout(render, 220); } else render();
+      return;
+    }
+    case 'toggle-bought': showBought = !showBought; return render();
+    case 'list-switch': return listSwitcher();
+    case 'item-del': return deleteItem(item);
     case 'item-edit': return editItem(item);
     case 'qty-inc': case 'qty-dec': {
       const s = stepOf(item.unit), d = act === 'qty-inc' ? s : -s;
@@ -899,7 +978,11 @@ $('#view').addEventListener('click', async (e) => {
     }
     case 'share': return shareList();
     case 'paste-import': return pasteImport();
-    case 'clear-bought': curList().items = curList().items.filter((x) => !x.done); save(false); return render();
+    case 'clear-bought': {
+      const L = curList(), prev = L.items.slice();
+      L.items = L.items.filter((x) => !x.done); save(false); render();
+      return toast('Kupljeno uklonjeno sa liste', 4000, { label: 'Poništi', fn: () => { L.items = prev; save(false); render(); } });
+    }
     case 'list-menu': return listMenu();
     case 'park-start': return startParking();
     case 'park-extend': return extendParking();
