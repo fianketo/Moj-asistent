@@ -330,6 +330,30 @@ function addToList(name, qty, unit, silent) {
 }
 
 let showBought = false;
+// Pretraga bez obzira na kvačice: „cokolada“ = „čokolada“, „dj“ = „đ“
+const fold = (t) => t.toLowerCase().replace(/[čć]/g, 'c').replace(/š/g, 's').replace(/ž/g, 'z').replace(/đ/g, 'dj');
+let searchIdx = null;
+function searchItems(q) {
+  const f = fold(q.trim()); if (!f) return [];
+  if (!searchIdx) searchIdx = [...CATALOG_INDEX.values()].map((x) => ({ n: x.name, f: fold(x.name) }));
+  const hist = S.history.map((n) => ({ n, f: fold(n), h: 1 }));
+  const seen = new Set(), out = [];
+  for (const it of [...hist, ...searchIdx]) {
+    const key = it.n.toLowerCase(); if (seen.has(key)) continue;
+    const words = it.f.split(/[\s()]+/);
+    const sc = it.f === f ? 0 : words.includes(f) ? 1 : it.f.startsWith(f) ? 2 : words.some((w) => w.startsWith(f)) ? 3 : it.f.includes(f) ? 4 : -1;
+    if (sc < 0) continue;
+    seen.add(key); out.push({ n: it.n, sc: sc - (it.h ? 0.5 : 0) });
+  }
+  return out.sort((a, b) => a.sc - b.sc || a.n.length - b.n.length).map((x) => x.n);
+}
+function hilite(name, q) {
+  const t = q.trim(), i = fold(name).indexOf(fold(t));
+  if (i < 0 || !t) return esc(name);
+  // fold može da promeni dužinu (đ→dj), pa za isticanje koristi dužinu iz originala približno
+  const L = t.length;
+  return esc(name.slice(0, i)) + '<b>' + esc(name.slice(i, i + L)) + '</b>' + esc(name.slice(i + L));
+}
 const POPULAR = ['Hleb', 'Mleko', 'Jaja', 'Jogurt', 'Banane', 'Jabuke', 'Krompir', 'Paradajz', 'Beli sir', 'Kafa (mlevena)', 'Voda (negazirana)', 'Toalet papir'];
 const catIcon = (cat) => (CATALOG.find((g) => g.cat === cat) || {}).icon || '🛍️';
 
@@ -367,9 +391,11 @@ function renderShopping() {
         <button class="btn small" data-act="clear-bought" style="margin-top:8px">🧹 Ukloni kupljeno sa liste</button>` : ''}`;
   }
   html += `<div class="shopbar" id="shopbar">
+      <div class="search-res" id="searchRes"></div>
       <div class="sugg-row" id="suggRow"></div>
       <form class="addrow" id="addForm" autocomplete="off">
-        <input class="input" id="itemIn" placeholder="＋ Dodaj artikal (npr. 2 mleko)" enterkeyhint="done" autocomplete="off">
+        <input class="input" id="itemIn" placeholder="🔎 Traži ili dodaj (npr. 2 mleko)" enterkeyhint="done" autocomplete="off" autocorrect="off" spellcheck="false">
+        <button type="button" class="iconbtn clr-btn" id="itemClr" title="Obriši" hidden>✕</button>
         <button type="button" class="iconbtn cat-btn" data-act="catalog" title="Katalog">📋</button>
       </form>
     </div>`;
@@ -377,26 +403,40 @@ function renderShopping() {
 
   const itemIn = $('#itemIn');
   const drawSugg = () => {
-    const q = itemIn.value.trim().toLowerCase();
-    const inList = new Set(curList().items.filter((i) => !i.done).map((i) => i.name.toLowerCase()));
-    let names;
-    if (!q) names = [...new Set([...S.history, ...POPULAR])].filter((n) => !inList.has(n.toLowerCase())).slice(0, 12);
-    else {
-      const parsed = parseItem(itemIn.value).name.toLowerCase();
-      const all = [...new Set([...S.history, ...[...CATALOG_INDEX.values()].map((x) => x.name)])];
-      const starts = all.filter((n) => n.toLowerCase().startsWith(parsed));
-      const has = all.filter((n) => !n.toLowerCase().startsWith(parsed) && n.toLowerCase().includes(parsed));
-      names = [...starts, ...has].slice(0, 10);
+    const raw = itemIn.value.trim();
+    const inList = new Map(curList().items.filter((i) => !i.done).map((i) => [i.name.toLowerCase(), i]));
+    if (!raw) {
+      $('#searchRes').innerHTML = '';
+      const names = [...new Set([...S.history, ...POPULAR])].filter((n) => !inList.has(n.toLowerCase())).slice(0, 12);
+      $('#suggRow').innerHTML = curList().items.length ? names.map((n) => `<button type="button" class="sugg" data-add="${esc(n)}">${esc(n)}</button>`).join('') : '';
+      return;
     }
-    if (!curList().items.length && !q) { $('#suggRow').innerHTML = ''; return; }
-    $('#suggRow').innerHTML = names.map((n) => `<button type="button" class="sugg" data-add="${esc(n)}">${catIcon((catOf(n) || {}).cat)} ${esc(n)}</button>`).join('');
+    $('#suggRow').innerHTML = '';
+    const p = parseItem(raw);
+    const res = searchItems(p.name).slice(0, 6);
+    const exact = res.some((r) => fold(r) === fold(p.name));
+    const rows = (exact ? res : [p.name, ...res.slice(0, 5)]).map((n) => {
+      const c = catOf(n), have = inList.get(n.toLowerCase());
+      const q = p.qty ? `${fmtNum(p.qty)} ${p.unit || (c ? c.unit : 'kom')}` : '';
+      return `<button type="button" class="res" data-add="${esc(n)}" data-q="${p.qty || ''}" data-u="${esc(p.unit || '')}">
+        <span class="res-ic">${catIcon(c ? c.cat : '')}</span><span class="res-nm">${hilite(n, p.name)}</span>
+        ${have ? `<span class="res-have">na listi ${esc(fmtQty(have))}</span>` : ''}${q ? `<span class="res-q">${esc(q)}</span>` : ''}<span class="res-add">＋</span></button>`;
+    }).join('');
+    $('#searchRes').innerHTML = rows;
   };
-  itemIn.addEventListener('input', drawSugg);
+  itemIn.addEventListener('input', () => { $('#itemClr').hidden = !itemIn.value; $('#toast').hidden = true; drawSugg(); });
+  // predlozi samo dok se kuca – lista ima više mesta
+  itemIn.addEventListener('focus', () => $('#shopbar').classList.add('focus'));
+  itemIn.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== itemIn && $('#shopbar')) $('#shopbar').classList.remove('focus'); }, 250));
+  $('#itemClr').onclick = () => { itemIn.value = ''; $('#itemClr').hidden = true; drawSugg(); itemIn.focus(); };
   drawSugg();
   $('#addForm').addEventListener('submit', (e) => {
     e.preventDefault();
     const v = itemIn.value.trim(); if (!v) return;
-    const it = parseItem(v), cu = catOf(it.name);
+    const it = parseItem(v);
+    const best = searchItems(it.name)[0];
+    if (best && fold(best) === fold(it.name)) it.name = best; // „cokolada“ → „Čokolada“
+    const cu = catOf(it.name);
     const added = addToList(it.name, it.qty, it.unit || (cu ? cu.unit : null), true);
     afterAdd(added);
   });
@@ -946,7 +986,7 @@ function importData(e) {
 // ================================================================ klikovi
 $('#view').addEventListener('click', async (e) => {
   const addB = e.target.closest('[data-add]');
-  if (addB) { const it = addToList(addB.dataset.add, null, null, true); return afterAdd(it); }
+  if (addB) { const it = addToList(addB.dataset.add, +addB.dataset.q || null, addB.dataset.u || null, true); return afterAdd(it); }
   const el = e.target.closest('[data-act],[data-list]'); if (!el) return;
   if (el.dataset.list) { S.activeList = el.dataset.list; save(false); return render(); }
   const act = el.dataset.act;
