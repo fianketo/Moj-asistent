@@ -795,8 +795,10 @@ async function pushGeofences() {
   } catch (e) { console.warn('geo', e); }
 }
 
+let gpsOff = false;
 function renderParking() {
   const P = S.parking, A = P.active;
+  if (Geo && P.auto) Geo.status().then((st) => { const was = gpsOff; gpsOff = st.gps === false; if (was !== gpsOff && tab === 'parking') render(); }).catch(() => {});
   clearInterval(parkTimer);
   if (!A && Date.now() - detect.at > 30e3) detectZone();
   if (A) {
@@ -826,7 +828,7 @@ function renderParking() {
   }
   const zone = zoneById(P.lastZone) || P.zones[0];
   const durs = [15, 30, 60, 90, 120, 180, 240];
-  $('#view').innerHTML = notifBanner() + `<div class="card block">
+  $('#view').innerHTML = notifBanner() + (gpsOff ? '<div class="banner"><span>📍 <b>Lokacija na telefonu je isključena</b> – bez nje te aplikacija ne može podsetiti da platiš parking.</span></div>' : '') + `<div class="card block">
       <label class="field" style="margin-top:0">Registarska oznaka
         <input class="input plate" id="pPlate" value="${esc(P.plate)}" placeholder="${P.city === 'novisad' ? 'NS123AB' : 'BG123AB'}" autocapitalize="characters"></label>
       <div class="field">Zona</div>
@@ -1263,7 +1265,8 @@ async function geoStatus() {
   const ok = '<span class="status-ok">✔︎</span>', bad = '<span class="status-bad">✖</span>';
   try {
     const st = await Geo.status();
-    const lines = [st.location ? `${ok} Lokacija dozvoljena` : `${bad} Lokacija nije dozvoljena`,
+    const lines = [st.gps === false ? `${bad} <b>Lokacija na telefonu je isključena</b> – uključi je u brzim podešavanjima` : `${ok} Lokacija na telefonu uključena`,
+      st.location ? `${ok} Lokacija dozvoljena` : `${bad} Lokacija nije dozvoljena`,
       st.background ? `${ok} Lokacija „uvek“ (i kad je aplikacija zatvorena)` : `${bad} Lokacija nije „Dozvoli uvek“ <button class="btn small" data-act="geo-perm">Dozvoli</button>`,
       st.activity ? `${ok} Prepoznavanje vožnje (fizička aktivnost)` : `${bad} Nije dozvoljena „Fizička aktivnost“ <button class="btn small" data-act="geo-perm">Dozvoli</button>`];
     if (st.lastEvent) lines.push(`ℹ️ Poslednji događaj: ${esc(st.lastEvent.replace(/@(\d+)$/, (m, t) => ' · ' + fmtWhen(new Date(+t))))}`);

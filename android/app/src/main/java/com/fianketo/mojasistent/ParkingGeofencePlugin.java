@@ -200,6 +200,8 @@ public class ParkingGeofencePlugin extends Plugin {
         SharedPreferences p = prefs(getContext());
         JSObject ret = new JSObject();
         ret.put("activity", hasActivity(getContext()));
+        android.location.LocationManager lm = (android.location.LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        ret.put("gps", lm != null && androidx.core.location.LocationManagerCompat.isLocationEnabled(lm));
         ret.put("lastActivityRegister", p.getString("lastActivityRegister", ""));
         ret.put("location", hasFine(getContext()));
         ret.put("background", hasBackground(getContext()));
