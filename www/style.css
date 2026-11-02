@@ -275,3 +275,7 @@ body[data-tab="kupovina"] .toast { bottom: calc(140px + env(safe-area-inset-bott
 .shopbar:not(.focus) .sugg-row { display: none; }
 body[data-tab="kupovina"] main { padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
 body[data-tab="kupovina"] .toast { bottom: calc(130px + env(safe-area-inset-bottom)); }
+.geo-log { margin-top: 6px; font-size: 13px; }
+.geo-log summary { cursor: pointer; color: var(--text); }
+.geo-log div { padding: 3px 0; border-bottom: 1px solid var(--line); color: var(--text); }
+.geo-log span { color: var(--muted); margin-right: 4px; }

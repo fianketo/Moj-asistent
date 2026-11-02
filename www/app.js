@@ -1269,7 +1269,9 @@ async function geoStatus() {
       st.location ? `${ok} Lokacija dozvoljena` : `${bad} Lokacija nije dozvoljena`,
       st.background ? `${ok} Lokacija „uvek“ (i kad je aplikacija zatvorena)` : `${bad} Lokacija nije „Dozvoli uvek“ <button class="btn small" data-act="geo-perm">Dozvoli</button>`,
       st.activity ? `${ok} Prepoznavanje vožnje (fizička aktivnost)` : `${bad} Nije dozvoljena „Fizička aktivnost“ <button class="btn small" data-act="geo-perm">Dozvoli</button>`];
-    if (st.lastEvent) lines.push(`ℹ️ Poslednji događaj: ${esc(st.lastEvent.replace(/@(\d+)$/, (m, t) => ' · ' + fmtWhen(new Date(+t))))}`);
+    const log = Array.isArray(st.log) ? st.log : [];
+    if (log.length) lines.push(`<details class="geo-log" ${log.length ? 'open' : ''}><summary>📜 Dnevnik (poslednji događaji)</summary>${log.slice(0, 12).map(([t, m]) => `<div><span>${fmtWhen(new Date(+t))}</span> ${esc(m)}</div>`).join('')}</details>`);
+    else lines.push('📜 Dnevnik je prazan – još nije bilo događaja.');
     if (st.lastRegister && st.lastRegister.startsWith('error')) lines.push(`${bad} ${esc(st.lastRegister)}`);
     return lines.join('<br>');
   } catch (e) { return `${bad} ${esc(e.message)}`; }

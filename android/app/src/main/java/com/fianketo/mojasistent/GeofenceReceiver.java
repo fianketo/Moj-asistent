@@ -54,7 +54,7 @@ public class GeofenceReceiver extends BroadcastReceiver {
             for (ActivityTransitionEvent ev : res.getTransitionEvents()) {
                 if (ev.getActivityType() != DetectedActivity.IN_VEHICLE) continue;
                 boolean exit = ev.getTransitionType() == ActivityTransition.ACTIVITY_TRANSITION_EXIT;
-                p.edit().putString("lastEvent", (exit ? "vehicle_exit@" : "vehicle_enter@") + System.currentTimeMillis()).apply();
+                log(p, exit ? "telefon: izlazak iz vozila" : "telefon: vožnja počela");
                 if (exit) onVehicleExit(ctx, p, false);
             }
             return;
@@ -65,19 +65,19 @@ public class GeofenceReceiver extends BroadcastReceiver {
         }
         GeofencingEvent ev = GeofencingEvent.fromIntent(intent);
         if (ev == null || ev.hasError()) {
-            p.edit().putString("lastEvent", "error:" + (ev == null ? "null" : ev.getErrorCode())).apply();
+            log(p, "error:" + (ev == null ? "null" : ev.getErrorCode()));
             return;
         }
         if (ev.getTriggeringGeofences() == null) return;
         for (Geofence g : ev.getTriggeringGeofences()) {
             if (ev.getGeofenceTransition() == Geofence.GEOFENCE_TRANSITION_DWELL) onDwell(ctx, p, g.getRequestId(), false);
-            else p.edit().putString("lastEvent", "exit:" + g.getRequestId() + "@" + System.currentTimeMillis()).apply();
+            else log(p, "napustio zapamćeno mesto");
         }
     }
 
     private void onDwell(Context ctx, SharedPreferences p, String id, boolean ignoreHours) {
         long now = System.currentTimeMillis();
-        p.edit().putString("lastEvent", "dwell:" + id + "@" + now).apply();
+        log(p, "zadržao se na zapamćenom mestu");
         if (id == null || !p.getBoolean("enabled", false)) return;
         if (p.getLong("activeUntil", 0) > now) return; // već plaćeno u aplikaciji
         if (now - p.getLong("notified_" + id, 0) < COOLDOWN_MS) return;
@@ -93,20 +93,22 @@ public class GeofenceReceiver extends BroadcastReceiver {
             notifyPay(ctx, id, zone, sms, plate, "");
             p.edit().putLong("notified_" + id, now).apply();
         } catch (Exception e) {
-            p.edit().putString("lastEvent", "error:" + e.getMessage()).apply();
+            log(p, "error:" + e.getMessage());
         }
     }
 
     /** Upravo si izašao iz auta: uzmi lokaciju, nađi zonu (katastar ili zapamćeno mesto) i podseti. */
     @SuppressLint("MissingPermission")
     private void onVehicleExit(Context ctx, SharedPreferences p, boolean test) {
-        if (!p.getBoolean("enabled", false) || !ParkingGeofencePlugin.hasFine(ctx)) return;
+        if (!p.getBoolean("enabled", false)) { log(p, "preskočeno: podsetnik isključen"); return; }
+        if (!ParkingGeofencePlugin.hasFine(ctx)) { log(p, "preskočeno: nema dozvole za lokaciju"); return; }
         long now = System.currentTimeMillis();
-        if (!test && p.getLong("activeUntil", 0) > now) return;
-        if (!test && now - p.getLong("lastAutoNotify", 0) < 20 * 60 * 1000L) return;
+        if (!test && p.getLong("activeUntil", 0) > now) { log(p, "preskočeno: parking već plaćen u aplikaciji"); return; }
+        if (!test && now - p.getLong("lastAutoNotify", 0) < 20 * 60 * 1000L) { log(p, "preskočeno: podsetnik poslat pre manje od 20 min"); return; }
         try {
-            if (!test && !isPaidTime(new JSONObject(p.getString("hours", "{}")))) return;
+            if (!test && !isPaidTime(new JSONObject(p.getString("hours", "{}")))) { log(p, "preskočeno: van vremena naplate"); return; }
         } catch (Exception ignored) { }
+        log(p, test ? "proba: tražim lokaciju" : "izašao iz auta – tražim lokaciju");
         final PendingResult pr = goAsync();
         CancellationTokenSource cts = new CancellationTokenSource();
         LocationServices.getFusedLocationProviderClient(ctx)
@@ -114,7 +116,8 @@ public class GeofenceReceiver extends BroadcastReceiver {
             .addOnCompleteListener(task -> {
                 try {
                     Location loc = task.isSuccessful() ? task.getResult() : null;
-                    if (loc == null) { p.edit().putString("lastEvent", "exit_no_location@" + now).apply(); return; }
+                    if (loc != null) log(p, String.format(java.util.Locale.US, "lokacija %.5f, %.5f (±%.0f m)", loc.getLatitude(), loc.getLongitude(), loc.getAccuracy()));
+                    if (loc == null) { log(p, "lokacija nije dobijena (isključena ili nema signala)"); return; }
                     handleParkedAt(ctx, p, loc.getLatitude(), loc.getLongitude());
                 } finally {
                     pr.finish();
@@ -143,12 +146,26 @@ public class GeofenceReceiver extends BroadcastReceiver {
                     if (d < best) { best = d; zoneName = s.optString("zone"); sms = s.optString("sms", ""); }
                 }
             }
-            p.edit().putString("lastEvent", "parked:" + (zoneName == null ? "van zone" : zoneName) + "@" + System.currentTimeMillis()).apply();
+            log(p, zoneName == null ? "parkirao van zone naplate – bez obaveštenja" : "parkirao: " + zoneName + " – obaveštenje poslato");
             if (zoneName == null) return;
             notifyPay(ctx, "auto", zoneName, sms, p.getString("plate", ""), extra);
             p.edit().putLong("lastAutoNotify", System.currentTimeMillis()).apply();
         } catch (Exception e) {
-            p.edit().putString("lastEvent", "error:" + e.getMessage()).apply();
+            log(p, "error:" + e.getMessage());
+        }
+    }
+
+    /** Dnevnik poslednjih događaja (vidi se u Podešavanjima aplikacije). */
+    static synchronized void log(SharedPreferences p, String msg) {
+        long now = System.currentTimeMillis();
+        try {
+            JSONArray a = new JSONArray(p.getString("log", "[]"));
+            JSONArray out = new JSONArray();
+            out.put(new JSONArray().put(now).put(msg));
+            for (int i = 0; i < a.length() && i < 19; i++) out.put(a.get(i));
+            p.edit().putString("log", out.toString()).putString("lastEvent", msg + "@" + now).apply();
+        } catch (Exception e) {
+            p.edit().putString("lastEvent", msg + "@" + now).apply();
         }
     }
 

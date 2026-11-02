@@ -83,8 +83,8 @@ public class ParkingGeofencePlugin extends Plugin {
             t.add(new ActivityTransition.Builder().setActivityType(DetectedActivity.IN_VEHICLE).setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER).build());
             t.add(new ActivityTransition.Builder().setActivityType(DetectedActivity.IN_VEHICLE).setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT).build());
             ActivityRecognition.getClient(ctx).requestActivityTransitionUpdates(new ActivityTransitionRequest(t), activityIntent(ctx))
-                .addOnSuccessListener(v -> p.edit().putString("lastActivityRegister", "ok:" + System.currentTimeMillis()).apply())
-                .addOnFailureListener(e -> p.edit().putString("lastActivityRegister", "error:" + e.getMessage()).apply());
+                .addOnSuccessListener(v -> { p.edit().putString("lastActivityRegister", "ok:" + System.currentTimeMillis()).apply(); GeofenceReceiver.log(p, "praćenje vožnje uključeno"); })
+                .addOnFailureListener(e -> { p.edit().putString("lastActivityRegister", "error:" + e.getMessage()).apply(); GeofenceReceiver.log(p, "GREŠKA praćenja vožnje: " + e.getMessage()); });
             return "ok";
         } catch (Exception e) {
             return "error:" + e.getMessage();
@@ -208,6 +208,7 @@ public class ParkingGeofencePlugin extends Plugin {
         ret.put("enabled", p.getBoolean("enabled", false));
         ret.put("lastRegister", p.getString("lastRegister", ""));
         ret.put("lastEvent", p.getString("lastEvent", ""));
+        try { ret.put("log", new JSArray(p.getString("log", "[]"))); } catch (Exception ignored) { }
         call.resolve(ret);
     }
 
