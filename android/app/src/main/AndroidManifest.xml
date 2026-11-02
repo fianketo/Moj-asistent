@@ -47,6 +47,14 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+        <!-- Bluetooth događaje šalje Bluetooth servis (ne „system“), pa ovaj prijemnik mora biti exported -->
+        <receiver android:name=".CarBtReceiver" android:exported="true"
+            android:permission="android.permission.BLUETOOTH_CONNECT">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+                <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
     </application>
 
     <!-- Permissions -->
@@ -66,6 +74,9 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Prepoznavanje izlaska iz auta (kad parkiraš) -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <!-- Prepoznavanje parkiranja kad se telefon odspoji od Bluetooth-a u autu -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <!-- Otvaranje SMS aplikacije, mapa i pregledača (Android 11+ vidljivost paketa) -->
     <queries>

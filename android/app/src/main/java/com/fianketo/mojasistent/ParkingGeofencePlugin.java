@@ -40,7 +40,8 @@ import org.json.JSONObject;
     permissions = {
         @Permission(alias = "location", strings = { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }),
         @Permission(alias = "background", strings = { Manifest.permission.ACCESS_BACKGROUND_LOCATION }),
-        @Permission(alias = "activity", strings = { Manifest.permission.ACTIVITY_RECOGNITION })
+        @Permission(alias = "activity", strings = { Manifest.permission.ACTIVITY_RECOGNITION }),
+        @Permission(alias = "bluetooth", strings = { Manifest.permission.BLUETOOTH_CONNECT })
     }
 )
 public class ParkingGeofencePlugin extends Plugin {
@@ -66,6 +67,14 @@ public class ParkingGeofencePlugin extends Plugin {
         return PendingIntent.getBroadcast(ctx, 4712, i, flags);
     }
 
+    static PendingIntent activityUpdatesIntent(Context ctx) {
+        Intent i = new Intent(ctx, GeofenceReceiver.class);
+        i.setAction(GeofenceReceiver.ACTION_ACTIVITY_UPDATE);
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) flags |= PendingIntent.FLAG_MUTABLE;
+        return PendingIntent.getBroadcast(ctx, 4713, i, flags);
+    }
+
     static boolean hasActivity(Context ctx) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return true;
         return ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED;
@@ -76,6 +85,7 @@ public class ParkingGeofencePlugin extends Plugin {
     static String registerActivity(Context ctx) {
         try {
             ActivityRecognition.getClient(ctx).removeActivityTransitionUpdates(activityIntent(ctx));
+            ActivityRecognition.getClient(ctx).removeActivityUpdates(activityUpdatesIntent(ctx));
             SharedPreferences p = prefs(ctx);
             if (!p.getBoolean("enabled", false)) return "disabled";
             if (!hasActivity(ctx)) return "no_activity_permission";
@@ -85,6 +95,9 @@ public class ParkingGeofencePlugin extends Plugin {
             ActivityRecognition.getClient(ctx).requestActivityTransitionUpdates(new ActivityTransitionRequest(t), activityIntent(ctx))
                 .addOnSuccessListener(v -> { p.edit().putString("lastActivityRegister", "ok:" + System.currentTimeMillis()).apply(); GeofenceReceiver.log(p, "praćenje vožnje uključeno"); })
                 .addOnFailureListener(e -> { p.edit().putString("lastActivityRegister", "error:" + e.getMessage()).apply(); GeofenceReceiver.log(p, "GREŠKA praćenja vožnje: " + e.getMessage()); });
+            // Rezerva: redovna provera kretanja (~30 s) – neki telefoni (Samsung) ne šalju prelaze pouzdano.
+            ActivityRecognition.getClient(ctx).requestActivityUpdates(30000, activityUpdatesIntent(ctx))
+                .addOnFailureListener(e -> GeofenceReceiver.log(p, "GREŠKA provere kretanja: " + e.getMessage()));
             return "ok";
         } catch (Exception e) {
             return "error:" + e.getMessage();
@@ -195,11 +208,55 @@ public class ParkingGeofencePlugin extends Plugin {
         call.resolve(r);
     }
 
+    /** Upareni Bluetooth uređaji (da korisnik izabere auto). */
+    @SuppressLint("MissingPermission")
+    @PluginMethod
+    public void listBluetooth(PluginCall call) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && getPermissionState("bluetooth") != PermissionState.GRANTED) {
+            requestPermissionForAlias("bluetooth", call, "afterBluetooth");
+            return;
+        }
+        afterBluetooth(call);
+    }
+
+    @SuppressLint("MissingPermission")
+    @PermissionCallback
+    private void afterBluetooth(PluginCall call) {
+        JSObject r = new JSObject();
+        JSArray list = new JSArray();
+        try {
+            android.bluetooth.BluetoothManager bm = (android.bluetooth.BluetoothManager) getContext().getSystemService(Context.BLUETOOTH_SERVICE);
+            android.bluetooth.BluetoothAdapter ad = bm == null ? null : bm.getAdapter();
+            if (ad != null) {
+                for (android.bluetooth.BluetoothDevice d : ad.getBondedDevices()) {
+                    JSObject o = new JSObject();
+                    o.put("name", d.getName() == null ? d.getAddress() : d.getName());
+                    o.put("address", d.getAddress());
+                    list.put(o);
+                }
+            }
+            r.put("ok", true);
+        } catch (SecurityException e) {
+            r.put("ok", false);
+            r.put("error", "nema dozvole za Bluetooth");
+        }
+        r.put("devices", list);
+        call.resolve(r);
+    }
+
+    @PluginMethod
+    public void setCarDevice(PluginCall call) {
+        prefs(getContext()).edit().putString("carBt", call.getString("address", "")).putString("carBtName", call.getString("name", "")).apply();
+        GeofenceReceiver.log(prefs(getContext()), call.getString("address", "").isEmpty() ? "Bluetooth auta uklonjen" : "Bluetooth auta: " + call.getString("name", ""));
+        call.resolve();
+    }
+
     @PluginMethod
     public void status(PluginCall call) {
         SharedPreferences p = prefs(getContext());
         JSObject ret = new JSObject();
         ret.put("activity", hasActivity(getContext()));
+        ret.put("carBtName", p.getString("carBtName", ""));
         android.location.LocationManager lm = (android.location.LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
         ret.put("gps", lm != null && androidx.core.location.LocationManagerCompat.isLocationEnabled(lm));
         ret.put("lastActivityRegister", p.getString("lastActivityRegister", ""));

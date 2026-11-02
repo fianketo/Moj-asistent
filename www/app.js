@@ -1034,6 +1034,7 @@ $('#view').addEventListener('click', async (e) => {
     case 'test': return testNotification();
     case 'battery': await Battery.request(); return;
     case 'geo-perm': await toggleAuto(true); return;
+    case 'car-bt': return pickCarBt();
     case 'geo-test-exit': if (Geo) { if (!S.parking.auto) return toast('Prvo uključi podsetnik iznad'); await pushGeofences(); await Geo.testVehicleExit(); toast('Proveravam lokaciju… obaveštenje stiže ako si u zoni'); setTimeout(render, 6000); } return;
     case 'exact': try { await LN.changeExactNotificationSetting(); } catch { /* */ } scheduleSync(); return render();
     case 'zone-add': S.parking.zones.push({ id: uid(), name: 'Nova zona', color: '#7c3aed', sms: '', maxMin: 0 }); save(false); return render();
@@ -1269,6 +1270,8 @@ async function geoStatus() {
       st.location ? `${ok} Lokacija dozvoljena` : `${bad} Lokacija nije dozvoljena`,
       st.background ? `${ok} Lokacija „uvek“ (i kad je aplikacija zatvorena)` : `${bad} Lokacija nije „Dozvoli uvek“ <button class="btn small" data-act="geo-perm">Dozvoli</button>`,
       st.activity ? `${ok} Prepoznavanje vožnje (fizička aktivnost)` : `${bad} Nije dozvoljena „Fizička aktivnost“ <button class="btn small" data-act="geo-perm">Dozvoli</button>`];
+    lines.push(st.carBtName ? `🚗 Bluetooth auta: <b>${esc(st.carBtName)}</b> <button class="btn small" data-act="car-bt">Promeni</button>`
+      : `🚗 Bluetooth auta nije izabran <button class="btn small" data-act="car-bt">Izaberi</button> <span style="font-size:12px">(najpouzdanije prepoznavanje parkiranja)</span>`);
     const log = Array.isArray(st.log) ? st.log : [];
     if (log.length) lines.push(`<details class="geo-log" ${log.length ? 'open' : ''}><summary>📜 Dnevnik (poslednji događaji)</summary>${log.slice(0, 12).map(([t, m]) => `<div><span>${fmtWhen(new Date(+t))}</span> ${esc(m)}</div>`).join('')}</details>`);
     else lines.push('📜 Dnevnik je prazan – još nije bilo događaja.');
@@ -1276,6 +1279,23 @@ async function geoStatus() {
     return lines.join('<br>');
   } catch (e) { return `${bad} ${esc(e.message)}`; }
 }
+async function pickCarBt() {
+  const r = await Geo.listBluetooth().catch((e) => ({ ok: false, error: e.message, devices: [] }));
+  if (!r.ok) return toast('Bluetooth: ' + (r.error || 'nema dozvole'));
+  if (!r.devices.length) return toast('Nema uparenih Bluetooth uređaja – upari telefon sa autom');
+  openSheet(`<h3>🚗 Koji Bluetooth je tvoj auto?</h3>
+    <p style="margin:0;color:var(--muted);font-size:13px">Kad se telefon odspoji od auta (ugasiš auto), aplikacija proveri da li si u zoni naplate.</p>
+    <div class="lists" id="btList">${r.devices.map((d) => `<button class="list-pick" data-addr="${esc(d.address)}" data-name="${esc(d.name)}"><span class="grow">${esc(d.name)}</span></button>`).join('')}
+      <button class="list-pick" data-addr="" data-name=""><span class="grow">✕ Bez Bluetooth-a</span></button></div>
+    <div class="foot"><button class="btn" onclick="closeSheet()">Otkaži</button></div>`, () => {
+    $('#btList').addEventListener('click', async (e) => {
+      const b = e.target.closest('[data-addr]'); if (!b) return;
+      await Geo.setCarDevice({ address: b.dataset.addr, name: b.dataset.name });
+      closeSheet(); render(); toast(b.dataset.addr ? 'Auto: ' + b.dataset.name : 'Bluetooth auta uklonjen');
+    });
+  });
+}
+
 async function rememberHere() {
   const loc = await getLocation();
   if (!loc) return toast('Lokacija nije dostupna – uključi lokaciju');

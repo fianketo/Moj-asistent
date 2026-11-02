@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.ActivityTransition;
 import com.google.android.gms.location.ActivityTransitionEvent;
 import com.google.android.gms.location.ActivityTransitionResult;
@@ -31,6 +32,7 @@ public class GeofenceReceiver extends BroadcastReceiver {
     static final String ACTION_GEOFENCE = "com.fianketo.mojasistent.GEOFENCE";
     static final String ACTION_TEST = "com.fianketo.mojasistent.TEST_DWELL"; // za test na emulatoru
     static final String ACTION_ACTIVITY = "com.fianketo.mojasistent.ACTIVITY";
+    static final String ACTION_ACTIVITY_UPDATE = "com.fianketo.mojasistent.ACTIVITY_UPDATE";
     static final String ACTION_TEST_EXIT = "com.fianketo.mojasistent.TEST_EXIT";
     static final long COOLDOWN_MS = 2 * 60 * 60 * 1000L;
 
@@ -55,8 +57,34 @@ public class GeofenceReceiver extends BroadcastReceiver {
                 if (ev.getActivityType() != DetectedActivity.IN_VEHICLE) continue;
                 boolean exit = ev.getTransitionType() == ActivityTransition.ACTIVITY_TRANSITION_EXIT;
                 log(p, exit ? "telefon: izlazak iz vozila" : "telefon: vožnja počela");
-                if (exit) onVehicleExit(ctx, p, false);
+                if (exit) parkedSignal(ctx, p, "prelaz aktivnosti"); else drivingSignal(p, null);
             }
+            return;
+        }
+        if (ACTION_ACTIVITY_UPDATE.equals(action)) {
+            if (!ActivityRecognitionResult.hasResult(intent)) return;
+            ActivityRecognitionResult r = ActivityRecognitionResult.extractResult(intent);
+            if (r == null) return;
+            DetectedActivity a = r.getMostProbableActivity();
+            long now = System.currentTimeMillis();
+            boolean driving = p.getBoolean("driving", false);
+            long lastVeh = p.getLong("lastVehicle", 0);
+            if (a.getType() == DetectedActivity.IN_VEHICLE && a.getConfidence() >= 60) {
+                drivingSignal(p, "provera kretanja: vožnja");
+            } else if (driving) {
+                boolean walking = (a.getType() == DetectedActivity.ON_FOOT || a.getType() == DetectedActivity.WALKING) && a.getConfidence() >= 50;
+                boolean stillLong = a.getType() == DetectedActivity.STILL && now - lastVeh > 4 * 60 * 1000L;
+                if (now - lastVeh > 60 * 60 * 1000L) p.edit().putBoolean("driving", false).apply();
+                else if (walking || stillLong) parkedSignal(ctx, p, walking ? "provera kretanja: hodaš posle vožnje" : "provera kretanja: stojiš posle vožnje");
+            }
+            return;
+        }
+        if (android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED.equals(action) || android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+            android.bluetooth.BluetoothDevice d = intent.getParcelableExtra(android.bluetooth.BluetoothDevice.EXTRA_DEVICE);
+            String car = p.getString("carBt", "");
+            if (d == null || car.isEmpty() || !car.equalsIgnoreCase(d.getAddress())) return;
+            if (android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) drivingSignal(p, "auto povezano (Bluetooth)");
+            else { log(p, "auto odspojeno (Bluetooth)"); parkedSignal(ctx, p, "Bluetooth auta"); }
             return;
         }
         if (ACTION_TEST.equals(action)) {
@@ -153,6 +181,22 @@ public class GeofenceReceiver extends BroadcastReceiver {
         } catch (Exception e) {
             log(p, "error:" + e.getMessage());
         }
+    }
+
+    private static void drivingSignal(SharedPreferences p, String msg) {
+        boolean was = p.getBoolean("driving", false);
+        p.edit().putBoolean("driving", true).putLong("lastVehicle", System.currentTimeMillis()).apply();
+        if (!was && msg != null) log(p, msg);
+    }
+
+    /** Neki izvor kaže da si parkirao – jednom u 8 min, pa proveri zonu. */
+    private void parkedSignal(Context ctx, SharedPreferences p, String source) {
+        long now = System.currentTimeMillis();
+        p.edit().putBoolean("driving", false).apply();
+        if (now - p.getLong("lastExitAt", 0) < 8 * 60 * 1000L) return;
+        p.edit().putLong("lastExitAt", now).apply();
+        log(p, "parkiranje prepoznato (" + source + ")");
+        onVehicleExit(ctx, p, false);
     }
 
     /** Dnevnik poslednjih događaja (vidi se u Podešavanjima aplikacije). */
