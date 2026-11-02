@@ -158,8 +158,8 @@ public class GeofenceReceiver extends BroadcastReceiver {
             String zoneName = null, sms = "", extra = "";
             JSONObject cityZones = new JSONObject(p.getString("cityZones", "{}"));
             if ("novisad".equals(p.getString("city", ""))) {
-                // tačke su duž ivica parkirališta; GPS ume da odstupa – 60 m + nesigurnost, najviše 100 m
-                double maxM = Math.min(100, 60 + Math.max(0, acc));
+                // 35 m: proverena granica (41 m od zone je stvarno bilo van zone naplate)
+                double maxM = 35;
                 ZoneLookup.Hit h = ZoneLookup.find(ctx, lat, lng, maxM);
                 if (h == null) {
                     ZoneLookup.Hit far = ZoneLookup.find(ctx, lat, lng, 1000);
