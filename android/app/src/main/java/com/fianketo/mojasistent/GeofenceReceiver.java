@@ -146,19 +146,27 @@ public class GeofenceReceiver extends BroadcastReceiver {
                     Location loc = task.isSuccessful() ? task.getResult() : null;
                     if (loc != null) log(p, String.format(java.util.Locale.US, "lokacija %.5f, %.5f (±%.0f m)", loc.getLatitude(), loc.getLongitude(), loc.getAccuracy()));
                     if (loc == null) { log(p, "lokacija nije dobijena (isključena ili nema signala)"); return; }
-                    handleParkedAt(ctx, p, loc.getLatitude(), loc.getLongitude());
+                    handleParkedAt(ctx, p, loc.getLatitude(), loc.getLongitude(), loc.hasAccuracy() ? loc.getAccuracy() : 20);
                 } finally {
                     pr.finish();
                 }
             });
     }
 
-    private void handleParkedAt(Context ctx, SharedPreferences p, double lat, double lng) {
+    private void handleParkedAt(Context ctx, SharedPreferences p, double lat, double lng, double acc) {
         try {
             String zoneName = null, sms = "", extra = "";
             JSONObject cityZones = new JSONObject(p.getString("cityZones", "{}"));
             if ("novisad".equals(p.getString("city", ""))) {
-                ZoneLookup.Hit h = ZoneLookup.find(ctx, lat, lng, 35);
+                // tačke su duž ivica parkirališta; GPS ume da odstupa – 60 m + nesigurnost, najviše 100 m
+                double maxM = Math.min(100, 60 + Math.max(0, acc));
+                ZoneLookup.Hit h = ZoneLookup.find(ctx, lat, lng, maxM);
+                if (h == null) {
+                    ZoneLookup.Hit far = ZoneLookup.find(ctx, lat, lng, 1000);
+                    log(p, far == null ? "najbliža zona: dalje od 1 km" : String.format(java.util.Locale.US, "najbliža zona: %s, %.0f m (granica %.0f m)", far.zoneKey, far.dist, maxM));
+                } else {
+                    log(p, String.format(java.util.Locale.US, "zona %s, %.0f m od parkirališta %s", h.zoneKey, h.dist, h.code == null ? "" : h.code));
+                }
                 if (h != null && cityZones.has(h.zoneKey)) {
                     JSONObject z = cityZones.getJSONObject(h.zoneKey);
                     zoneName = z.optString("name"); sms = z.optString("sms");

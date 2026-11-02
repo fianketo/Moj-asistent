@@ -745,7 +745,7 @@ async function loadNs() {
   } catch (e) { console.warn('zones-ns', e); }
   return nsData;
 }
-async function nsZoneAt(loc, maxM = 30) {
+async function nsZoneAt(loc, maxM = 60) {
   const d = await loadNs(); if (!d) return null;
   const kx = Math.cos(loc.lat * Math.PI / 180) * 111320, ky = 110574;
   let best = maxM * maxM, bi = -1;
