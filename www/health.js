@@ -1,0 +1,116 @@
+/* Zdravlje: recepti, programi ishrane i treninzi (probni sadržaj, opšti predlozi).
+ * Sastojci: [naziv iz kataloga, količina, jedinica, napomena]. Kalorije i proteini su po porciji, približno. */
+'use strict';
+
+const MEALS = { dorucak: 'Doručak', rucak: 'Ručak', vecera: 'Večera', uzina: 'Užina' };
+
+const RECIPES = [
+  { id: 'ovsena', name: 'Ovsena kaša sa bananom i orasima', icon: '🥣', meal: ['dorucak'], min: 10, serv: 2, kcal: 380, prot: 14,
+    ing: [['Ovsene pahuljice', 100, 'g'], ['Mleko', 0.4, 'l'], ['Banane', 1, 'kom'], ['Med', 20, 'g'], ['Orasi', 20, 'g'], ['Cimet', null, '', 'prstohvat']],
+    steps: ['Mleko zagrej da provri, pa smanji vatru.', 'Dodaj pahuljice i kuvaj 3–4 minuta uz mešanje.', 'Skloni sa ringle, dodaj iseckanu bananu, med i cimet.', 'Pospi seckanim orasima.'] },
+  { id: 'omlet', name: 'Omlet sa povrćem i sirom', icon: '🍳', meal: ['dorucak', 'vecera'], min: 15, serv: 2, kcal: 300, prot: 20,
+    ing: [['Jaja', 4, 'kom'], ['Paprika', 1, 'kom'], ['Paradajz', 1, 'kom'], ['Crni luk', 0.5, 'kom'], ['Beli sir', 60, 'g'], ['Suncokretovo ulje', 10, 'ml']],
+    steps: ['Iseckaj luk, papriku i paradajz na kockice.', 'Na malo ulja prodinstaj luk i papriku 3 minuta.', 'Umuti jaja sa prstohvatom soli i prelij preko povrća.', 'Dodaj paradajz i izmrvljen sir, poklopi i peci na tihoj vatri 4–5 minuta.'] },
+  { id: 'jogurt', name: 'Grčki jogurt sa muslijem i jabukom', icon: '🥛', meal: ['dorucak', 'uzina'], min: 5, serv: 2, kcal: 320, prot: 18,
+    ing: [['Grčki jogurt', 2, 'kom'], ['Kornfleks / musli', 60, 'g'], ['Jabuke', 1, 'kom'], ['Med', 15, 'g']],
+    steps: ['Jogurt podeli u dve činije.', 'Dodaj musli i jabuku isečenu na kockice.', 'Prelij medom.'] },
+  { id: 'tost-avokado', name: 'Integralni tost sa avokadom i jajetom', icon: '🥑', meal: ['dorucak'], min: 12, serv: 2, kcal: 350, prot: 15,
+    ing: [['Crni / integralni hleb', 0.5, 'kom', '4 kriške'], ['Avokado', 1, 'kom'], ['Jaja', 2, 'kom'], ['Limun', 0.5, 'kom']],
+    steps: ['Jaja skuvaj 8 minuta (tvrdo) ili 6 minuta (meko).', 'Avokado izgnječi viljuškom sa limunom, solju i biberom.', 'Hleb tostiraj, namaži avokadom i stavi isečeno jaje.'] },
+  { id: 'kajgana', name: 'Kajgana sa šunkom', icon: '🍳', meal: ['dorucak'], min: 10, serv: 2, kcal: 330, prot: 24,
+    ing: [['Jaja', 4, 'kom'], ['Šunka', 80, 'g'], ['Mladi luk', null, '', 'po želji'], ['Suncokretovo ulje', 10, 'ml']],
+    steps: ['Šunku iseckaj na trakice i kratko proprži.', 'Dodaj umućena jaja i mešaj na tihoj vatri dok se ne stegnu.', 'Posluži sa kriškom integralnog hleba i povrćem.'] },
+  { id: 'sociva', name: 'Čorba od sočiva', icon: '🍲', meal: ['rucak', 'vecera'], min: 40, serv: 4, kcal: 320, prot: 18,
+    ing: [['Sočivo', 250, 'g'], ['Šargarepa', 2, 'kom'], ['Crni luk', 1, 'kom'], ['Beli luk', null, '', '2 čena'], ['Pasirani paradajz', 1, 'kom'], ['Suncokretovo ulje', 20, 'ml'], ['Aleva paprika', null, '', '1 kašičica']],
+    steps: ['Sočivo operi.', 'Na ulju prodinstaj seckan luk, beli luk i rendanu šargarepu.', 'Dodaj alevu papriku, sočivo, paradajz i 1,5 l vode.', 'Kuvaj 25–30 minuta dok sočivo ne omekša. Posoli na kraju.'] },
+  { id: 'piletina-rerna', name: 'Piletina sa povrćem iz rerne', icon: '🍗', meal: ['rucak'], min: 50, serv: 4, kcal: 450, prot: 38,
+    ing: [['Pileći file', 0.6, 'kg'], ['Krompir', 0.8, 'kg'], ['Tikvice', 1, 'kom'], ['Paprika', 2, 'kom'], ['Crni luk', 1, 'kom'], ['Maslinovo ulje', 30, 'ml'], ['Aleva paprika', null, '', '1 kašičica']],
+    steps: ['Rernu zagrej na 200 °C.', 'Krompir i povrće iseci na komade, piletinu na kocke.', 'Sve izmešaj sa uljem, alevom paprikom, solju i biberom.', 'Peci 35–40 minuta, promešaj na pola.'] },
+  { id: 'musaka', name: 'Musaka od krompira', icon: '🥔', meal: ['rucak'], min: 70, serv: 4, kcal: 520, prot: 28,
+    ing: [['Krompir', 1, 'kg'], ['Mleveno meso (mešano)', 0.5, 'kg'], ['Crni luk', 1, 'kom'], ['Jaja', 2, 'kom'], ['Mleko', 0.2, 'l'], ['Pavlaka (kisela)', 1, 'kom'], ['Suncokretovo ulje', 20, 'ml']],
+    steps: ['Krompir oljušti i iseci na tanke kolutove.', 'Na ulju proprži luk, dodaj meso i prži dok ne promeni boju. Začini.', 'U pleh ređaj krompir, meso, pa opet krompir.', 'Prelij sa 1 dl vode, peci 40 min na 200 °C.', 'Umuti jaja, mleko i pavlaku, prelij i peci još 15 minuta.'] },
+  { id: 'losos', name: 'Losos sa brokolijem i pirinčem', icon: '🐟', meal: ['rucak', 'vecera'], min: 25, serv: 2, kcal: 560, prot: 38,
+    ing: [['Losos', 0.4, 'kg'], ['Brokoli', 1, 'kom'], ['Pirinač', 150, 'g'], ['Limun', 1, 'kom'], ['Maslinovo ulje', 20, 'ml']],
+    steps: ['Pirinač skuvaj po uputstvu.', 'Brokoli kuvaj na pari 5–6 minuta.', 'Losos posoli i peci na tiganju sa malo ulja 4 minuta sa svake strane.', 'Posluži sa limunom.'] },
+  { id: 'bolonjeze', name: 'Špagete bolonjeze', icon: '🍝', meal: ['rucak'], min: 35, serv: 4, kcal: 580, prot: 32,
+    ing: [['Špagete', 400, 'g'], ['Mleveno junece meso', 0.4, 'kg'], ['Pasirani paradajz', 1, 'kom'], ['Crni luk', 1, 'kom'], ['Beli luk', null, '', '2 čena'], ['Origano', null, '', 'po ukusu'], ['Maslinovo ulje', 20, 'ml']],
+    steps: ['Na ulju proprži luk i beli luk.', 'Dodaj meso i prži 8–10 minuta.', 'Dodaj paradajz i origano, krčkaj 15 minuta.', 'Špagete skuvaj al dente i pomešaj sa sosom.'] },
+  { id: 'sopska', name: 'Šopska salata', icon: '🥗', meal: ['rucak', 'vecera'], min: 10, serv: 3, kcal: 210, prot: 9,
+    ing: [['Paradajz', 0.5, 'kg'], ['Krastavac', 0.4, 'kg'], ['Paprika', 2, 'kom'], ['Crni luk', 1, 'kom'], ['Beli sir', 150, 'g'], ['Suncokretovo ulje', 20, 'ml']],
+    steps: ['Povrće iseci na kockice.', 'Posoli i prelij uljem.', 'Preko narendaj ili izmrvi sir.'] },
+  { id: 'curetina-wok', name: 'Ćuretina sa povrćem i pirinčem', icon: '🥘', meal: ['rucak', 'vecera'], min: 30, serv: 3, kcal: 480, prot: 40,
+    ing: [['Ćuretina', 0.5, 'kg'], ['Pirinač', 200, 'g'], ['Paprika', 2, 'kom'], ['Šargarepa', 2, 'kom'], ['Smrznuto povrće', 1, 'pak'], ['Suncokretovo ulje', 20, 'ml']],
+    steps: ['Pirinač skuvaj.', 'Ćuretinu iseci na trakice i brzo proprži na jakoj vatri.', 'Dodaj povrće i prži još 6–8 minuta da ostane hrskavo.', 'Začini (so, biber, malo soja sosa) i pomešaj sa pirinčem.'] },
+  { id: 'tuna-salata', name: 'Salata sa tunjevinom', icon: '🥗', meal: ['rucak', 'vecera'], min: 15, serv: 2, kcal: 380, prot: 35,
+    ing: [['Tunjevina (konzerva)', 2, 'kom'], ['Kukuruz (konzerva)', 1, 'kom'], ['Zelena salata', 1, 'kom'], ['Paradajz', 0.3, 'kg'], ['Jaja', 2, 'kom'], ['Maslinovo ulje', 15, 'ml']],
+    steps: ['Jaja skuvaj tvrdo i iseci.', 'Salatu operi i iseckaj, dodaj paradajz i kukuruz.', 'Dodaj oceđenu tunjevinu i jaja, prelij uljem i limunom.'] },
+  { id: 'paprike', name: 'Punjene paprike', icon: '🫑', meal: ['rucak'], min: 80, serv: 4, kcal: 430, prot: 26,
+    ing: [['Babura', 1, 'kg', '8 komada'], ['Mleveno meso (mešano)', 0.5, 'kg'], ['Pirinač', 100, 'g'], ['Crni luk', 1, 'kom'], ['Pasirani paradajz', 1, 'kom'], ['Aleva paprika', null, '', '1 kašičica']],
+    steps: ['Paprikama izvadi semenke.', 'Pomešaj meso, oprani pirinač, seckan luk, so, biber i alevu papriku.', 'Napuni paprike i ređaj u šerpu.', 'Prelij paradajzom razblaženim vodom da ih pokrije i kuvaj 60 minuta na tihoj vatri.'] },
+  { id: 'oslic', name: 'Oslić sa blitvom i krompirom', icon: '🐟', meal: ['rucak', 'vecera'], min: 35, serv: 3, kcal: 380, prot: 32,
+    ing: [['Oslić', 0.6, 'kg'], ['Blitva', 1, 'pak'], ['Krompir', 0.6, 'kg'], ['Beli luk', null, '', '2 čena'], ['Maslinovo ulje', 30, 'ml'], ['Limun', 1, 'kom']],
+    steps: ['Krompir iseci na kocke i kuvaj 10 minuta, dodaj blitvu i kuvaj još 5.', 'Oceđeno pomešaj sa uljem, belim lukom i solju.', 'Oslić posoli i peci u rerni 15–18 min na 200 °C ili na tiganju.', 'Posluži sa limunom.'] },
+  { id: 'humus', name: 'Humus sa štapićima povrća', icon: '🥕', meal: ['uzina'], min: 10, serv: 4, kcal: 220, prot: 8,
+    ing: [['Leblebije', 1, 'kom', 'konzerva'], ['Limun', 1, 'kom'], ['Beli luk', null, '', '1 čen'], ['Maslinovo ulje', 30, 'ml'], ['Šargarepa', 2, 'kom'], ['Krastavac', 1, 'kom']],
+    steps: ['Leblebije ocedi (sačuvaj malo tečnosti).', 'Izblendaj sa limunom, belim lukom, uljem, solju i malo tečnosti do glatke kreme.', 'Šargarepu i krastavac iseci na štapiće.'] },
+  { id: 'sejk', name: 'Šejk od banane i kikiriki putera', icon: '🥤', meal: ['uzina', 'dorucak'], min: 5, serv: 1, kcal: 450, prot: 20,
+    ing: [['Mleko', 0.3, 'l'], ['Banane', 1, 'kom'], ['Kikiriki puter', 20, 'g'], ['Ovsene pahuljice', 30, 'g']],
+    steps: ['Sve stavi u blender i miksaj 30 sekundi.'] },
+  { id: 'vocka', name: 'Jabuka i bademi', icon: '🍎', meal: ['uzina'], min: 1, serv: 1, kcal: 250, prot: 6,
+    ing: [['Jabuke', 1, 'kom'], ['Bademi', 30, 'g']],
+    steps: ['Brza užina – jabuka i šaka badema.'] },
+];
+
+// Nedeljni planovi: za svaki dan [doručak, ručak, večera, užina] (id recepta).
+const DIET_PLANS = [
+  { id: 'balans', name: 'Zdravo i uravnoteženo', icon: '⚖️', kcal: '≈ 1800–2000 kcal', desc: 'Raznovrsna domaća hrana, puno povrća, umereno meso i riba.',
+    days: [['ovsena', 'piletina-rerna', 'sopska', 'vocka'], ['omlet', 'sociva', 'tuna-salata', 'jogurt'], ['jogurt', 'bolonjeze', 'sopska', 'vocka'],
+      ['tost-avokado', 'oslic', 'omlet', 'humus'], ['ovsena', 'paprike', 'tuna-salata', 'vocka'], ['kajgana', 'musaka', 'sopska', 'jogurt'], ['omlet', 'losos', 'sociva', 'vocka']] },
+  { id: 'mrsavljenje', name: 'Lagano – mršavljenje', icon: '🪶', kcal: '≈ 1400–1600 kcal', desc: 'Manje kalorija, više proteina i povrća da ne budeš gladan.',
+    days: [['jogurt', 'curetina-wok', 'sopska', 'vocka'], ['omlet', 'tuna-salata', 'sociva', 'humus'], ['jogurt', 'oslic', 'sopska', 'vocka'],
+      ['omlet', 'sociva', 'tuna-salata', 'humus'], ['jogurt', 'piletina-rerna', 'sopska', 'vocka'], ['omlet', 'oslic', 'tuna-salata', 'humus'], ['tost-avokado', 'curetina-wok', 'sopska', 'vocka']] },
+  { id: 'proteini', name: 'Više proteina – uz trening', icon: '💪', kcal: '≈ 2300–2600 kcal', desc: 'Za dane treninga: više proteina i ugljenih hidrata za oporavak.',
+    days: [['kajgana', 'curetina-wok', 'losos', 'sejk'], ['ovsena', 'piletina-rerna', 'omlet', 'sejk'], ['omlet', 'bolonjeze', 'tuna-salata', 'jogurt'],
+      ['kajgana', 'losos', 'curetina-wok', 'sejk'], ['ovsena', 'paprike', 'omlet', 'sejk'], ['tost-avokado', 'musaka', 'tuna-salata', 'jogurt'], ['kajgana', 'piletina-rerna', 'losos', 'sejk']] },
+];
+
+// Vežbe: reps = ponavljanja, sec = trajanje (s), side = po strani
+const EXERCISES = {
+  zagrevanje: { name: 'Zagrevanje', icon: '🔥', how: 'Marš u mestu, kruženje rukama i kukovima, lagani poskoci.' },
+  cucanj: { name: 'Čučanj', icon: '🦵', how: 'Stopala u širini ramena, spusti kukove kao da sedaš na stolicu, kolena prate prste, leđa prava.' },
+  cucanjSkok: { name: 'Čučanj sa skokom', icon: '🦘', how: 'Spusti se u čučanj, pa se eksplozivno odrazi u skok. Doskoči mekano.' },
+  sklekKolena: { name: 'Sklek sa kolena', icon: '💪', how: 'Kolena na podu, šake malo šire od ramena. Telo pravo, spusti grudi do poda.' },
+  sklek: { name: 'Sklek', icon: '💪', how: 'Telo pravo od glave do peta, spusti grudi do poda i odgurni se.' },
+  iskorak: { name: 'Iskorak', icon: '🚶', how: 'Veliki korak napred, spusti zadnje koleno skoro do poda, vrati se. Menjaj noge.' },
+  bugarski: { name: 'Bugarski čučanj (stolica)', icon: '🪑', how: 'Zadnja noga na stolici, spuštaj se na prednjoj nozi dok butina ne bude vodoravno.' },
+  plank: { name: 'Plank', icon: '🧱', how: 'Oslonac na podlakticama i prstima, telo pravo, zategni stomak. Ne spuštaj kukove.' },
+  plankRamena: { name: 'Plank sa dodirom ramena', icon: '🧱', how: 'Iz položaja za sklek naizmenično dodiruj suprotno rame, kukovi mirni.' },
+  most: { name: 'Glute most', icon: '🌉', how: 'Na leđima, kolena savijena. Podigni kukove stežući zadnjicu, zadrži 1 s, spusti.' },
+  propadanja: { name: 'Propadanja na stolici', icon: '🪑', how: 'Leđima uz stolicu, šake na ivici. Savij laktove do 90°, pa se podigni.' },
+  superman: { name: 'Superman', icon: '🦸', how: 'Na stomaku, istovremeno podigni ruke i noge, zadrži 2 s, spusti.' },
+  trbusnjaci: { name: 'Trbušnjaci (krunč)', icon: '🔄', how: 'Na leđima, kolena savijena. Podigni ramena od poda stežući stomak, bez vučenja vrata.' },
+  penjac: { name: 'Planinar (mountain climbers)', icon: '⛰️', how: 'Iz položaja za sklek naizmenično privlači kolena ka grudima, brzim tempom.' },
+  istezanje: { name: 'Istezanje', icon: '🧘', how: 'Istegni butine, listove, leđa i ramena – svaki položaj zadrži 20–30 s.' },
+  hod: { name: 'Hodanje', icon: '🚶', how: 'Brz hod, ruke rade.' },
+  trk: { name: 'Lagano trčanje', icon: '🏃', how: 'Tempo u kome možeš da pričaš.' },
+};
+
+const TRAININGS = [
+  { id: 'pocetnik', name: 'Početnik kod kuće', icon: '🏠', level: 'Početni', days: [1, 3, 5], perWeek: '3× nedeljno · ~25 min', desc: 'Bez opreme. Celo telo, polako jačanje.',
+    workouts: [
+      { name: 'Trening A', rest: 60, items: [['zagrevanje', { sec: 300 }], ['cucanj', { sets: 3, reps: 12 }], ['sklekKolena', { sets: 3, reps: 8 }], ['most', { sets: 3, reps: 15 }], ['plank', { sets: 3, sec: 30 }], ['istezanje', { sec: 300 }]] },
+      { name: 'Trening B', rest: 60, items: [['zagrevanje', { sec: 300 }], ['iskorak', { sets: 3, reps: 10, side: true }], ['sklekKolena', { sets: 3, reps: 10 }], ['superman', { sets: 3, reps: 12 }], ['trbusnjaci', { sets: 3, reps: 15 }], ['istezanje', { sec: 300 }]] },
+    ] },
+  { id: 'snaga', name: 'Snaga bez opreme', icon: '🔥', level: 'Srednji', days: [1, 3, 5], perWeek: '3× nedeljno · ~35 min', desc: 'Za one koji već vežbaju. Stolica je jedina „sprava“.',
+    workouts: [
+      { name: 'Noge i stomak', rest: 60, items: [['zagrevanje', { sec: 300 }], ['cucanjSkok', { sets: 4, reps: 12 }], ['bugarski', { sets: 3, reps: 10, side: true }], ['most', { sets: 3, reps: 20 }], ['penjac', { sets: 3, sec: 40 }], ['plank', { sets: 3, sec: 45 }], ['istezanje', { sec: 300 }]] },
+      { name: 'Gornji deo tela', rest: 60, items: [['zagrevanje', { sec: 300 }], ['sklek', { sets: 4, reps: 12 }], ['propadanja', { sets: 3, reps: 12 }], ['plankRamena', { sets: 3, reps: 20 }], ['superman', { sets: 3, reps: 15 }], ['trbusnjaci', { sets: 3, reps: 20 }], ['istezanje', { sec: 300 }]] },
+    ] },
+  { id: 'trcanje', name: 'Od hodanja do trčanja', icon: '🏃', level: 'Početni', days: [2, 4, 6], perWeek: '3× nedeljno · ~30 min', desc: 'Za 6 nedelja do 20 minuta trčanja bez pauze.',
+    workouts: [
+      { name: 'Nedelja 1–2', intervals: [['hod', 300], ...Array(8).fill([['trk', 60], ['hod', 90]]).flat(), ['hod', 300]] },
+      { name: 'Nedelja 3–4', intervals: [['hod', 300], ...Array(5).fill([['trk', 180], ['hod', 90]]).flat(), ['hod', 300]] },
+      { name: 'Nedelja 5', intervals: [['hod', 300], ['trk', 480], ['hod', 180], ['trk', 480], ['hod', 300]] },
+      { name: 'Nedelja 6', intervals: [['hod', 300], ['trk', 1200], ['hod', 300]] },
+    ] },
+];

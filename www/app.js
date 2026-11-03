@@ -100,7 +100,7 @@ function save(resync = true) {
 
 // ---------------------------------------------------------------- UI osnova
 let tab = 'podsetnici';
-const TITLES = { podsetnici: 'Podsetnici', kupovina: 'Kupovina', parking: 'Parking', podesavanja: 'Podešavanja' };
+const TITLES = { podsetnici: 'Podsetnici', kupovina: 'Kupovina', parking: 'Parking', zdravlje: 'Zdravlje', podesavanja: 'Podešavanja' };
 
 function toast(msg, ms = 2600, action) {
   const t = $('#toast');
@@ -116,7 +116,8 @@ function openSheet(html, onMount) {
   $('#sheetBg').hidden = false;
   onMount && onMount(sh);
 }
-function closeSheet() { $('#sheetBg').hidden = true; $('#sheet').innerHTML = ''; }
+function closeSheet() {
+  if (window.onSheetClose) window.onSheetClose(); $('#sheetBg').hidden = true; $('#sheet').innerHTML = ''; }
 $('#sheetBg').addEventListener('click', (e) => { if (e.target.id === 'sheetBg') closeSheet(); });
 
 function openExternal(url) {
@@ -143,7 +144,7 @@ $('#fab').addEventListener('click', () => { if (tab === 'podsetnici') editRemind
 function render() {
   const d = new Date();
   $('#today').textContent = `${DAYS[d.getDay()]} ${d.getDate()}. ${MONTHS[d.getMonth()]}`;
-  ({ podsetnici: renderReminders, kupovina: renderShopping, parking: renderParking, podesavanja: renderSettings })[tab]();
+  ({ podsetnici: renderReminders, kupovina: renderShopping, parking: renderParking, zdravlje: () => renderHealth(), podesavanja: renderSettings })[tab]();
 }
 
 // ================================================================ PODSETNICI

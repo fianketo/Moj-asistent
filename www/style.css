@@ -279,3 +279,54 @@ body[data-tab="kupovina"] .toast { bottom: calc(130px + env(safe-area-inset-bott
 .geo-log summary { cursor: pointer; color: var(--text); }
 .geo-log div { padding: 3px 0; border-bottom: 1px solid var(--line); color: var(--text); }
 .geo-log span { color: var(--muted); margin-right: 4px; }
+
+/* ===== Zdravlje ===== */
+nav button { font-size: 10.5px; }
+.seg { display: flex; background: var(--line); border-radius: 12px; padding: 3px; gap: 2px; margin-bottom: 12px; position: sticky; top: calc(52px + env(safe-area-inset-top)); z-index: 3; }
+.seg button { flex: 1; border: 0; background: none; padding: 8px 4px; border-radius: 9px; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; }
+.seg button.on { background: var(--card); color: var(--text); box-shadow: var(--shadow); }
+.h-hero { padding: 4px 4px 8px; }
+.h-day { font-size: 24px; font-weight: 800; }
+.h-date { color: var(--muted); }
+.h-cta { display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; border: 2px dashed var(--line); background: var(--card);
+  border-radius: 14px; padding: 14px; margin: 10px 0; cursor: pointer; color: var(--text); }
+.h-cta > span { font-size: 32px; }
+.h-cta small, .h-plan small { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; font-weight: 400; }
+.h-plan { display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; border: 2px solid transparent; background: var(--card);
+  border-radius: 14px; padding: 12px; margin-bottom: 8px; cursor: pointer; color: var(--text); box-shadow: var(--shadow); }
+.h-plan.on { border-color: var(--accent); background: var(--accent-soft); }
+.h-pi { font-size: 30px; flex: none; }
+.h-plan > div { flex: 1; }
+.h-pick { font-size: 20px; color: var(--accent); font-weight: 800; }
+.h-meal .h-ic { font-size: 22px; flex: none; width: 28px; text-align: center; }
+.h-meal .nm small { display: block; font-size: 12px; color: var(--muted); font-weight: 400; }
+.h-train .h-big { font-size: 16px; }
+.h-ex > div { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+.h-ex > div:last-child { border-bottom: 0; }
+.h-ex b { white-space: nowrap; }
+.h-note { font-size: 12px; color: var(--muted); margin-top: 18px; }
+.rec-head { display: flex; gap: 12px; align-items: flex-start; }
+.rec-head > div { flex: 1; }
+.rec-ic { font-size: 44px; line-height: 1; }
+.rec-serv { display: flex; align-items: center; gap: 10px; margin: 12px 0 4px; font-size: 15px; }
+.rec-ing { list-style: none; padding: 0; margin: 0 0 12px; }
+.rec-ing li { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+.rec-ing b { font-weight: 600; text-align: right; }
+.rec-ing small { color: var(--muted); font-weight: 400; }
+.rec-steps { padding-left: 20px; margin: 0; }
+.rec-steps li { padding: 5px 0; font-size: 15px; line-height: 1.45; }
+.sheet.full { max-height: 100vh; height: 100vh; border-radius: 0; display: flex; flex-direction: column; padding-top: calc(14px + env(safe-area-inset-top)); }
+.sheet.full #pl { display: flex; flex-direction: column; flex: 1; }
+.pl-top { display: flex; align-items: center; gap: 10px; }
+.pl-top .progress { margin: 0; flex: 1; }
+.pl-main { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px 8px; }
+.pl-ic { font-size: 80px; line-height: 1.1; }
+.pl-main h3 { font-size: 26px; margin: 10px 0 4px; }
+.pl-time { font-size: 64px; font-weight: 800; font-variant-numeric: tabular-nums; margin: 14px 0; }
+.pl-reps { font-size: 64px; font-weight: 800; margin: 14px 0; }
+.pl-reps small { font-size: 18px; color: var(--muted); font-weight: 500; }
+.pl-how { color: var(--muted); max-width: 420px; font-size: 15px; line-height: 1.45; }
+.pl-btns { display: flex; gap: 8px; padding-bottom: env(safe-area-inset-bottom); }
+.pl-btns .btn { padding: 16px; font-size: 17px; }
+.pl-done { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; gap: 8px; }
+.pl-btns .grow { flex: 1; }
