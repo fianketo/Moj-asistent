@@ -1,12 +1,14 @@
 /* Zdravlje – ekrani: Danas, Recepti, Ishrana, Treninzi i vođeni trening. */
 'use strict';
 
-const H = () => (S.health = Object.assign({ plan: null, program: null, favs: [], log: [], persons: 1 }, S.health || {}));
+const H = () => (S.health = Object.assign({ plan: null, program: null, favs: [], log: [], persons: 1, weights: {} }, S.health || {}));
 const recipeById = (id) => RECIPES.find((r) => r.id === id);
 const WD = ['Nedelja', 'Ponedeljak', 'Utorak', 'Sreda', 'Četvrtak', 'Petak', 'Subota'];
 const WD_SHORT = ['ned', 'pon', 'uto', 'sre', 'čet', 'pet', 'sub'];
 const planDayIdx = (d = new Date()) => (d.getDay() + 6) % 7; // pon=0 … ned=6
-let hsub = 'danas', rFilter = 'sve', rQuery = '';
+let hsub = 'danas', rFilter = 'sve', rQuery = '', dCat = 'sve', tCat = 'sve';
+const DIET_CATS = { sve: 'Sve', zdravlje: '❤️ Zdravlje', mrsavljenje: '🪶 Mršavljenje', sport: '💪 Sport', posno: '🌱 Posno / vege' };
+const TRAIN_CATS = { sve: 'Sve', kuca: '🏠 Kod kuće', teretana: '🏋️ Teretana', trcanje: '🏃 Trčanje', mobilnost: '🧘 Mobilnost' };
 
 function renderHealth() {
   const tabs = { danas: 'Danas', recepti: 'Recepti', ishrana: 'Ishrana', treninzi: 'Treninzi' };
@@ -51,6 +53,7 @@ function hToday() {
   return out;
 }
 function mealRow(meal, id) {
+  if (!id) return `<div class="item-row h-meal"><span class="h-ic">⏳</span><span class="nm"><small>${MEALS[meal]}</small>Post do podneva – voda, čaj, kafa bez šećera</span></div>`;
   const r = recipeById(id); if (!r) return '';
   return `<div class="item-row h-meal" data-h="recipe" data-id="${r.id}"><span class="h-ic">${r.icon}</span>
     <span class="nm"><small>${MEALS[meal]}</small>${esc(r.name)}</span><span class="qty-pill">${r.kcal} kcal</span></div>`;
@@ -68,14 +71,17 @@ function nextDayName(prog) {
 
 // ---------------------------------------------------------------- RECEPTI
 function hRecipes() {
-  const chips = { sve: 'Sve', fav: '⭐ Omiljeni', ...MEALS };
+  const chips = { sve: 'Sve', fav: '⭐ Omiljeni', ...MEALS, posno: '🌱 Posno', vege: '🥦 Vege' };
   return `<input class="input" id="rSearch" placeholder="🔎 Traži recept ili namirnicu (npr. piletina)" value="${esc(rQuery)}" autocomplete="off" style="margin:0 0 8px">
     <div class="chips">${Object.entries(chips).map(([k, v]) => `<button class="chip ${k === rFilter ? 'on' : ''}" data-h="rfilter" data-v="${k}">${v}</button>`).join('')}</div>
     <div class="grp" id="rList">${recipeRows()}</div>`;
 }
 function recipeRows() {
   const f = fold(rQuery.trim()), favs = H().favs;
-  const list = RECIPES.filter((r) => (rFilter === 'sve' || (rFilter === 'fav' ? favs.includes(r.id) : r.meal.includes(rFilter)))
+  const tg = (r) => r.tags || [];
+  const ok = (r) => rFilter === 'sve' || (rFilter === 'fav' ? favs.includes(r.id) : rFilter === 'posno' ? tg(r).some((t) => t.startsWith('posno'))
+    : rFilter === 'vege' ? tg(r).some((t) => ['vege', 'vegan', 'posno'].includes(t)) : r.meal.includes(rFilter));
+  const list = RECIPES.filter((r) => ok(r)
     && (!f || fold(r.name).includes(f) || r.ing.some(([n]) => fold(n).includes(f))));
   if (!list.length) return `<div class="empty" style="padding:24px">Nema recepata${rFilter === 'fav' ? ' – dodaj ⭐ u receptu' : ''}.</div>`;
   return list.map((r) => `<div class="item-row h-meal" data-h="recipe" data-id="${r.id}"><span class="h-ic">${r.icon}</span>
@@ -127,12 +133,13 @@ function addIngredients(pairs) {
 // ---------------------------------------------------------------- ISHRANA
 function hDiet() {
   const h = H(), plan = DIET_PLANS.find((p) => p.id === h.plan);
-  let out = DIET_PLANS.map((p) => `<button class="h-plan ${p.id === h.plan ? 'on' : ''}" data-h="plan" data-v="${p.id}">
+  let out = `<div class="chips">${Object.entries(DIET_CATS).map(([k, v]) => `<button class="chip ${k === dCat ? 'on' : ''}" data-h="dcat" data-v="${k}">${v}</button>`).join('')}</div>`;
+  out += DIET_PLANS.filter((p) => dCat === 'sve' || p.cat === dCat || p.id === h.plan).map((p) => `<button class="h-plan ${p.id === h.plan ? 'on' : ''}" data-h="plan" data-v="${p.id}">
       <span class="h-pi">${p.icon}</span><div><b>${esc(p.name)}</b><small>${esc(p.kcal)} · ${esc(p.desc)}</small></div>
       <span class="h-pick">${p.id === h.plan ? '✓' : ''}</span></button>`).join('');
   if (plan) {
     const today = planDayIdx();
-    out += `<div class="rec-serv" style="margin-top:14px"><span>Kupujem za osoba:</span><div class="stepper"><button data-h="persons" data-v="-1">−</button><span>${h.persons}</span><button data-h="persons" data-v="1">+</button></div></div>
+    out += `<div class="rec-serv" style="margin-top:14px"><span>Broj osoba za kupovinu:</span><div class="stepper"><button data-h="persons" data-v="-1">−</button><span>${h.persons}</span><button data-h="persons" data-v="1">+</button></div></div>
       <button class="btn primary block" data-h="week-shop" style="margin-top:8px">🛒 Kupovina za celu nedelju</button>`;
     out += plan.days.map((d, i) => `<div class="grp-h">${i === today ? '👉 ' : ''}${WD[(i + 1) % 7]} <span class="grow"></span><span>${d.reduce((s, id) => s + ((recipeById(id) || {}).kcal || 0), 0)} kcal</span></div>
       <div class="grp">${Object.keys(MEALS).map((m, j) => mealRow(m, d[j])).join('')}</div>`).join('');
@@ -143,11 +150,13 @@ function hDiet() {
 // ---------------------------------------------------------------- TRENINZI
 function hTrain() {
   const h = H(), prog = TRAININGS.find((t) => t.id === h.program);
-  let out = TRAININGS.map((t) => `<button class="h-plan ${t.id === h.program ? 'on' : ''}" data-h="prog" data-v="${t.id}">
+  let out = `<div class="chips">${Object.entries(TRAIN_CATS).map(([k, v]) => `<button class="chip ${k === tCat ? 'on' : ''}" data-h="tcat" data-v="${k}">${v}</button>`).join('')}</div>`;
+  out += TRAININGS.filter((t) => tCat === 'sve' || t.cat === tCat || t.id === h.program).map((t) => `<button class="h-plan ${t.id === h.program ? 'on' : ''}" data-h="prog" data-v="${t.id}">
       <span class="h-pi">${t.icon}</span><div><b>${esc(t.name)}</b><small>${esc(t.level)} · ${esc(t.perWeek)} · ${t.days.map((d) => WD_SHORT[d]).join(', ')}<br>${esc(t.desc)}</small></div>
       <span class="h-pick">${t.id === h.program ? '✓' : ''}</span></button>`).join('');
   if (prog) {
     const hasRem = S.reminders.some((r) => r.src === 'trening' && !r.done);
+    if (prog.note) out += `<div class="banner" style="margin-top:12px"><span>🧑‍🏫 ${esc(prog.note)}</span></div>`;
     out += `<button class="btn block" data-h="train-rem" style="margin-top:12px">⏰ ${hasRem ? 'Promeni podsetnik za trening' : 'Podseti me na dane treninga'}</button>`;
     out += prog.workouts.map((w, i) => `<div class="grp-h">${esc(w.name)}<span class="grow"></span></div>
       <div class="card block">
@@ -243,6 +252,12 @@ function onPlayer(e) {
   if (a === 'close') return closePlayer();
   if (a === 'quit') { if (confirm('Prekinuti trening?')) closePlayer(); return; }
   if (a === 'done' || a === 'skip') return nextStep();
+  if (a === 'w+' || a === 'w-') {
+    const st = player.steps[player.i], w = H().weights;
+    const cur = w[st.e] != null ? w[st.e] : 20;
+    w[st.e] = Math.max(0, (w[st.e] == null && a === 'w+') ? 20 : cur + (a === 'w+' ? 2.5 : -2.5));
+    save(false); return drawPlayer();
+  }
   if (a === 'back' && player.i > 0) { player.i--; return enterStep(); }
   if (a === 'play') { if (player.running) { clearInterval(player.timer); player.running = false; drawPlayer(); } else startTimer(); }
 }
@@ -259,10 +274,12 @@ function drawPlayer() {
     return;
   }
   const ex = EXERCISES[st.e];
-  const target = st.reps ? `<div class="pl-reps">${st.reps}<small>${st.side ? ' po strani' : ' ponavljanja'}</small></div>` : `<div class="pl-time" id="plTime">${mmss(player.left)}</div>`;
+  const target = st.reps ? `<div class="pl-reps">${st.reps}<small>${st.side ? ' po strani' : ' ponavljanja'}</small></div>` : `<div class="pl-time" id="plTime">${mmss(player.left)}</div>${st.side ? '<div class="meta">po strani</div>' : ''}`;
+  const wt = H().weights[st.e];
+  const weight = ex.gym ? `<div class="pl-w"><span>Težina</span><div class="stepper"><button data-p="w-">−</button><span>${wt != null ? fmtNum(wt) + ' kg' : '–'}</span><button data-p="w+">+</button></div></div>` : '';
   el.innerHTML = `<div class="pl-top"><button class="iconbtn" data-p="quit">✕</button><div class="progress grow"><div style="width:${pct}%"></div></div><span class="meta">${player.i + 1}/${total}</span></div>
     <div class="pl-main"><div class="pl-ic">${ex.icon}</div><h3>${esc(ex.name)}</h3>${st.set ? `<div class="meta">Serija ${st.set} od ${st.sets}</div>` : ''}
-      ${target}<p class="pl-how">${esc(ex.how)}</p></div>
+      ${target}${weight}<p class="pl-how">${esc(ex.how)}</p></div>
     <div class="pl-btns"><button class="btn" data-p="back">◀</button>
       ${st.reps ? '<button class="btn ok grow" data-p="done">✓ Gotovo</button>'
         : `<button class="btn primary grow" data-p="play">${player.running ? '⏸ Pauza' : '▶ Start'}</button><button class="btn" data-p="skip">⏭</button>`}</div>`;
@@ -274,6 +291,8 @@ document.addEventListener('DOMContentLoaded', () => $('#view').addEventListener(
   const a = b.dataset.h, h = H();
   if (a === 'sub') { hsub = b.dataset.v; render(); window.scrollTo(0, 0); }
   if (a === 'rfilter') { rFilter = b.dataset.v; render(); }
+  if (a === 'dcat') { dCat = b.dataset.v; render(); }
+  if (a === 'tcat') { tCat = b.dataset.v; render(); }
   if (a === 'recipe') openRecipe(b.dataset.id);
   if (a === 'plan') { h.plan = h.plan === b.dataset.v ? null : b.dataset.v; save(false); render(); }
   if (a === 'prog') { h.program = h.program === b.dataset.v ? null : b.dataset.v; save(false); render(); }

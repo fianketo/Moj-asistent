@@ -330,3 +330,5 @@ nav button { font-size: 10.5px; }
 .pl-btns .btn { padding: 16px; font-size: 17px; }
 .pl-done { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; gap: 8px; }
 .pl-btns .grow { flex: 1; }
+.pl-w { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; color: var(--muted); }
+.pl-w .stepper span { min-width: 70px; }
