@@ -156,7 +156,10 @@ function openRecipe(id) {
       <div class="rec-serv"><span>Porcija:</span><div class="stepper"><button data-r="-">−</button><span>${serv}</span><button data-r="+">+</button></div></div>
       <h2>Sastojci</h2><ul class="rec-ing">${r.ing.map(([n, q, u, note]) => `<li><span>${esc(n)}</span><b>${q ? esc(fmtNum(Math.round(q * k * 100) / 100) + ' ' + u) : ''}${note ? ` <small>${esc(note)}</small>` : ''}</b></li>`).join('')}</ul>
       <button class="btn primary block" data-r="shop">🛒 Dodaj sastojke u listu „${esc(curList().name)}“</button>
-      <h2>Priprema</h2><ol class="rec-steps">${r.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+      <h2>Priprema <span class="meta" style="text-transform:none;letter-spacing:0">· ${r.steps.length} koraka</span></h2>
+      <button class="btn block" data-r="cook" style="margin-bottom:8px">👨‍🍳 Kuvaj korak po korak</button>
+      <ol class="rec-steps">${r.steps.map((st, i) => { const m = stepMinutes(st); return `<li>${esc(st)}${m ? ` <button class="tmr" data-r="timer" data-m="${m}" data-l="${esc(r.name)} – korak ${i + 1}">⏱ ${m >= 60 ? fmtNum(Math.round(m / 6) / 10) + ' h' : m + ' min'}</button>` : ''}</li>`; }).join('')}</ol>
+      ${r.tip ? `<div class="rec-tip">💡 <b>Savet:</b> ${esc(r.tip)}</div>` : ''}
       <div class="foot"><button class="btn" onclick="closeSheet()">Zatvori</button></div></div>`;
   };
   const mount = () => $('#recWrap').addEventListener('click', (e) => {
@@ -166,6 +169,8 @@ function openRecipe(id) {
     if (a === '-') serv = Math.max(1, serv - 1);
     if (a === 'fav') { h.favs = h.favs.includes(r.id) ? h.favs.filter((x) => x !== r.id) : [...h.favs, r.id]; save(false); }
     if (a === 'shop') { const n = addIngredients([[r, serv / r.serv]]); closeSheet(); toast(`Dodato ${n} ${artikala(n)} u „${curList().name}“`); return; }
+    if (a === 'timer') return startKitchenTimer(+b.dataset.m, b.dataset.l);
+    if (a === 'cook') return cookMode(r);
     $('#sheet').innerHTML = draw(); mount();
   });
   openSheet(draw(), mount);
@@ -254,6 +259,52 @@ function trainingReminder() {
   }
   save(); ensurePermission(); render();
   toast(`Podsetnik: ${prog.days.map((d) => WD_SHORT[d]).join(', ')} u ${pad(+m[1])}:${pad(+(m[2] || 0))}`);
+}
+
+// ---------------------------------------------------------------- KUHINJSKI TAJMER I KUVANJE KORAK PO KORAK
+let ktimers = [];
+async function startKitchenTimer(min, label) {
+  const end = Date.now() + min * MIN, id = 7000 + Math.floor(Math.random() * 900);
+  ktimers.push({ id, end, label });
+  if (IS_NATIVE) { // stiže i kad je aplikacija zatvorena
+    try { await LN.schedule({ notifications: [{ id, title: '⏱ Tajmer je istekao', body: label, schedule: { at: new Date(end), allowWhileIdle: true }, channelId: 'podsetnici', smallIcon: 'ic_stat_notify' }] }); } catch { /* */ }
+  } else {
+    setTimeout(() => { showWebNotification({ key: 'tm' + id, title: '⏱ Tajmer je istekao', body: label, tab }); try { navigator.vibrate && navigator.vibrate([400, 150, 400]); } catch { /* */ } }, min * MIN);
+  }
+  toast(`⏱ Tajmer ${min} min pokrenut – javiću kad istekne`);
+  drawTimerBar();
+}
+function drawTimerBar() {
+  ktimers = ktimers.filter((t) => t.end > Date.now() - 5000);
+  let bar = $('#ktbar');
+  if (!ktimers.length) { if (bar) bar.remove(); clearInterval(drawTimerBar.iv); drawTimerBar.iv = null; return; }
+  if (!bar) { bar = document.createElement('div'); bar.id = 'ktbar'; document.body.appendChild(bar); }
+  bar.innerHTML = ktimers.map((t) => { const l = Math.max(0, Math.round((t.end - Date.now()) / 1000)); return `<span>⏱ ${l ? mmss(l) : 'Gotovo!'}</span>`; }).join('');
+  if (!drawTimerBar.iv) drawTimerBar.iv = setInterval(drawTimerBar, 1000);
+}
+function cookMode(r) {
+  let i = 0, wake = null;
+  try { navigator.wakeLock && navigator.wakeLock.request('screen').then((l) => (wake = l)).catch(() => {}); } catch { /* */ }
+  const draw = () => {
+    const st = r.steps[i], m = stepMinutes(st), last = i === r.steps.length - 1;
+    return `<div id="ck"><div class="pl-top"><button class="iconbtn" data-c="x">✕</button><div class="progress grow"><div style="width:${Math.round(((i + 1) / r.steps.length) * 100)}%"></div></div><span class="meta">${i + 1}/${r.steps.length}</span></div>
+      <div class="ck-main"><div class="ck-title">${r.icon} ${esc(r.name)}</div><div class="ck-n">Korak ${i + 1}</div><p class="ck-step">${esc(st)}</p>
+      ${m ? `<button class="btn primary" data-c="t" data-m="${m}">⏱ Pokreni tajmer ${m >= 60 ? fmtNum(Math.round(m / 6) / 10) + ' h' : m + ' min'}</button>` : ''}
+      ${last && r.tip ? `<div class="rec-tip" style="margin-top:16px">💡 ${esc(r.tip)}</div>` : ''}</div>
+      <div class="pl-btns"><button class="btn" data-c="p" ${i ? '' : 'disabled'}>◀ Nazad</button><button class="btn ${last ? 'ok' : 'primary'} grow" data-c="n">${last ? '✓ Prijatno!' : 'Sledeći korak ▶'}</button></div></div>`;
+  };
+  const close = () => { try { wake && wake.release(); } catch { /* */ } $('#sheet').classList.remove('full'); closeSheet(); };
+  const mount = () => $('#ck').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-c]'); if (!b) return;
+    const c = b.dataset.c;
+    if (c === 'x') return close();
+    if (c === 't') return startKitchenTimer(+b.dataset.m, `${r.name} – korak ${i + 1}`);
+    if (c === 'p' && i > 0) i--;
+    if (c === 'n') { if (i === r.steps.length - 1) return close(); i++; }
+    $('#sheet').innerHTML = draw(); mount();
+  });
+  openSheet(draw(), mount);
+  $('#sheet').classList.add('full');
 }
 
 // ---------------------------------------------------------------- VOĐENI TRENING
