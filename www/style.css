@@ -337,3 +337,4 @@ nav button { font-size: 10.5px; }
 .week-nav small { display: block; color: var(--muted); font-size: 12px; }
 .week-nav .iconbtn { width: 44px; height: 44px; }
 .h-swap { font-size: 17px; width: 36px; height: 36px; flex: none; }
+.chips-sm .chip { padding: 5px 11px; font-size: 13px; }

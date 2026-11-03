@@ -20,7 +20,7 @@ function mealPool(plan, m) {
   const rule = PLAN_RULES[plan.id] || (() => true);
   // glavni obroci moraju biti dovoljno hranljivi (prilozi i lake čorbe ne mogu biti ceo ručak)
   const minK = { dorucak: 180, rucak: 280, vecera: 200, uzina: 0 }[m];
-  const pool = RECIPES.filter((r) => r.meal.includes(m) && r.kcal >= minK && rule(r, m));
+  const pool = RECIPES.filter((r) => r.meal.includes(m) && r.type !== 'desert' && r.kcal >= minK && rule(r, m));
   return pool.length ? pool : RECIPES.filter((r) => r.meal.includes(m));
 }
 // 7 dana × 4 obroka; prva nedelja programa je ručno složena, ostale se slažu po pravilima programa
@@ -58,7 +58,7 @@ function swapMeal(plan, w, d, mi) {
   h.swaps[`${plan.id}|${w}|${d}|${mi}`] = choices[Math.floor(Math.random() * choices.length)];
   save(false); render();
 }
-let dWeek = 0;
+let dWeek = 0, rType = 'sve';
 let hsub = 'danas', rFilter = 'sve', rQuery = '', dCat = 'sve', tCat = 'sve';
 const DIET_CATS = { sve: 'Sve', zdravlje: '❤️ Zdravlje', mrsavljenje: '🪶 Mršavljenje', sport: '💪 Sport', posno: '🌱 Posno / vege' };
 const TRAIN_CATS = { sve: 'Sve', kuca: '🏠 Kod kuće', teretana: '🏋️ Teretana', trcanje: '🏃 Trčanje', mobilnost: '🧘 Mobilnost' };
@@ -126,21 +126,24 @@ function nextDayName(prog) {
 
 // ---------------------------------------------------------------- RECEPTI
 function hRecipes() {
-  const chips = { sve: 'Sve', fav: '⭐ Omiljeni', ...MEALS, posno: '🌱 Posno', vege: '🥦 Vege' };
-  return `<input class="input" id="rSearch" placeholder="🔎 Traži recept ili namirnicu (npr. piletina)" value="${esc(rQuery)}" autocomplete="off" style="margin:0 0 8px">
-    <div class="chips">${Object.entries(chips).map(([k, v]) => `<button class="chip ${k === rFilter ? 'on' : ''}" data-h="rfilter" data-v="${k}">${v}</button>`).join('')}</div>
-    <div class="grp" id="rList">${recipeRows()}</div>`;
+  const types = { sve: '📚 Sve', ...RTYPES };
+  const quick = { sve: 'Bez filtera', fav: '⭐ Omiljeni', brzo: '⚡ Do 30 min', posno: '🌱 Posno', vege: '🥦 Vege', lagano: '🪶 Lagano', protein: '💪 Proteini' };
+  return `<input class="input" id="rSearch" placeholder="🔎 Traži recept ili namirnicu (npr. piletina, tikvice)" value="${esc(rQuery)}" autocomplete="off" style="margin:0 0 8px">
+    <div class="chips">${Object.entries(types).map(([k, v]) => `<button class="chip ${k === rType ? 'on' : ''}" data-h="rtype" data-v="${k}">${v}</button>`).join('')}</div>
+    <div class="chips chips-sm">${Object.entries(quick).map(([k, v]) => `<button class="chip ${k === rFilter ? 'on' : ''}" data-h="rfilter" data-v="${k}">${v}</button>`).join('')}</div>
+    <div id="rList">${recipeRows()}</div>`;
 }
 function recipeRows() {
   const f = fold(rQuery.trim()), favs = H().favs;
   const tg = (r) => r.tags || [];
-  const ok = (r) => rFilter === 'sve' || (rFilter === 'fav' ? favs.includes(r.id) : rFilter === 'posno' ? tg(r).some((t) => t.startsWith('posno'))
-    : rFilter === 'vege' ? tg(r).some((t) => ['vege', 'vegan', 'posno'].includes(t)) : r.meal.includes(rFilter));
+  const ok = (r) => (rType === 'sve' || r.type === rType) && (rFilter === 'sve' || (rFilter === 'fav' ? favs.includes(r.id)
+    : rFilter === 'posno' ? tg(r).some((t) => t.startsWith('posno')) : rFilter === 'vege' ? r.f && r.f.vege
+    : rFilter === 'brzo' ? r.min <= 30 : rFilter === 'lagano' ? r.kcal <= 350 && r.type !== 'desert' : rFilter === 'protein' ? r.prot >= 30 : r.meal.includes(rFilter)));
   const list = RECIPES.filter((r) => ok(r)
     && (!f || fold(r.name).includes(f) || r.ing.some(([n]) => fold(n).includes(f))));
   if (!list.length) return `<div class="empty" style="padding:24px">Nema recepata${rFilter === 'fav' ? ' – dodaj ⭐ u receptu' : ''}.</div>`;
-  return list.map((r) => `<div class="item-row h-meal" data-h="recipe" data-id="${r.id}"><span class="h-ic">${r.icon}</span>
-    <span class="nm">${esc(r.name)}<small>${r.min} min · ${r.kcal} kcal · ${r.prot} g proteina</small></span>${favs.includes(r.id) ? '<span>⭐</span>' : ''}</div>`).join('');
+  return `<div class="meta" style="margin:0 4px 6px">Pronađeno: <b>${list.length}</b> ${list.length % 10 === 1 && list.length % 100 !== 11 ? 'recept' : 'recepata'}</div><div class="grp">` + list.map((r) => `<div class="item-row h-meal" data-h="recipe" data-id="${r.id}"><span class="h-ic">${r.icon}</span>
+    <span class="nm">${esc(r.name)}<small>${r.min >= 60 ? fmtNum(Math.round(r.min / 6) / 10) + ' h' : r.min + ' min'} · ${r.kcal} kcal · ${r.prot} g proteina${r.tags && r.tags.includes('posno') ? ' · 🌱' : ''}</small></span>${favs.includes(r.id) ? '<span>⭐</span>' : ''}</div>`).join('') + '</div>';
 }
 function openRecipe(id) {
   const r = recipeById(id), h = H();
@@ -355,6 +358,7 @@ document.addEventListener('DOMContentLoaded', () => $('#view').addEventListener(
   const a = b.dataset.h, h = H();
   if (a === 'sub') { hsub = b.dataset.v; render(); window.scrollTo(0, 0); }
   if (a === 'rfilter') { rFilter = b.dataset.v; render(); }
+  if (a === 'rtype') { rType = b.dataset.v; render(); }
   if (a === 'dcat') { dCat = b.dataset.v; render(); }
   if (a === 'tcat') { tCat = b.dataset.v; render(); }
   if (a === 'recipe') openRecipe(b.dataset.id);

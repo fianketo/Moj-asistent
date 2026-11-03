@@ -9,7 +9,7 @@ const CATALOG = [
     ['Šargarepa', 'kg'], ['Peršun (list)', 'pak'], ['Peršun (koren)', 'kom'], ['Celer', 'kom'], ['Mirođija', 'pak'], ['Kupus', 'kom'],
     ['Kelj', 'kom'], ['Karfiol', 'kom'], ['Brokoli', 'kom'], ['Tikvice', 'kg'], ['Plavi patlidžan', 'kg'], ['Zelena salata', 'kom'],
     ['Zelena salata (miks)', 'pak'], ['Rukola', 'pak'], ['Spanać', 'pak'], ['Blitva', 'pak'], ['Cvekla', 'kg'], ['Rotkvice', 'pak'],
-    ['Boranija', 'kg'], ['Grašak', 'kg'], ['Kukuruz šećerac', 'kom'], ['Pečurke', 'pak'], ['Bundeva', 'kg'], ['Đumbir', 'g'],
+    ['Boranija', 'kg'], ['Grašak', 'kg'], ['Kukuruz šećerac', 'kom'], ['Pečurke', 'pak'], ['Bundeva', 'kg'], ['Đumbir', 'g'], ['Rotkvice (veza)', 'pak'], ['Ruzmarin (svež)', 'pak'], ['Kiseli kupus', 'kom'], ['Šampinjoni', 'pak'],
     ['Jabuke', 'kg'], ['Kruške', 'kg'], ['Banane', 'kg'], ['Pomorandže', 'kg'], ['Mandarine', 'kg'], ['Limun', 'kom'], ['Limeta', 'kom'],
     ['Grejpfrut', 'kom'], ['Grožđe', 'kg'], ['Jagode', 'pak'], ['Maline', 'pak'], ['Borovnice', 'pak'], ['Trešnje', 'kg'],
     ['Višnje', 'kg'], ['Kajsije', 'kg'], ['Breskve', 'kg'], ['Nektarine', 'kg'], ['Šljive', 'kg'], ['Lubenica', 'kom'], ['Dinja', 'kom'],
@@ -19,7 +19,7 @@ const CATALOG = [
     ['Hleb', 'kom'], ['Beli hleb', 'kom'], ['Polubeli hleb', 'kom'], ['Crni / integralni hleb', 'kom'], ['Raženi hleb', 'kom'],
     ['Tost hleb', 'kom'], ['Kifle', 'kom'], ['Pecivo', 'kom'], ['Lepinje', 'kom'], ['Somun', 'kom'], ['Baguet', 'kom'],
     ['Burek', 'kom'], ['Pita', 'kom'], ['Kroasan', 'kom'], ['Đevrek', 'kom'], ['Tortilje', 'pak'], ['Prezle', 'pak'],
-    ['Kore za pitu', 'pak'], ['Lisnato testo', 'pak'], ['Kvasac', 'kom'],
+    ['Kore za pitu', 'pak'], ['Lisnato testo', 'pak'], ['Kvasac', 'kom'], ['Kore za lazanje', 'pak'], ['Piškote', 'pak'], ['Hlebne mrvice', 'pak'],
   ] },
   { cat: 'Mlečni proizvodi i jaja', icon: '🥛', items: [
     ['Mleko', 'l'], ['Dugotrajno mleko', 'l'], ['Sveže mleko', 'l'], ['Mleko bez laktoze', 'l'], ['Jogurt', 'kom'], ['Kiselo mleko', 'kom'],
@@ -36,7 +36,7 @@ const CATALOG = [
     ['Mleveno junece meso', 'kg'], ['Ćevapi', 'kg'], ['Pljeskavica', 'kom'], ['Kobasice', 'kg'], ['Viršle', 'pak'], ['Slanina', 'g'],
     ['Šunka', 'g'], ['Pileća prsa (narezak)', 'g'], ['Pršuta', 'g'], ['Kulen', 'g'], ['Čajna kobasica', 'g'], ['Salama', 'g'],
     ['Pašteta', 'kom'], ['Riba (sveža)', 'kg'], ['Oslić', 'kg'], ['Losos', 'kg'], ['Pastrmka', 'kg'], ['Šaran', 'kg'],
-    ['Lignje', 'kg'], ['Škampi', 'pak'], ['Tunjevina (konzerva)', 'kom'], ['Sardine (konzerva)', 'kom'], ['Riblji štapići', 'pak'],
+    ['Lignje', 'kg'], ['Škampi', 'pak'], ['Tunjevina (konzerva)', 'kom'], ['Sardine (konzerva)', 'kom'], ['Riblji štapići', 'pak'], ['Skuša', 'kg'], ['Som', 'kg'], ['Bakalar', 'kg'], ['Dagnje', 'kg'], ['Pileća džigerica', 'kg'], ['Suva rebra', 'kg'], ['Suvi vrat', 'g'],
   ] },
   { cat: 'Smrznuto', icon: '🧊', items: [
     ['Smrznuto povrće', 'pak'], ['Smrznuti grašak', 'pak'], ['Pomfrit', 'pak'], ['Smrznuta pica', 'kom'], ['Smrznute pljeskavice', 'pak'],
@@ -53,7 +53,7 @@ const CATALOG = [
     ['Aleva paprika', 'kom'], ['Origano', 'kom'], ['Bosiljak', 'kom'], ['Lovorov list', 'kom'], ['Cimet', 'kom'], ['Vanilin šećer', 'pak'],
     ['Prašak za pecivo', 'pak'], ['Soda bikarbona', 'kom'], ['Želatin', 'pak'], ['Med', 'kom'], ['Džem', 'kom'], ['Pekmez', 'kom'],
     ['Eurokrem / namaz', 'kom'], ['Kikiriki puter', 'kom'], ['Orasi', 'g'], ['Lešnici', 'g'], ['Bademi', 'g'], ['Suvo grožđe', 'g'],
-    ['Mak', 'g'], ['Kokos', 'g'], ['Kakao', 'kom'], ['Čokolada za kuvanje', 'kom'],
+    ['Mak', 'g'], ['Kokos', 'g'], ['Kakao', 'kom'], ['Čokolada za kuvanje', 'kom'], ['Kinoa', 'g'], ['Kus-kus', 'g'], ['Heljda', 'g'], ['Ječam', 'g'], ['Bulgur', 'g'], ['Njoke', 'pak'], ['Soja sos', 'kom'], ['Kari', 'kom'], ['Kurkuma', 'kom'], ['Kokosovo mleko', 'kom'], ['Susam', 'g'], ['Čia semenke', 'g'], ['Laneno seme', 'g'], ['Mascarpone', 'kom'], ['Gustin (skrob)', 'pak'], ['Pšenica (žito)', 'g'], ['Suve šljive', 'g'], ['Urme', 'g'], ['Kim', 'kom'], ['Muskatni oraščić', 'kom'], ['Peršun (suvi)', 'kom'], ['Mirođija (suva)', 'kom'], ['Ljuta paprika (mlevena)', 'kom'], ['Ajvar (domaći)', 'kom'], ['Senf (dižon)', 'kom'], ['Pesto', 'kom'], ['Tofu', 'pak'],
   ] },
   { cat: 'Slatkiši i grickalice', icon: '🍫', items: [
     ['Čokolada', 'kom'], ['Keks', 'pak'], ['Petit beurre keks', 'pak'], ['Napolitanke', 'pak'], ['Bombone', 'pak'], ['Žvake', 'kom'],
