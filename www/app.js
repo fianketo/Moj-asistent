@@ -1142,7 +1142,9 @@ async function syncNotifications() {
     const want = new Set(list.map((n) => hashId(n.key)));
     // otkaži samo ono što više ne treba (probna obaveštenja se ne diraju)
     const pending = (await LN.getPending()).notifications || [];
-    const stale = pending.filter((n) => !want.has(+n.id) && !TEST_IDS.includes(+n.id));
+    // aktivni kuhinjski tajmeri se ne diraju; stari (ugašeni) se uklanjaju
+    const timerIds = new Set((S.ktimers || []).filter((t) => t.end > Date.now()).map((t) => t.id));
+    const stale = pending.filter((n) => !want.has(+n.id) && !TEST_IDS.includes(+n.id) && !timerIds.has(+n.id));
     if (stale.length) await LN.cancel({ notifications: stale.map((n) => ({ id: +n.id })) });
     if (list.length) {
       await LN.schedule({

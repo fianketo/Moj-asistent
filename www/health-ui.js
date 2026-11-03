@@ -262,26 +262,63 @@ function trainingReminder() {
 }
 
 // ---------------------------------------------------------------- KUHINJSKI TAJMER I KUVANJE KORAK PO KORAK
-let ktimers = [];
+// tajmeri se čuvaju u S.ktimers da prežive zatvaranje aplikacije i mogu da se ugase
+const KT = () => (S.ktimers = S.ktimers || []);
+const webTimeouts = {};
+function armWebTimer(t) {
+  clearTimeout(webTimeouts[t.id]);
+  const left = t.end - Date.now(); if (left <= 0 || IS_NATIVE) return;
+  webTimeouts[t.id] = setTimeout(() => { showWebNotification({ key: 'tm' + t.id, title: '⏱ Tajmer je istekao', body: t.label, tab }); try { navigator.vibrate && navigator.vibrate([400, 150, 400]); } catch { /* */ } }, left);
+}
 async function startKitchenTimer(min, label) {
   const end = Date.now() + min * MIN, id = 7000 + Math.floor(Math.random() * 900);
-  ktimers.push({ id, end, label });
+  const t = { id, end, label, min };
+  KT().push(t); save(false);
   if (IS_NATIVE) { // stiže i kad je aplikacija zatvorena
     try { await LN.schedule({ notifications: [{ id, title: '⏱ Tajmer je istekao', body: label, schedule: { at: new Date(end), allowWhileIdle: true }, channelId: 'podsetnici', smallIcon: 'ic_stat_notify' }] }); } catch { /* */ }
-  } else {
-    setTimeout(() => { showWebNotification({ key: 'tm' + id, title: '⏱ Tajmer je istekao', body: label, tab }); try { navigator.vibrate && navigator.vibrate([400, 150, 400]); } catch { /* */ } }, min * MIN);
-  }
-  toast(`⏱ Tajmer ${min} min pokrenut – javiću kad istekne`);
+  } else armWebTimer(t);
+  toast(`⏱ Tajmer ${min} min pokrenut – dodirni ga gore desno da ga ugasiš`, 3500);
   drawTimerBar();
 }
+async function cancelKitchenTimer(id) {
+  S.ktimers = KT().filter((t) => t.id !== id); save(false);
+  clearTimeout(webTimeouts[id]);
+  if (IS_NATIVE) { try { await LN.cancel({ notifications: [{ id }] }); } catch { /* */ } }
+  drawTimerBar();
+}
+function timerMenu(id) {
+  const t = KT().find((x) => x.id === id); if (!t) return;
+  const left = Math.max(0, Math.round((t.end - Date.now()) / 1000));
+  openSheet(`<h3>⏱ Tajmer</h3><p class="meta" style="margin:0">${esc(t.label)}</p>
+    <div class="pl-time" style="text-align:center">${left ? mmss(left) : 'Gotovo!'}</div>
+    <div class="row"><button class="btn danger grow" id="tmOff">✕ Ugasi tajmer</button>
+      ${KT().length > 1 ? '<button class="btn grow" id="tmAll">Ugasi sve</button>' : ''}</div>
+    <div class="foot"><button class="btn" onclick="closeSheet()">Zatvori</button></div>`, () => {
+    $('#tmOff').onclick = () => { cancelKitchenTimer(id); closeSheet(); toast('Tajmer ugašen'); };
+    if ($('#tmAll')) $('#tmAll').onclick = () => { KT().slice().forEach((x) => cancelKitchenTimer(x.id)); closeSheet(); toast('Svi tajmeri ugašeni'); };
+  });
+}
 function drawTimerBar() {
-  ktimers = ktimers.filter((t) => t.end > Date.now() - 5000);
+  const now = Date.now();
+  // istekli se sami sklone posle 60 s
+  const before = KT().length;
+  S.ktimers = KT().filter((t) => t.end > now - 60000);
+  if (S.ktimers.length !== before) save(false);
   let bar = $('#ktbar');
-  if (!ktimers.length) { if (bar) bar.remove(); clearInterval(drawTimerBar.iv); drawTimerBar.iv = null; return; }
-  if (!bar) { bar = document.createElement('div'); bar.id = 'ktbar'; document.body.appendChild(bar); }
-  bar.innerHTML = ktimers.map((t) => { const l = Math.max(0, Math.round((t.end - Date.now()) / 1000)); return `<span>⏱ ${l ? mmss(l) : 'Gotovo!'}</span>`; }).join('');
+  if (!S.ktimers.length) { if (bar) bar.remove(); clearInterval(drawTimerBar.iv); drawTimerBar.iv = null; return; }
+  if (!bar) {
+    bar = document.createElement('div'); bar.id = 'ktbar'; document.body.appendChild(bar);
+    bar.addEventListener('click', (e) => {
+      const x = e.target.closest('[data-kx]'); if (x) { e.stopPropagation(); cancelKitchenTimer(+x.dataset.kx); return toast('Tajmer ugašen'); }
+      const c = e.target.closest('[data-kt]'); if (c) timerMenu(+c.dataset.kt);
+    });
+  }
+  bar.innerHTML = S.ktimers.map((t) => { const l = Math.max(0, Math.round((t.end - now) / 1000));
+    return `<span class="kt ${l ? '' : 'done'}" data-kt="${t.id}">⏱ ${l ? mmss(l) : 'Gotovo!'}<button class="kx" data-kx="${t.id}" aria-label="Ugasi">✕</button></span>`; }).join('');
   if (!drawTimerBar.iv) drawTimerBar.iv = setInterval(drawTimerBar, 1000);
 }
+// posle ponovnog otvaranja aplikacije vrati tajmere koji još traju
+document.addEventListener('DOMContentLoaded', () => setTimeout(() => { KT().forEach(armWebTimer); drawTimerBar(); }, 500));
 function cookMode(r) {
   let i = 0, wake = null;
   try { navigator.wakeLock && navigator.wakeLock.request('screen').then((l) => (wake = l)).catch(() => {}); } catch { /* */ }

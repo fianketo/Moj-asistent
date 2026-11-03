@@ -348,4 +348,6 @@ nav button { font-size: 10.5px; }
 .ck-step { font-size: 24px; line-height: 1.4; font-weight: 500; margin: 10px 0 20px; }
 .sheet.full #ck { display: flex; flex-direction: column; flex: 1; }
 #ktbar { position: fixed; top: calc(60px + env(safe-area-inset-top)); right: 10px; z-index: 40; display: flex; gap: 6px; }
-#ktbar span { background: #0f172a; color: #fff; border-radius: 99px; padding: 6px 12px; font-weight: 700; font-variant-numeric: tabular-nums; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+#ktbar .kt { display: flex; align-items: center; gap: 6px; background: #0f172a; color: #fff; border-radius: 99px; padding: 4px 4px 4px 12px; font-weight: 700; font-variant-numeric: tabular-nums; box-shadow: 0 4px 14px rgba(0,0,0,.25); cursor: pointer; }
+#ktbar .kt.done { background: #16a34a; animation: flash 1s infinite; }
+#ktbar .kx { border: 0; background: rgba(255,255,255,.18); color: #fff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; cursor: pointer; }
