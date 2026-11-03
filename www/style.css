@@ -332,3 +332,8 @@ nav button { font-size: 10.5px; }
 .pl-btns .grow { flex: 1; }
 .pl-w { display: flex; align-items: center; gap: 10px; margin: 4px 0 8px; color: var(--muted); }
 .pl-w .stepper span { min-width: 70px; }
+.week-nav { display: flex; align-items: center; justify-content: space-between; background: var(--card); border-radius: 12px; padding: 6px; margin: 14px 0 6px; box-shadow: var(--shadow); }
+.week-nav > div { text-align: center; }
+.week-nav small { display: block; color: var(--muted); font-size: 12px; }
+.week-nav .iconbtn { width: 44px; height: 44px; }
+.h-swap { font-size: 17px; width: 36px; height: 36px; flex: none; }
