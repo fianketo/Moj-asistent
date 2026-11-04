@@ -1,7 +1,7 @@
 /* Zdravlje – ekrani: Danas, Recepti, Ishrana, Treninzi i vođeni trening. */
 'use strict';
 
-const H = () => (S.health = Object.assign({ plan: null, program: null, favs: [], log: [], persons: 1, weights: {} }, S.health || {}));
+const H = () => (S.health = Object.assign({ plan: null, program: null, favs: [], log: [], persons: 1, weights: {}, recent: [] }, S.health || {}));
 const recipeById = (id) => RECIPES.find((r) => r.id === id);
 const WD = ['Nedelja', 'Ponedeljak', 'Utorak', 'Sreda', 'Četvrtak', 'Petak', 'Subota'];
 const WD_SHORT = ['ned', 'pon', 'uto', 'sre', 'čet', 'pet', 'sub'];
@@ -71,7 +71,12 @@ function renderHealth() {
   $('#view').innerHTML = html;
   if (hsub === 'recepti') {
     const q = $('#rSearch');
-    q.addEventListener('input', () => { rQuery = q.value; $('#rList').innerHTML = recipeRows(); });
+    q.addEventListener('input', () => {
+      const was = !!$('#rList'); rQuery = q.value;
+      const homeNow = !rQuery.trim() && rType === 'sve' && rFilter === 'sve';
+      if (was && !homeNow) { $('#rList').innerHTML = recipeRows(); return; }
+      clearTimeout(renderHealth.t); renderHealth.t = setTimeout(() => { render(); const n = $('#rSearch'); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); } }, 0);
+    });
   }
 }
 
@@ -125,50 +130,143 @@ function nextDayName(prog) {
 }
 
 // ---------------------------------------------------------------- RECEPTI
+const TYPE_COLOR = { corba: ['#fde68a', '#f59e0b'], meso: ['#fecaca', '#dc2626'], piletina: ['#fed7aa', '#ea580c'], riba: ['#bae6fd', '#0284c7'], testenina: ['#fef3c7', '#d97706'],
+  povrce: ['#bbf7d0', '#16a34a'], salata: ['#d9f99d', '#65a30d'], pita: ['#fde68a', '#b45309'], dorucak: ['#fef9c3', '#ca8a04'], desert: ['#fbcfe8', '#db2777'], namaz: ['#e9d5ff', '#7c3aed'] };
+const grad = (r) => { const c = TYPE_COLOR[r.type] || ['#e2e8f0', '#64748b']; return `background:linear-gradient(135deg, ${c[0]}, ${c[1]}33)`; };
+const fmtMin = (m) => (m >= 60 ? fmtNum(Math.round(m / 6) / 10) + ' h' : m + ' min');
+function badges(r) {
+  const b = [];
+  if (r.tags && r.tags.includes('posno')) b.push('🌱 Posno'); else if (r.tags && r.tags.includes('posno-riba')) b.push('🐟 Posno (riba)');
+  if (r.f.vege && !(r.tags || []).includes('posno')) b.push('🥦 Vege');
+  if (r.f.glutenFree) b.push('🌾 Bez glutena');
+  if (r.f.lactoseFree) b.push('🥛 Bez laktoze');
+  if (r.f.protein) b.push('💪 Proteinsko');
+  if (r.min <= 20) b.push('⚡ Brzo');
+  return b;
+}
+let rSel = { haves: [] };
+function recipeCard(r, wide) {
+  const fav = H().favs.includes(r.id);
+  return `<button class="rcard ${wide ? 'wide' : ''}" data-h="recipe" data-id="${r.id}">
+    <div class="rc-top" style="${grad(r)}"><span class="rc-ic">${r.icon}</span><span class="rc-time">⏱ ${fmtMin(r.min)}</span>${fav ? '<span class="rc-fav">⭐</span>' : ''}</div>
+    <div class="rc-body"><div class="rc-name">${esc(r.name)}</div><div class="rc-meta">${r.kcal} kcal · ${DIFF[r.diff]}${r.tags && r.tags.includes('posno') ? ' · 🌱' : ''}</div></div></button>`;
+}
+function recipeDay() {
+  const d = startOfDay(new Date()), pool = RECIPES.filter((r) => r.meal.includes('rucak') || r.meal.includes('vecera'));
+  return pool[Math.abs(Math.floor(d / DAY) * 7919) % pool.length];
+}
 function hRecipes() {
   const types = { sve: '📚 Sve', ...RTYPES };
-  const quick = { sve: 'Bez filtera', fav: '⭐ Omiljeni', brzo: '⚡ Do 30 min', posno: '🌱 Posno', vege: '🥦 Vege', lagano: '🪶 Lagano', protein: '💪 Proteini' };
-  return `<input class="input" id="rSearch" placeholder="🔎 Traži recept ili namirnicu (npr. piletina, tikvice)" value="${esc(rQuery)}" autocomplete="off" style="margin:0 0 8px">
+  const quick = { sve: 'Bez filtera', fav: '⭐ Omiljeni', brzo: '⚡ Do 30 min', posno: '🌱 Posno', vege: '🥦 Vege', gluten: '🌾 Bez glutena', laktoza: '🥛 Bez laktoze', lagano: '🪶 Lagano', protein: '💪 Proteini', lako: '👌 Lako za spremiti' };
+  const home = !rQuery.trim() && rType === 'sve' && rFilter === 'sve';
+  let out = `<div class="r-search"><input class="input" id="rSearch" placeholder="🔎 Traži jelo ili namirnicu" value="${esc(rQuery)}" autocomplete="off">
+      <button class="btn" data-h="fridge" title="Šta imam u frižideru">🧊 Imam…</button></div>
     <div class="chips">${Object.entries(types).map(([k, v]) => `<button class="chip ${k === rType ? 'on' : ''}" data-h="rtype" data-v="${k}">${v}</button>`).join('')}</div>
-    <div class="chips chips-sm">${Object.entries(quick).map(([k, v]) => `<button class="chip ${k === rFilter ? 'on' : ''}" data-h="rfilter" data-v="${k}">${v}</button>`).join('')}</div>
-    <div id="rList">${recipeRows()}</div>`;
+    <div class="chips chips-sm">${Object.entries(quick).map(([k, v]) => `<button class="chip ${k === rFilter ? 'on' : ''}" data-h="rfilter" data-v="${k}">${v}</button>`).join('')}</div>`;
+  if (home) {
+    const day = recipeDay(), h = H();
+    const recent = (h.recent || []).map(recipeById).filter(Boolean).slice(0, 10);
+    const favs = h.favs.map(recipeById).filter(Boolean);
+    out += `<div class="r-hero" data-h="recipe" data-id="${day.id}" style="${grad(day)}"><div><small>🍽️ PREDLOG DANA</small><b>${esc(day.name)}</b>
+      <span>⏱ ${fmtMin(day.min)} · ${day.kcal} kcal · ${DIFF[day.diff]}</span></div><span class="r-hero-ic">${day.icon}</span></div>`;
+    if (recent.length) out += `<div class="grp-h">🕘 Nedavno gledano</div><div class="hscroll">${recent.map((r) => recipeCard(r)).join('')}</div>`;
+    if (favs.length) out += `<div class="grp-h">⭐ Omiljeni</div><div class="hscroll">${favs.map((r) => recipeCard(r)).join('')}</div>`;
+    out += `<div class="grp-h">📂 Vrste jela</div><div class="type-grid">${Object.entries(RTYPES).map(([k, v]) => { const c = TYPE_COLOR[k]; const n = RECIPES.filter((r) => r.type === k).length;
+      return `<button class="type-tile" data-h="rtype" data-v="${k}" style="background:linear-gradient(135deg, ${c[0]}, ${c[1]}22)"><span>${v.split(' ')[0]}</span><b>${v.split(' ').slice(1).join(' ')}</b><small>${n} recepata</small></button>`; }).join('')}</div>
+      <div class="grp-h">⚡ Brzo i lako (do 20 min)</div><div class="hscroll">${RECIPES.filter((r) => r.min <= 20 && r.type !== 'namaz').slice(0, 14).map((r) => recipeCard(r)).join('')}</div>`;
+    return out;
+  }
+  return out + `<div id="rList">${recipeRows()}</div>`;
 }
 function recipeRows() {
   const f = fold(rQuery.trim()), favs = H().favs;
   const tg = (r) => r.tags || [];
-  const ok = (r) => (rType === 'sve' || r.type === rType) && (rFilter === 'sve' || (rFilter === 'fav' ? favs.includes(r.id)
-    : rFilter === 'posno' ? tg(r).some((t) => t.startsWith('posno')) : rFilter === 'vege' ? r.f && r.f.vege
-    : rFilter === 'brzo' ? r.min <= 30 : rFilter === 'lagano' ? r.kcal <= 350 && r.type !== 'desert' : rFilter === 'protein' ? r.prot >= 30 : r.meal.includes(rFilter)));
-  const list = RECIPES.filter((r) => ok(r)
+  const qf = { fav: (r) => favs.includes(r.id), posno: (r) => tg(r).some((t) => t.startsWith('posno')), vege: (r) => r.f.vege, brzo: (r) => r.min <= 30,
+    lagano: (r) => r.kcal <= 350 && r.type !== 'desert', protein: (r) => r.prot >= 25, gluten: (r) => r.f.glutenFree, laktoza: (r) => r.f.lactoseFree, lako: (r) => r.diff === 1 };
+  const list = RECIPES.filter((r) => (rType === 'sve' || r.type === rType) && (rFilter === 'sve' || (qf[rFilter] ? qf[rFilter](r) : true))
     && (!f || fold(r.name).includes(f) || r.ing.some(([n]) => fold(n).includes(f))));
   if (!list.length) return `<div class="empty" style="padding:24px">Nema recepata${rFilter === 'fav' ? ' – dodaj ⭐ u receptu' : ''}.</div>`;
-  return `<div class="meta" style="margin:0 4px 6px">Pronađeno: <b>${list.length}</b> ${list.length % 10 === 1 && list.length % 100 !== 11 ? 'recept' : 'recepata'}</div><div class="grp">` + list.map((r) => `<div class="item-row h-meal" data-h="recipe" data-id="${r.id}"><span class="h-ic">${r.icon}</span>
-    <span class="nm">${esc(r.name)}<small>${r.min >= 60 ? fmtNum(Math.round(r.min / 6) / 10) + ' h' : r.min + ' min'} · ${r.kcal} kcal · ${r.prot} g proteina${r.tags && r.tags.includes('posno') ? ' · 🌱' : ''}</small></span>${favs.includes(r.id) ? '<span>⭐</span>' : ''}</div>`).join('') + '</div>';
+  return `<div class="meta" style="margin:0 4px 6px">Pronađeno: <b>${list.length}</b> ${list.length % 10 === 1 && list.length % 100 !== 11 ? 'recept' : 'recepata'}</div>
+    <div class="rgrid">${list.map((r) => recipeCard(r)).join('')}</div>`;
+}
+// „Šta imam u frižideru?“
+function fridgeFinder() {
+  const all = [...new Set(RECIPES.flatMap((r) => r.ing.map(([n]) => n)))].filter((n) => !PANTRY.has(n)).sort((a, b) => a.localeCompare(b, 'sr'));
+  const draw = () => {
+    const haves = rSel.haves;
+    const res = haves.length ? RECIPES.map((r) => {
+      const need = r.ing.map(([n]) => n).filter((n) => !PANTRY.has(n));
+      const have = need.filter((n) => haves.includes(n));
+      return { r, have: have.length, need: need.length, miss: need.filter((n) => !haves.includes(n)) };
+    }).filter((x) => x.have).sort((a, b) => (b.have / b.need) - (a.have / a.need) || b.have - a.have).slice(0, 30) : [];
+    return `<div id="frWrap"><h3>🧊 Šta imam u frižideru?</h3>
+      <p class="meta" style="margin:0 0 8px">Dodaj namirnice koje imaš – pokazaću jela koja možeš da napraviš (so, ulje i začine računam da imaš).</p>
+      <input class="input" id="frIn" list="frList" placeholder="npr. jaja, krompir, piletina…" autocomplete="off"><datalist id="frList">${all.map((n) => `<option value="${esc(n)}">`).join('')}</datalist>
+      <div class="chips" style="flex-wrap:wrap">${haves.map((n) => `<button class="chip on" data-fr="rm" data-n="${esc(n)}">${esc(n)} ✕</button>`).join('')}</div>
+      <div class="chips chips-sm" style="flex-wrap:wrap">${['Jaja', 'Krompir', 'Pileći file', 'Crni luk', 'Paradajz', 'Mleko', 'Beli sir', 'Pirinač', 'Testenina (penne)', 'Tikvice', 'Mleveno meso (mešano)', 'Šargarepa', 'Paprika', 'Pečurke', 'Kupus', 'Spanać'].filter((n) => !haves.includes(n)).map((n) => `<button class="chip" data-fr="add" data-n="${esc(n)}">+ ${esc(n)}</button>`).join('')}</div>
+      <div class="fr-res">${res.map(({ r, have, need, miss }) => `<button class="fr-row" data-fr="open" data-id="${r.id}"><span class="h-ic">${r.icon}</span>
+        <span class="nm">${esc(r.name)}<small>${have === need ? '<b style="color:var(--ok)">✓ Imaš sve!</b>' : `Imaš ${have}/${need} · fali: ${esc(miss.slice(0, 3).join(', '))}${miss.length > 3 ? '…' : ''}`}</small></span>
+        <span class="fr-pct" style="--p:${Math.round((have / need) * 100)}">${Math.round((have / need) * 100)}%</span></button>`).join('')}</div>
+      <div class="foot"><button class="btn" onclick="closeSheet()">Zatvori</button></div></div>`;
+  };
+  const mount = () => {
+    const inp = $('#frIn');
+    let busy = false;
+    const add = (n) => {
+      if (busy) return; busy = true; inp.value = '';
+      const m = all.find((x) => fold(x) === fold(n)) || all.find((x) => fold(x).startsWith(fold(n))) || all.find((x) => fold(x).includes(fold(n)));
+      if (m && !rSel.haves.includes(m)) rSel.haves.push(m); else if (!m) toast('Nema te namirnice u receptima');
+      setTimeout(() => { $('#sheet').innerHTML = draw(); mount(); const f = $('#frIn'); if (f) f.focus(); }, 0);
+    };
+    inp.addEventListener('change', () => inp.value.trim() && add(inp.value.trim()));
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter' && inp.value.trim()) add(inp.value.trim()); });
+    $('#frWrap').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-fr]'); if (!b) return;
+      if (b.dataset.fr === 'add') add(b.dataset.n);
+      if (b.dataset.fr === 'rm') { rSel.haves = rSel.haves.filter((x) => x !== b.dataset.n); $('#sheet').innerHTML = draw(); mount(); }
+      if (b.dataset.fr === 'open') openRecipe(b.dataset.id);
+    });
+  };
+  openSheet(draw(), mount);
 }
 function openRecipe(id) {
   const r = recipeById(id), h = H();
-  let serv = r.serv;
+  h.recent = [id, ...(h.recent || []).filter((x) => x !== id)].slice(0, 12); save(false);
+  let serv = r.serv, tabR = 'sastojci';
+  const have = new Set(); // štiklirani sastojci = „imam“
   const draw = () => {
-    const k = serv / r.serv;
-    return `<div id="recWrap"><div class="rec-head"><span class="rec-ic">${r.icon}</span><div><h3>${esc(r.name)}</h3>
-      <div class="meta">⏱ ${r.min} min · 🔥 ${r.kcal} kcal · 💪 ${r.prot} g proteina <small>(po porciji)</small></div></div>
-      <button class="iconbtn" data-r="fav" title="Omiljeni">${h.favs.includes(r.id) ? '⭐' : '☆'}</button></div>
-      <div class="rec-serv"><span>Porcija:</span><div class="stepper"><button data-r="-">−</button><span>${serv}</span><button data-r="+">+</button></div></div>
-      <h2>Sastojci</h2><ul class="rec-ing">${r.ing.map(([n, q, u, note]) => `<li><span>${esc(n)}</span><b>${q ? esc(fmtNum(Math.round(q * k * 100) / 100) + ' ' + u) : ''}${note ? ` <small>${esc(note)}</small>` : ''}</b></li>`).join('')}</ul>
-      <button class="btn primary block" data-r="shop">🛒 Dodaj sastojke u listu „${esc(curList().name)}“</button>
-      <h2>Priprema <span class="meta" style="text-transform:none;letter-spacing:0">· ${r.steps.length} koraka</span></h2>
-      <button class="btn block" data-r="cook" style="margin-bottom:8px">👨‍🍳 Kuvaj korak po korak</button>
-      <ol class="rec-steps">${r.steps.map((st, i) => { const m = stepMinutes(st); return `<li>${esc(st)}${m ? ` <button class="tmr" data-r="timer" data-m="${m}" data-l="${esc(r.name)} – korak ${i + 1}">⏱ ${m >= 60 ? fmtNum(Math.round(m / 6) / 10) + ' h' : m + ' min'}</button>` : ''}</li>`; }).join('')}</ol>
-      ${r.tip ? `<div class="rec-tip">💡 <b>Savet:</b> ${esc(r.tip)}</div>` : ''}
-      <div class="foot"><button class="btn" onclick="closeSheet()">Zatvori</button></div></div>`;
+    const k = serv / r.serv, miss = r.ing.filter(([n]) => !have.has(n)).length;
+    return `<div id="recWrap"><div class="rec-hero" style="${grad(r)}"><span class="rec-hero-ic">${r.icon}</span>
+        <button class="iconbtn rec-fav" data-r="fav" title="Omiljeni">${h.favs.includes(r.id) ? '⭐' : '☆'}</button>
+        <button class="iconbtn rec-x" data-r="close" title="Zatvori">✕</button></div>
+      <h3 class="rec-title">${esc(r.name)}</h3>
+      <div class="rec-stats"><div><b>${fmtMin(r.min)}</b><small>vreme</small></div><div><b>${r.kcal}</b><small>kcal/porc.</small></div><div><b>${r.prot} g</b><small>proteini</small></div><div><b>${DIFF[r.diff]}</b><small>težina</small></div></div>
+      <div class="rec-badges">${badges(r).map((x) => `<span>${x}</span>`).join('')}</div>
+      <div class="seg seg-in"><button class="${tabR === 'sastojci' ? 'on' : ''}" data-r="tab" data-v="sastojci">🧺 Sastojci (${r.ing.length})</button><button class="${tabR === 'priprema' ? 'on' : ''}" data-r="tab" data-v="priprema">👨‍🍳 Priprema (${r.steps.length})</button></div>
+      ${tabR === 'sastojci' ? `
+        <div class="rec-serv"><span>Porcija:</span><div class="stepper"><button data-r="-">−</button><span>${serv}</span><button data-r="+">+</button></div></div>
+        <p class="meta" style="margin:4px 2px 6px">Štikliraj ono što već imaš – u listu idu samo sastojci koji fale.</p>
+        <ul class="rec-ing">${r.ing.map(([n, q, u, note]) => `<li class="${have.has(n) ? 'have' : ''}" data-r="have" data-n="${esc(n)}"><span class="tick">${have.has(n) ? '✓' : ''}</span><span class="grow">${esc(n)}</span><b>${q ? esc(fmtNum(Math.round(q * k * 100) / 100) + ' ' + u) : ''}${note ? ` <small>${esc(note)}</small>` : ''}</b></li>`).join('')}</ul>
+        <button class="btn primary block" data-r="shop" ${miss ? '' : 'disabled'}>🛒 ${miss === r.ing.length ? 'Dodaj sve sastojke' : `Dodaj ono što fali (${miss})`} u „${esc(curList().name)}“</button>
+        <button class="btn block" data-r="tab" data-v="priprema" style="margin-top:8px">Dalje: priprema →</button>`
+      : `<button class="btn primary block" data-r="cook" style="margin:10px 0">👨‍🍳 Kuvaj korak po korak</button>
+        <ol class="rec-steps2">${r.steps.map((st, i) => { const m = stepMinutes(st); return `<li><span class="sn">${i + 1}</span><div>${esc(st)}${m ? ` <button class="tmr" data-r="timer" data-m="${m}" data-l="${esc(r.name)} – korak ${i + 1}">⏱ ${fmtMin(m)}</button>` : ''}</div></li>`; }).join('')}</ol>
+        ${r.tip ? `<div class="rec-tip">💡 <b>Savet:</b> ${esc(r.tip)}</div>` : ''}`}
+      <div class="foot"><button class="btn" data-r="close">Zatvori</button></div></div>`;
   };
   const mount = () => $('#recWrap').addEventListener('click', (e) => {
     const b = e.target.closest('[data-r]'); if (!b) return;
     const a = b.dataset.r;
+    if (a === 'close') { closeSheet(); if (tab === 'zdravlje' && hsub === 'recepti') render(); return; }
     if (a === '+') serv = Math.min(12, serv + 1);
     if (a === '-') serv = Math.max(1, serv - 1);
+    if (a === 'tab') { tabR = b.dataset.v; $('#sheet').scrollTo(0, 0); }
+    if (a === 'have') { const n = b.dataset.n; have.has(n) ? have.delete(n) : have.add(n); }
     if (a === 'fav') { h.favs = h.favs.includes(r.id) ? h.favs.filter((x) => x !== r.id) : [...h.favs, r.id]; save(false); }
-    if (a === 'shop') { const n = addIngredients([[r, serv / r.serv]]); closeSheet(); toast(`Dodato ${n} ${artikala(n)} u „${curList().name}“`); return; }
+    if (a === 'shop') {
+      const part = { ...r, ing: r.ing.filter(([n]) => !have.has(n)) };
+      const n = addIngredients([[part, serv / r.serv]]); toast(`Dodato ${n} ${artikala(n)} u „${curList().name}“`, 3500, { label: 'Otvori', fn: () => { closeSheet(); setTab('kupovina'); } }); return;
+    }
     if (a === 'timer') return startKitchenTimer(+b.dataset.m, b.dataset.l);
     if (a === 'cook') return cookMode(r);
     $('#sheet').innerHTML = draw(); mount();
@@ -446,7 +544,8 @@ document.addEventListener('DOMContentLoaded', () => $('#view').addEventListener(
   const a = b.dataset.h, h = H();
   if (a === 'sub') { hsub = b.dataset.v; render(); window.scrollTo(0, 0); }
   if (a === 'rfilter') { rFilter = b.dataset.v; render(); }
-  if (a === 'rtype') { rType = b.dataset.v; render(); }
+  if (a === 'rtype') { rType = b.dataset.v; render(); window.scrollTo(0, 0); }
+  if (a === 'fridge') fridgeFinder();
   if (a === 'dcat') { dCat = b.dataset.v; render(); }
   if (a === 'tcat') { tCat = b.dataset.v; render(); }
   if (a === 'recipe') openRecipe(b.dataset.id);

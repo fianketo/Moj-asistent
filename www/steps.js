@@ -308,3 +308,16 @@ function stepMinutes(t) {
   m = t.match(/(\d+)\s*(?:–\s*(\d+))?\s*min\b/);
   return m ? +(m[2] || m[1]) : 0;
 }
+
+// ---- oznake za ishranu i težina pripreme
+const ING_GLUTEN = new Set(['Brašno T-400', 'Brašno T-500', 'Integralno brašno', 'Hleb', 'Beli hleb', 'Polubeli hleb', 'Crni / integralni hleb', 'Raženi hleb', 'Tost hleb', 'Kifle', 'Pecivo', 'Lepinje', 'Somun', 'Baguet', 'Burek', 'Pita', 'Kroasan', 'Đevrek', 'Tortilje', 'Prezle', 'Kore za pitu', 'Lisnato testo', 'Kore za lazanje', 'Špagete', 'Testenina (penne)', 'Makarone', 'Rezanci za supu', 'Griz', 'Kus-kus', 'Bulgur', 'Ječam', 'Pšenica (žito)', 'Kornfleks / musli', 'Ovsene pahuljice', 'Keks', 'Petit beurre keks', 'Piškote', 'Krekeri', 'Njoke', 'Hlebne mrvice', 'Pivo', 'Soja sos', 'Riblji štapići', 'Napolitanke', 'Kvasac']);
+const ING_LACTOSE = new Set([...ING_DAIRY_EGG].filter((x) => x !== 'Jaja' && x !== 'Margarin'));
+for (const r of RECIPES) {
+  const names = r.ing.map(([n]) => n);
+  r.f.glutenFree = !names.some((n) => ING_GLUTEN.has(n));
+  r.f.lactoseFree = !names.some((n) => ING_LACTOSE.has(n));
+  r.f.protein = r.prot >= 25;
+  r.diff = r.min <= 20 && r.steps.length <= 5 ? 1 : r.min >= 90 || r.steps.length >= 8 ? 3 : 2;
+}
+const DIFF = { 1: 'Lako', 2: 'Srednje', 3: 'Zahtevno' };
+const PANTRY = new Set(['So', 'Biber', 'Suncokretovo ulje', 'Maslinovo ulje', 'Aleva paprika', 'Šećer', 'Sirće', 'Lovorov list', 'Origano', 'Cimet', 'Bosiljak', 'Kim', 'Muskatni oraščić', 'Vanilin šećer', 'Prašak za pecivo', 'Peršun (suvi)', 'Mirođija (suva)', 'Ljuta paprika (mlevena)', 'Kurkuma', 'Kari', 'Vegeta']);
