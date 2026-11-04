@@ -124,5 +124,6 @@ Object.entries({
 for (const t of TRAININGS) {
   const eq = new Set();
   for (const w of t.workouts) for (const [e] of (w.items || w.intervals)) { const q = (EXERCISES[e] || {}).equip; if (q && !/bez opreme|^$/.test(q)) q.split(/, | ili /).forEach((x) => eq.add(x)); }
-  t.equipment = [...eq];
+  const NORM = { 'bučica': 'bučice', 'sajla i uže': 'sajla', 'kosa klupa': 'klupa', 'sprava': 'sprave', 'sprava za povlačenje': 'sprave', 'nožna presa': 'sprave', 'šipka za zgibove': 'šipka za zgibove', 'kauč': '', 'pod': '', 'zid': '', 'girja': '', 'stepenik': t.cat === 'teretana' ? '' : 'stepenik', 'šipka': t.cat === 'kuca' ? '' : 'šipka' };
+  t.equipment = [...new Set([...eq].map((x) => (x in NORM ? NORM[x] : x)).filter(Boolean))];
 }

@@ -317,31 +317,126 @@ function hDiet() {
 }
 
 // ---------------------------------------------------------------- TRENINZI
-function hTrain() {
-  const h = H(), prog = TRAININGS.find((t) => t.id === h.program);
-  let out = `<div class="chips">${Object.entries(TRAIN_CATS).map(([k, v]) => `<button class="chip ${k === tCat ? 'on' : ''}" data-h="tcat" data-v="${k}">${v}</button>`).join('')}</div>`;
-  if (h.program && !h.showProgs) out = `<button class="btn small" data-h="show-progs" style="margin-bottom:8px">↔ Promeni program treninga</button>`;
-  out += TRAININGS.filter((t) => (h.program && !h.showProgs) ? t.id === h.program : (tCat === 'sve' || t.cat === tCat || t.id === h.program)).map((t) => `<button class="h-plan ${t.id === h.program ? 'on' : ''}" data-h="prog" data-v="${t.id}">
-      <span class="h-pi">${t.icon}</span><div><b>${esc(t.name)}</b><small>${esc(t.level)} · ${esc(t.perWeek)} · ${t.days.map((d) => WD_SHORT[d]).join(', ')}<br>${esc(t.desc)}</small></div>
-      <span class="h-pick">${t.id === h.program ? '✓' : ''}</span></button>`).join('');
-  if (prog) {
-    const hasRem = S.reminders.some((r) => r.src === 'trening' && !r.done);
-    if (prog.note) out += `<div class="banner" style="margin-top:12px"><span>🧑‍🏫 ${esc(prog.note)}</span></div>`;
-    out += `<button class="btn block" data-h="train-rem" style="margin-top:12px">⏰ ${hasRem ? 'Promeni podsetnik za trening' : 'Podseti me na dane treninga'}</button>`;
-    out += prog.workouts.map((w, i) => `<div class="grp-h">${esc(w.name)}<span class="grow"></span></div>
-      <div class="card block">
-        <div class="h-ex">${(w.items || w.intervals.filter((x, k, a) => k === 0 || x[0] !== a[k - 1][0] || k === a.length - 1).slice(0, 6)).map(([e, o]) => {
-          const ex = EXERCISES[e];
-          const t = w.items ? (o.sets ? `${o.sets}× ${o.reps ? o.reps + (o.side ? ' po strani' : '') : fmtSec(o.sec)}` : fmtSec(o.sec)) : fmtSec(o);
-          return `<div><span>${ex.icon} ${esc(ex.name)}</span><b>${t}</b></div>`;
-        }).join('')}${w.intervals ? `<div class="meta">Ukupno ${fmtSec(w.intervals.reduce((s, [, sec]) => s + sec, 0))}, vodi te tajmer</div>` : ''}</div>
-        <button class="btn primary block" data-h="start" data-p="${prog.id}" data-w="${i}" style="margin-top:8px">▶ Počni</button>
-      </div>`).join('');
-    const hist = h.log.filter((l) => l.prog === prog.id).slice(-5).reverse();
-    if (hist.length) out += `<div class="grp-h">📈 Urađeno</div><div class="grp">${hist.map((l) => `<div class="item-row"><span class="tick" style="background:var(--ok);border-color:var(--ok)">✓</span><span class="nm">${esc(prog.workouts[l.w] ? prog.workouts[l.w].name : '')}</span><span class="meta">${fmtWhen(new Date(l.t))}</span></div>`).join('')}</div>`;
-  }
+// ---------------------------------------------------------------- TRENINZI – pregled, raspored, statistika
+const CAT_COLOR = { kuca: ['#c7d2fe', '#4f46e5'], teretana: ['#fecaca', '#dc2626'], trcanje: ['#bbf7d0', '#16a34a'], mobilnost: ['#bae6fd', '#0891b2'] };
+const pgrad = (t) => { const c = CAT_COLOR[t.cat] || ['#e2e8f0', '#64748b']; return `background:linear-gradient(135deg, ${c[0]}, ${c[1]}40)`; };
+const KIND = { snaga: '💪 Snaga', core: '🧱 Trup', kardio: '❤️ Kardio', mobilnost: '🧘 Mobilnost', zagrevanje: '🔥 Zagrevanje', odmor: '😮‍💨 Odmor' };
+function workoutMinutes(w) {
+  if (w.intervals) return Math.round(w.intervals.reduce((s, [, sec]) => s + sec, 0) / 60);
+  let sec = 0; for (const [, o] of w.items) sec += o.sets ? o.sets * ((o.reps ? o.reps * 3 * (o.side ? 2 : 1) : o.sec * (o.side ? 2 : 1)) + (w.rest || 60)) : o.sec;
+  return Math.round(sec / 60);
+}
+function weekSchedule(prog) { // pon..ned → naziv treninga ili null
+  const out = Array(7).fill(null); let k = 0;
+  for (let i = 0; i < 7; i++) { const d = (i + 1) % 7; if (prog.days.includes(d)) out[i] = prog.workouts[k++ % prog.workouts.length].name; }
   return out;
 }
+function progCard(t, sel) {
+  return `<button class="pcard ${sel ? 'on' : ''}" data-h="prog-open" data-v="${t.id}"><div class="pc-top" style="${pgrad(t)}"><span>${t.icon}</span>${sel ? '<em>✓ Tvoj program</em>' : ''}</div>
+    <div class="pc-body"><b>${esc(t.name)}</b><small>${esc(t.goal || t.desc)}</small>
+    <div class="pc-chips"><span>${esc(t.level)}</span><span>${t.days.length}× ned.</span><span>~${Math.max(...t.workouts.map(workoutMinutes))} min</span>${t.weeks ? `<span>${t.weeks} ned.</span>` : ''}<span>${t.equipment.length ? '🏋️ oprema' : '🏠 bez opreme'}</span></div></div></button>`;
+}
+function hTrain() {
+  const h = H(), prog = TRAININGS.find((t) => t.id === h.program);
+  if (!prog || h.showProgs) {
+    return `<div class="r-search"><div class="grow"></div><button class="btn" data-h="exlib">📖 Biblioteka vežbi</button></div>
+      <div class="chips">${Object.entries(TRAIN_CATS).map(([k, v]) => `<button class="chip ${k === tCat ? 'on' : ''}" data-h="tcat" data-v="${k}">${v}</button>`).join('')}</div>
+      ${prog ? `<button class="btn small" data-h="hide-progs" style="margin-bottom:8px">← Nazad na moj program</button>` : '<p class="meta" style="margin:0 2px 8px">Izaberi program – dodirni karticu za detalje.</p>'}
+      <div class="pgrid">${TRAININGS.filter((t) => tCat === 'sve' || t.cat === tCat).map((t) => progCard(t, t.id === h.program)).join('')}</div>`;
+  }
+  // izabran program
+  const log = h.log.filter((l) => l.prog === prog.id);
+  const weekStartT = weekStart(weekAbs()).getTime();
+  const thisWeek = log.filter((l) => l.t >= weekStartT);
+  const started = h.progStart || (log[0] && log[0].t) || Date.now();
+  const weekNo = Math.floor((Date.now() - started) / (7 * DAY)) + 1;
+  const sched = weekSchedule(prog), todayIdx = planDayIdx();
+  const doneDays = new Set(thisWeek.map((l) => planDayIdx(new Date(l.t))));
+  const next = nextWorkout(prog), ni = prog.workouts.indexOf(next);
+  const todayDone = log.some((l) => dayDiff(new Date(l.t)) === 0);
+  // poslednjih 8 nedelja
+  const wk = Array.from({ length: 8 }, (_, i) => { const ws = weekStart(weekAbs() - 7 + i).getTime(); return h.log.filter((l) => l.t >= ws && l.t < ws + 7 * DAY).length; });
+  const maxW = Math.max(prog.days.length, ...wk);
+  const totMin = h.log.reduce((s, l) => s + (l.dur || 0), 0), totVol = h.log.reduce((s, l) => s + (l.vol || 0), 0);
+  let streak = 0; for (let i = wk[7] ? 7 : 6; i >= 0 && wk[i] >= 1; i--) streak++; // uzastopne nedelje sa bar jednim treningom
+  const hasRem = S.reminders.some((r) => r.src === 'trening' && !r.done);
+  return `<div class="p-hero" style="${pgrad(prog)}"><div><small>MOJ PROGRAM</small><b>${prog.icon} ${esc(prog.name)}</b><span>${esc(prog.goal || '')}</span></div>
+      ${prog.weeks ? `<div class="p-prog"><div><b>Nedelja ${Math.min(weekNo, prog.weeks)}</b> od ${prog.weeks}</div><div class="progress"><div style="width:${Math.min(100, Math.round((weekNo / prog.weeks) * 100))}%"></div></div></div>` : ''}</div>
+    <div class="wk-strip">${sched.map((name, i) => `<div class="${i === todayIdx ? 'today' : ''} ${name ? 'train' : ''} ${doneDays.has(i) ? 'done' : ''}"><small>${WD_SHORT[(i + 1) % 7]}</small><span>${doneDays.has(i) ? '✓' : name ? '🏋️' : '·'}</span></div>`).join('')}</div>
+    <div class="next-card"><div><small>${todayDone ? 'DANAS URAĐENO ✅' : sched[todayIdx] ? 'DANAS' : 'SLEDEĆI TRENING'}</small><b>${esc(next.name)}</b><span>~${workoutMinutes(next)} min · ${(next.items || []).filter(([, o]) => o.sets).length || '⏱'} ${next.items ? 'vežbi' : 'intervalni'}</span></div>
+      <button class="btn primary" data-h="start" data-p="${prog.id}" data-w="${ni}">▶ Počni</button></div>
+    <div class="stat-row"><div><b>${thisWeek.length}/${prog.days.length}</b><small>ove nedelje</small></div><div><b>${streak}</b><small>nedelja u nizu</small></div><div><b>${Math.round(totMin / 60 * 10) / 10} h</b><small>ukupno</small></div>${totVol ? `<div><b>${totVol >= 1000 ? fmtNum(Math.round(totVol / 100) / 10) + ' t' : totVol + ' kg'}</b><small>podignuto</small></div>` : ''}</div>
+    <div class="grp-h">📊 Treninzi po nedeljama</div>
+    <div class="bars">${wk.map((n, i) => `<div><span style="height:${Math.round((n / maxW) * 100)}%">${n || ''}</span><small>${i === 7 ? 'ova' : '-' + (7 - i)}</small></div>`).join('')}</div>
+    ${prog.note ? `<div class="banner" style="margin-top:12px"><span>🧑‍🏫 <b>Saveti trenera:</b> ${esc(prog.note)}</span></div>` : ''}
+    <div class="grp-h">📋 Treninzi u programu</div>
+    ${prog.workouts.map((w, i) => `<details class="wcard" ${i === ni ? 'open' : ''}><summary><b>${esc(w.name)}</b><span>~${workoutMinutes(w)} min</span></summary>
+      <div class="h-ex">${(w.items || w.intervals.filter((x, k, a) => k === 0 || x[0] !== a[k - 1][0]).slice(0, 8)).map(([e, o]) => {
+        const ex = EXERCISES[e];
+        const t = w.items ? (o.sets ? `${o.sets}× ${o.reps ? o.reps + (o.side ? '/str.' : '') : fmtSec(o.sec)}` : fmtSec(o.sec)) : fmtSec(o);
+        return `<div data-h="ex" data-v="${e}"><span>${ex.icon} ${esc(ex.name)} <i>ⓘ</i></span><b>${t}</b></div>`; }).join('')}</div>
+      <button class="btn block" data-h="start" data-p="${prog.id}" data-w="${i}" style="margin-top:8px">▶ Počni ${esc(w.name)}</button></details>`).join('')}
+    <div class="row" style="margin-top:12px"><button class="btn grow" data-h="train-rem">⏰ ${hasRem ? 'Promeni podsetnik' : 'Podsetnik'}</button><button class="btn grow" data-h="exlib">📖 Vežbe</button><button class="btn grow" data-h="show-progs">↔ Programi</button></div>
+    ${log.length ? `<div class="grp-h">📈 Istorija</div><div class="grp">${log.slice(-6).reverse().map((l) => `<div class="item-row"><span class="tick" style="background:var(--ok);border-color:var(--ok)">✓</span><span class="nm">${esc(prog.workouts[l.w] ? prog.workouts[l.w].name : '')}<small class="meta" style="display:block">${l.dur ? l.dur + ' min' : ''}${l.sets ? ' · ' + l.sets + ' serija' : ''}${l.vol ? ' · ' + l.vol + ' kg' : ''}</small></span><span class="meta">${fmtWhen(new Date(l.t))}</span></div>`).join('')}</div>` : ''}`;
+}
+function openProgram(id) {
+  const t = TRAININGS.find((x) => x.id === id), h = H(), sel = h.program === id, sched = weekSchedule(t);
+  openSheet(`<div id="pgWrap"><div class="rec-hero" style="${pgrad(t)}"><span class="rec-hero-ic">${t.icon}</span><button class="iconbtn rec-x" data-g="x">✕</button></div>
+    <h3 class="rec-title">${esc(t.name)}</h3><p class="meta" style="margin:-4px 0 10px">${esc(t.desc)}</p>
+    <div class="rec-stats"><div><b>${esc(t.level.split('–')[0])}</b><small>nivo</small></div><div><b>${t.days.length}×</b><small>nedeljno</small></div><div><b>~${Math.max(...t.workouts.map(workoutMinutes))}</b><small>min</small></div><div><b>${t.weeks || '∞'}</b><small>nedelja</small></div></div>
+    ${t.goal ? `<div class="rec-badges"><span>🎯 ${esc(t.goal)}</span></div>` : ''}
+    <h2>Nedeljni raspored</h2><div class="wk-strip big">${sched.map((n, i) => `<div class="${n ? 'train' : ''}"><small>${WD_SHORT[(i + 1) % 7]}</small><span>${n ? esc(n.replace(/^Trening /, '')) : 'odmor'}</span></div>`).join('')}</div>
+    <h2>Oprema</h2><p style="margin:0">${t.equipment.length ? esc(t.equipment.join(', ')) : '🏠 Nije potrebna – samo prostor i podloga'}</p>
+    ${t.note ? `<div class="rec-tip">🧑‍🏫 <b>Kako napredovati:</b> ${esc(t.note)}</div>` : ''}
+    <h2>Treninzi</h2>${t.workouts.map((w) => `<div class="wcard-s"><b>${esc(w.name)}</b> <span class="meta">~${workoutMinutes(w)} min</span><div class="h-ex">${(w.items || w.intervals.filter((x, k, a) => k === 0 || x[0] !== a[k - 1][0]).slice(0, 6)).map(([e, o]) => `<div data-g="ex" data-v="${e}"><span>${EXERCISES[e].icon} ${esc(EXERCISES[e].name)} <i>ⓘ</i></span><b>${w.items ? (o.sets ? `${o.sets}× ${o.reps || fmtSec(o.sec)}` : fmtSec(o.sec)) : fmtSec(o)}</b></div>`).join('')}</div></div>`).join('')}
+    <div class="foot"><button class="btn" data-g="x">Zatvori</button>${sel ? '<button class="btn danger" data-g="leave">Napusti program</button>' : '<button class="btn primary" data-g="pick">✓ Izaberi program</button>'}</div></div>`, () => {
+    $('#pgWrap').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-g]'); if (!b) return;
+      const a = b.dataset.g;
+      if (a === 'x') return closeSheet();
+      if (a === 'ex') return openExercise(b.dataset.v, () => openProgram(id));
+      if (a === 'pick') { h.program = id; h.progStart = Date.now(); h.showProgs = false; save(false); closeSheet(); render(); toast(`Program „${t.name}“ izabran 💪`); }
+      if (a === 'leave') { if (!confirm('Napustiti program? Istorija ostaje sačuvana.')) return; h.program = null; save(false); closeSheet(); render(); }
+    });
+  });
+}
+function openExercise(key, back) {
+  const ex = EXERCISES[key];
+  openSheet(`<div id="exWrap"><div class="ex-hero"><span>${ex.icon}</span></div><h3 class="rec-title">${esc(ex.name)}</h3>
+    <div class="rec-badges">${ex.kind ? `<span>${KIND[ex.kind] || ex.kind}</span>` : ''}${ex.equip ? `<span>🧰 ${esc(ex.equip)}</span>` : ''}</div>
+    ${ex.prim ? `<div class="muscles"><div><small>GLAVNI MIŠIĆI</small><b>${esc(ex.prim)}</b></div>${ex.sec ? `<div><small>POMOĆNI</small><b>${esc(ex.sec)}</b></div>` : ''}</div>` : ''}
+    <h2>Kako se radi</h2><p style="margin:0 0 6px;line-height:1.5">${esc(ex.how)}</p>
+    ${ex.cues && ex.cues.length ? `<h2>✅ Tehnika</h2><ol class="cues">${ex.cues.map((c) => `<li>${esc(c)}</li>`).join('')}</ol>` : ''}
+    ${ex.mistakes && ex.mistakes.length ? `<h2>⚠️ Česte greške</h2><ul class="mist">${ex.mistakes.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}
+    ${ex.easier || ex.harder ? `<div class="var-row">${ex.easier ? `<div><small>⬇ LAKŠE</small>${esc(ex.easier)}</div>` : ''}${ex.harder ? `<div><small>⬆ TEŽE</small>${esc(ex.harder)}</div>` : ''}</div>` : ''}
+    <div class="foot">${back ? '<button class="btn" data-x="back">← Nazad</button>' : ''}<button class="btn primary" data-x="close">U redu</button></div></div>`, () => {
+    $('#exWrap').addEventListener('click', (e) => { const b = e.target.closest('[data-x]'); if (!b) return; if (b.dataset.x === 'back' && back) back(); else closeSheet(); });
+  });
+}
+let exKind = 'sve', exQ = '';
+function exerciseLibrary() {
+  const keys = Object.keys(EXERCISES).filter((k) => k !== 'odmor');
+  const draw = () => {
+    const f = fold(exQ);
+    const list = keys.filter((k) => { const e = EXERCISES[k]; return (exKind === 'sve' || e.kind === exKind) && (!f || fold(e.name).includes(f) || fold(e.prim || '').includes(f)); });
+    return `<div id="elWrap"><h3>📖 Biblioteka vežbi <span class="meta">(${keys.length})</span></h3>
+      <input class="input" id="elQ" placeholder="🔎 Vežba ili mišić (npr. zadnjica, leđa)" value="${esc(exQ)}" autocomplete="off">
+      <div class="chips" style="margin-top:8px">${Object.entries({ sve: 'Sve', snaga: KIND.snaga, core: KIND.core, kardio: KIND.kardio, mobilnost: KIND.mobilnost }).map(([k, v]) => `<button class="chip ${k === exKind ? 'on' : ''}" data-l="k" data-v="${k}">${v}</button>`).join('')}</div>
+      <div class="grp">${list.map((k) => { const e = EXERCISES[k]; return `<div class="item-row" data-l="ex" data-v="${k}"><span class="h-ic" style="font-size:24px">${e.icon}</span><span class="nm">${esc(e.name)}<small class="meta" style="display:block">${esc(e.prim || '')}${e.equip && e.equip !== 'bez opreme' ? ' · ' + esc(e.equip) : ''}</small></span><span class="meta">›</span></div>`; }).join('') || '<div class="empty" style="padding:20px">Nema vežbi</div>'}</div>
+      <div class="foot"><button class="btn" onclick="closeSheet()">Zatvori</button></div></div>`;
+  };
+  const mount = () => {
+    const q = $('#elQ');
+    q.addEventListener('input', () => { exQ = q.value; const pos = q.value.length; setTimeout(() => { $('#sheet').innerHTML = draw(); mount(); const n = $('#elQ'); n.focus(); n.setSelectionRange(pos, pos); }, 0); });
+    $('#elWrap').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-l]'); if (!b) return;
+      if (b.dataset.l === 'k') { exKind = b.dataset.v; $('#sheet').innerHTML = draw(); mount(); }
+      if (b.dataset.l === 'ex') openExercise(b.dataset.v, exerciseLibrary);
+    });
+  };
+  openSheet(draw(), mount);
+}
+
 const fmtSec = (s) => (s >= 60 ? `${Math.floor(s / 60)}${s % 60 ? ':' + pad(s % 60) : ''} min` : `${s} s`);
 
 function trainingReminder() {
@@ -443,7 +538,7 @@ function cookMode(r) {
 }
 
 // ---------------------------------------------------------------- VOĐENI TRENING
-let player = null;
+let player = null, actx = null;
 function startWorkout(progId, wi) {
   const prog = TRAININGS.find((t) => t.id === progId), w = prog.workouts[wi];
   const steps = [];
@@ -456,16 +551,18 @@ function startWorkout(progId, wi) {
       if (!last) steps.push({ rest: w.rest || 60 });
     }
   });
-  player = { prog, wi, w, steps, i: 0, left: 0, running: false, timer: null, wake: null };
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); } catch { /* */ }
+  player = { prog, wi, w, steps, i: 0, left: 0, total: 0, running: false, timer: null, wake: null, t0: Date.now(), done: [], reps: null };
   try { navigator.wakeLock && navigator.wakeLock.request('screen').then((l) => (player && (player.wake = l))).catch(() => {}); } catch { /* */ }
-  openSheet('<div id="pl"></div>', () => { drawPlayer(); $('#pl').addEventListener('click', onPlayer); });
+  openSheet('<div id="pl"></div>', () => { $('#pl').addEventListener('click', onPlayer); });
   $('#sheet').classList.add('full');
   enterStep();
 }
 function enterStep() {
   const st = player.steps[player.i];
   clearInterval(player.timer); player.running = false;
-  player.left = st.rest || st.sec || 0;
+  player.left = player.total = st.rest || st.sec || 0;
+  player.reps = st.reps || null;
   if (st.rest || st.auto) startTimer();
   drawPlayer();
 }
@@ -477,23 +574,43 @@ function startTimer() {
     if (player.left <= 3 && player.left > 0) beep(false);
     if (player.left <= 0) { clearInterval(player.timer); beep(true); return nextStep(); }
     const el = $('#plTime'); if (el) el.textContent = mmss(player.left);
+    const ring = $('#plRing'); if (ring) ring.style.strokeDashoffset = String(301.6 * (1 - player.left / player.total));
   }, 1000);
   drawPlayer();
 }
 const mmss = (s) => `${Math.floor(s / 60)}:${pad(s % 60)}`;
-function beep(long) { try { navigator.vibrate && navigator.vibrate(long ? [300, 100, 300] : 80); } catch { /* */ } }
+function beep(long) {
+  try { navigator.vibrate && navigator.vibrate(long ? [300, 100, 300] : 80); } catch { /* */ }
+  try {
+    if (!actx) return;
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.frequency.value = long ? 880 : 660; g.gain.value = 0.15;
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + (long ? 0.45 : 0.12));
+  } catch { /* */ }
+}
 function nextStep() {
   if (!player) return;
+  const st = player.steps[player.i];
+  if (!st.rest && st.set) player.done.push({ e: st.e, reps: player.reps || 0, kg: EXERCISES[st.e].gym ? (H().weights[st.e] || 0) : 0 });
   if (player.i < player.steps.length - 1) { player.i++; enterStep(); }
   else finishWorkout();
 }
 function finishWorkout() {
   clearInterval(player.timer);
-  H().log.push({ t: Date.now(), prog: player.prog.id, w: player.wi });
-  H().log = H().log.slice(-200);
+  const h = H(), dur = Math.max(1, Math.round((Date.now() - player.t0) / MIN));
+  const vol = Math.round(player.done.reduce((s, d) => s + d.reps * d.kg, 0));
+  h.best = h.best || {};
+  const prs = [];
+  for (const d of player.done) if (d.kg && d.kg > (h.best[d.e] || 0)) { h.best[d.e] = d.kg; if (!prs.includes(d.e)) prs.push(d.e); }
+  h.log.push({ t: Date.now(), prog: player.prog.id, w: player.wi, dur, sets: player.done.length, vol });
+  h.log = h.log.slice(-300);
   save(false);
-  $('#pl').innerHTML = `<div class="pl-done"><div style="font-size:72px">🎉</div><h3>Trening završen!</h3><p>${esc(player.w.name)} · ${player.steps.filter((s) => !s.rest).length} vežbi/serija</p>
-    <button class="btn primary block" data-p="close">Super</button></div>`;
+  const wk = h.log.filter((l) => l.t >= weekStart(weekAbs()).getTime()).length;
+  $('#pl').innerHTML = `<div class="pl-done"><div style="font-size:72px">🎉</div><h3>Bravo, trening je gotov!</h3><p class="meta">${esc(player.w.name)}</p>
+    <div class="stat-row"><div><b>${dur}</b><small>minuta</small></div><div><b>${player.done.length || player.steps.length}</b><small>${player.done.length ? 'serija' : 'intervala'}</small></div>${vol ? `<div><b>${vol}</b><small>kg ukupno</small></div>` : ''}<div><b>${wk}</b><small>ove nedelje</small></div></div>
+    ${prs.length ? `<div class="rec-tip">🏆 <b>Novi lični rekord:</b> ${prs.map((e) => `${esc(EXERCISES[e].name)} – ${fmtNum(h.best[e])} kg`).join(', ')}</div>` : ''}
+    <p class="meta">Popij vode, istegni se i odmori. Sledeći trening: ${esc(nextWorkout(player.prog).name)}.</p>
+    <button class="btn primary block" data-p="close">Super 💪</button></div>`;
 }
 function closePlayer() {
   if (player) { clearInterval(player.timer); try { player.wake && player.wake.release(); } catch { /* */ } }
@@ -505,6 +622,9 @@ function onPlayer(e) {
   if (a === 'close') return closePlayer();
   if (a === 'quit') { if (confirm('Prekinuti trening?')) closePlayer(); return; }
   if (a === 'done' || a === 'skip') return nextStep();
+  if (a === 'info') { const st = player.steps[player.i]; player.showInfo = !player.showInfo; void st; return drawPlayer(); }
+  if (a === 'r+' || a === 'r-') { player.reps = Math.max(0, (player.reps || 0) + (a === 'r+' ? 1 : -1)); return drawPlayer(); }
+  if (a === 'plus15') { player.left += 15; player.total += 15; return drawPlayer(); }
   if (a === 'w+' || a === 'w-') {
     const st = player.steps[player.i], w = H().weights;
     const cur = w[st.e] != null ? w[st.e] : 20;
@@ -514,27 +634,36 @@ function onPlayer(e) {
   if (a === 'back' && player.i > 0) { player.i--; return enterStep(); }
   if (a === 'play') { if (player.running) { clearInterval(player.timer); player.running = false; drawPlayer(); } else startTimer(); }
 }
+function ring(left, total, label) {
+  const off = total ? 301.6 * (1 - left / total) : 0;
+  return `<div class="ring"><svg viewBox="0 0 110 110"><circle cx="55" cy="55" r="48" class="ring-bg"/><circle id="plRing" cx="55" cy="55" r="48" class="ring-fg" style="stroke-dashoffset:${off}"/></svg>
+    <div><div class="pl-time" id="plTime">${mmss(left)}</div>${label ? `<small>${label}</small>` : ''}</div></div>`;
+}
 function drawPlayer() {
   const el = $('#pl'); if (!el || !player) return;
   const st = player.steps[player.i], total = player.steps.length;
   const nxt = player.steps.slice(player.i + 1).find((s) => !s.rest);
   const pct = Math.round((player.i / total) * 100);
+  const top = `<div class="pl-top"><button class="iconbtn" data-p="quit">✕</button><div class="progress grow"><div style="width:${pct}%"></div></div><span class="meta">${mmss(Math.round((Date.now() - player.t0) / 1000))}</span></div>`;
+  const nextLine = nxt ? `<div class="pl-next">Sledeće: ${EXERCISES[nxt.e].icon} <b>${esc(EXERCISES[nxt.e].name)}</b>${nxt.set ? ` · ${nxt.set}/${nxt.sets}` : ''}${nxt.reps ? ` · ${nxt.reps} pon.` : nxt.sec ? ` · ${fmtSec(nxt.sec)}` : ''}</div>` : '<div class="pl-next">Poslednja vežba 💪</div>';
   if (st.rest) {
-    el.innerHTML = `<div class="pl-top"><button class="iconbtn" data-p="quit">✕</button><div class="progress grow"><div style="width:${pct}%"></div></div><span class="meta">${player.i + 1}/${total}</span></div>
-      <div class="pl-main"><div class="pl-ic">😮‍💨</div><h3>Odmor</h3><div class="pl-time" id="plTime">${mmss(player.left)}</div>
-      ${nxt ? `<p class="meta">Sledeće: ${EXERCISES[nxt.e].icon} ${esc(EXERCISES[nxt.e].name)}${nxt.set ? ` · serija ${nxt.set}/${nxt.sets}` : ''}</p>` : ''}</div>
-      <div class="pl-btns"><button class="btn" data-p="back">◀</button><button class="btn primary grow" data-p="skip">Preskoči odmor ▶</button></div>`;
+    el.innerHTML = `${top}<div class="pl-main"><h3>Odmor</h3>${ring(player.left, player.total, 'diši duboko')}</div>${nextLine}
+      <div class="pl-btns"><button class="btn" data-p="plus15">+15 s</button><button class="btn primary grow" data-p="skip">Preskoči odmor ▶</button></div>`;
     return;
   }
   const ex = EXERCISES[st.e];
-  const target = st.reps ? `<div class="pl-reps">${st.reps}<small>${st.side ? ' po strani' : ' ponavljanja'}</small></div>` : `<div class="pl-time" id="plTime">${mmss(player.left)}</div>${st.side ? '<div class="meta">po strani</div>' : ''}`;
-  const wt = H().weights[st.e];
-  const weight = ex.gym ? `<div class="pl-w"><span>Težina</span><div class="stepper"><button data-p="w-">−</button><span>${wt != null ? fmtNum(wt) + ' kg' : '–'}</span><button data-p="w+">+</button></div></div>` : '';
-  el.innerHTML = `<div class="pl-top"><button class="iconbtn" data-p="quit">✕</button><div class="progress grow"><div style="width:${pct}%"></div></div><span class="meta">${player.i + 1}/${total}</span></div>
-    <div class="pl-main"><div class="pl-ic">${ex.icon}</div><h3>${esc(ex.name)}</h3>${st.set ? `<div class="meta">Serija ${st.set} od ${st.sets}</div>` : ''}
-      ${target}${weight}<p class="pl-how">${esc(ex.how)}</p></div>
+  const wt = H().weights[st.e], best = (H().best || {})[st.e];
+  const target = st.reps
+    ? `<div class="pl-reps-row"><button class="q-btn" data-p="r-">−</button><div class="pl-reps">${player.reps}<small>${st.side ? ' po strani' : ' pon.'}</small></div><button class="q-btn" data-p="r+">+</button></div><div class="meta">cilj: ${st.reps}${st.reps !== player.reps ? ' · upisaćeš ' + player.reps : ''}</div>`
+    : ring(player.left, player.total || 1, st.side ? 'po strani' : (player.running ? '' : 'dodirni Start'));
+  const weight = ex.gym ? `<div class="pl-w"><span>Težina</span><div class="stepper"><button data-p="w-">−</button><span>${wt != null ? fmtNum(wt) + ' kg' : '–'}</span><button data-p="w+">+</button></div>${best ? `<small>rekord ${fmtNum(best)} kg</small>` : ''}</div>` : '';
+  const info = player.showInfo && ex.cues ? `<div class="pl-info">${ex.cues.map((c) => `<div>✅ ${esc(c)}</div>`).join('')}${(ex.mistakes || []).map((c) => `<div>⚠️ ${esc(c)}</div>`).join('')}</div>` : `<p class="pl-how">${esc(ex.how)}</p>`;
+  el.innerHTML = `${top}
+    <div class="pl-main"><div class="pl-ic">${ex.icon}</div><h3>${esc(ex.name)}</h3>${st.set ? `<div class="pl-set">Serija <b>${st.set}</b> od ${st.sets}</div>` : ''}
+      ${target}${weight}${info}<button class="btn small" data-p="info">${player.showInfo ? 'Sakrij tehniku' : 'ℹ️ Tehnika i greške'}</button></div>
+    ${nextLine}
     <div class="pl-btns"><button class="btn" data-p="back">◀</button>
-      ${st.reps ? '<button class="btn ok grow" data-p="done">✓ Gotovo</button>'
+      ${st.reps ? '<button class="btn ok grow" data-p="done">✓ Serija urađena</button>'
         : `<button class="btn primary grow" data-p="play">${player.running ? '⏸ Pauza' : '▶ Start'}</button><button class="btn" data-p="skip">⏭</button>`}</div>`;
 }
 
@@ -551,7 +680,11 @@ document.addEventListener('DOMContentLoaded', () => $('#view').addEventListener(
   if (a === 'recipe') openRecipe(b.dataset.id);
   if (a === 'plan') { h.plan = h.plan === b.dataset.v && !h.showPlans ? null : b.dataset.v; h.planWeek = weekAbs(); h.showPlans = false; dWeek = 0; save(false); render(); }
   if (a === 'show-plans') { h.showPlans = true; render(); }
-  if (a === 'show-progs') { h.showProgs = true; render(); }
+  if (a === 'show-progs') { h.showProgs = true; render(); window.scrollTo(0, 0); }
+  if (a === 'hide-progs') { h.showProgs = false; render(); }
+  if (a === 'prog-open') openProgram(b.dataset.v);
+  if (a === 'exlib') exerciseLibrary();
+  if (a === 'ex') openExercise(b.dataset.v);
   if (a === 'wk') { dWeek += +b.dataset.v; render(); }
   if (a === 'swap') { e.stopPropagation(); const [w, d, mi] = b.dataset.s.split('|').map(Number); return swapMeal(DIET_PLANS.find((p) => p.id === h.plan), w, d, mi); }
   if (a === 'prog') { h.program = h.program === b.dataset.v && !h.showProgs ? null : b.dataset.v; h.showProgs = false; save(false); render(); }
