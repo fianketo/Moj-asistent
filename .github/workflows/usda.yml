@@ -1,0 +1,33 @@
+name: Preuzmi USDA bazu hranljivih vrednosti
+
+on:
+  push:
+    branches: [claude/personal-assistant-app-3yx3up]
+    paths: ['.github/workflows/usda.yml', 'data/usda/extract.py']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Preuzmi SR Legacy (USDA FoodData Central, javno dobro)
+        run: |
+          mkdir -p /tmp/sr && cd /tmp/sr
+          curl -sSL --fail -o sr.zip "https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_csv_2018-04.zip"
+          unzip -q -o sr.zip && ls -R | head -30
+      - name: Izvuci vrednosti
+        run: |
+          D=$(dirname $(find /tmp/sr -name food_nutrient.csv | head -1))
+          python3 data/usda/extract.py "$D"
+          ls -la data/usda
+      - name: Sačuvaj u granu
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/usda/sr.json
+          git commit -m "Podaci: USDA FoodData Central SR Legacy (hranljive vrednosti)" || exit 0
+          git pull --rebase -q && git push
