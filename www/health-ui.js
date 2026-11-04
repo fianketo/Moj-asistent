@@ -206,7 +206,7 @@ function fridgeFinder() {
     }).filter((x) => x.have).sort((a, b) => (b.have / b.need) - (a.have / a.need) || b.have - a.have).slice(0, 30) : [];
     return `<div id="frWrap"><h3>🧊 Šta imam u frižideru?</h3>
       <p class="meta" style="margin:0 0 8px">Dodaj namirnice koje imaš – pokazaću jela koja možeš da napraviš (so, ulje i začine računam da imaš).</p>
-      <input class="input" id="frIn" list="frList" placeholder="npr. jaja, krompir, piletina…" autocomplete="off"><datalist id="frList">${all.map((n) => `<option value="${esc(n)}">`).join('')}</datalist>
+      <div class="fr-in"><input class="input" id="frIn" placeholder="🔎 npr. jaja, krompir, piletina…" autocomplete="off" autocorrect="off" spellcheck="false"><div class="fr-sug" id="frSug" hidden></div></div>
       <div class="chips" style="flex-wrap:wrap">${haves.map((n) => `<button class="chip on" data-fr="rm" data-n="${esc(n)}">${esc(n)} ✕</button>`).join('')}</div>
       <div class="chips chips-sm" style="flex-wrap:wrap">${['Jaja', 'Krompir', 'Pileći file', 'Crni luk', 'Paradajz', 'Mleko', 'Beli sir', 'Pirinač', 'Testenina (penne)', 'Tikvice', 'Mleveno meso (mešano)', 'Šargarepa', 'Paprika', 'Pečurke', 'Kupus', 'Spanać'].filter((n) => !haves.includes(n)).map((n) => `<button class="chip" data-fr="add" data-n="${esc(n)}">+ ${esc(n)}</button>`).join('')}</div>
       <div class="fr-res">${res.map(({ r, have, need, miss }) => `<button class="fr-row" data-fr="open" data-id="${r.id}"><span class="h-ic">${r.icon}</span>
@@ -223,8 +223,15 @@ function fridgeFinder() {
       if (m && !rSel.haves.includes(m)) rSel.haves.push(m); else if (!m) toast('Nema te namirnice u receptima');
       setTimeout(() => { $('#sheet').innerHTML = draw(); mount(); const f = $('#frIn'); if (f) f.focus(); }, 0);
     };
-    inp.addEventListener('change', () => inp.value.trim() && add(inp.value.trim()));
-    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter' && inp.value.trim()) add(inp.value.trim()); });
+    // sopstveni predlozi umesto <datalist> (Android WebView ga loše iscrtava)
+    const sug = $('#frSug');
+    inp.addEventListener('input', () => {
+      const f = fold(inp.value.trim());
+      const list = f ? all.filter((x) => !rSel.haves.includes(x) && fold(x).includes(f)).sort((a, b) => fold(b).startsWith(f) - fold(a).startsWith(f)).slice(0, 8) : [];
+      sug.innerHTML = list.map((n) => `<button data-fr="add" data-n="${esc(n)}">+ ${esc(n)}</button>`).join('') || (f ? '<span class="meta">Nema te namirnice u receptima</span>' : '');
+      sug.hidden = !f;
+    });
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter' && inp.value.trim()) { const first = sug.querySelector('[data-n]'); add(first ? first.dataset.n : inp.value.trim()); } });
     $('#frWrap').addEventListener('click', (e) => {
       const b = e.target.closest('[data-fr]'); if (!b) return;
       if (b.dataset.fr === 'add') add(b.dataset.n);
