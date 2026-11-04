@@ -1,7 +1,12 @@
 /* Zdravlje – ekrani: Danas, Recepti, Ishrana, Treninzi i vođeni trening. */
 'use strict';
 
-const H = () => (S.health = Object.assign({ plan: null, program: null, favs: [], log: [], persons: 1, weights: {}, recent: [] }, S.health || {}));
+const H_DEF = () => ({ plan: null, program: null, favs: [], log: [], persons: 1, weights: {}, recent: [] });
+const H = () => { // uvek isti objekat (ranije je svaki poziv pravio novi, pa su se izmene gubile)
+  const h = S.health || (S.health = {}), d = H_DEF();
+  for (const k in d) if (!(k in h)) h[k] = d[k];
+  return h;
+};
 const recipeById = (id) => RECIPES.find((r) => r.id === id);
 const WD = ['Nedelja', 'Ponedeljak', 'Utorak', 'Sreda', 'Četvrtak', 'Petak', 'Subota'];
 const WD_SHORT = ['ned', 'pon', 'uto', 'sre', 'čet', 'pet', 'sub'];
@@ -67,7 +72,7 @@ function renderHealth() {
   const tabs = { danas: 'Danas', recepti: 'Recepti', ishrana: 'Ishrana', treninzi: 'Treninzi' };
   let html = `<div class="seg">${Object.entries(tabs).map(([k, v]) => `<button class="${k === hsub ? 'on' : ''}" data-h="sub" data-v="${k}">${v}</button>`).join('')}</div>`;
   html += ({ danas: hToday, recepti: hRecipes, ishrana: hDiet, treninzi: hTrain })[hsub]();
-  html += `<p class="h-note">ℹ️ Opšti predlozi za zdrave odrasle osobe – nisu zamena za savet lekara ili nutricioniste. Kalorije su približne.</p>`;
+  html += `<p class="h-note">ℹ️ Opšti predlozi za zdrave odrasle osobe – nisu zamena za savet lekara ili nutricioniste. Kalorije su izračunate iz USDA baze na osnovu sastojaka (približno).</p>`;
   $('#view').innerHTML = html;
   if (hsub === 'recepti') {
     const q = $('#rSearch');
@@ -248,10 +253,14 @@ function openRecipe(id) {
         <p class="meta" style="margin:4px 2px 6px">Štikliraj ono što već imaš – u listu idu samo sastojci koji fale.</p>
         <ul class="rec-ing">${r.ing.map(([n, q, u, note]) => `<li class="${have.has(n) ? 'have' : ''}" data-r="have" data-n="${esc(n)}"><span class="tick">${have.has(n) ? '✓' : ''}</span><span class="grow">${esc(n)}</span><b>${q ? esc(fmtNum(Math.round(q * k * 100) / 100) + ' ' + u) : ''}${note ? ` <small>${esc(note)}</small>` : ''}</b></li>`).join('')}</ul>
         <button class="btn primary block" data-r="shop" ${miss ? '' : 'disabled'}>🛒 ${miss === r.ing.length ? 'Dodaj sve sastojke' : `Dodaj ono što fali (${miss})`} u „${esc(curList().name)}“</button>
-        <button class="btn block" data-r="tab" data-v="priprema" style="margin-top:8px">Dalje: priprema →</button>`
+        <button class="btn block" data-r="tab" data-v="priprema" style="margin-top:8px">Dalje: priprema →</button>
+        ${nutritionBlock(r)}${allergenBlock(r)}`
       : `<button class="btn primary block" data-r="cook" style="margin:10px 0">👨‍🍳 Kuvaj korak po korak</button>
         <ol class="rec-steps2">${r.steps.map((st, i) => { const m = stepMinutes(st); return `<li><span class="sn">${i + 1}</span><div>${esc(st)}${m ? ` <button class="tmr" data-r="timer" data-m="${m}" data-l="${esc(r.name)} – korak ${i + 1}">⏱ ${fmtMin(m)}</button>` : ''}</div></li>`; }).join('')}</ol>
-        ${r.tip ? `<div class="rec-tip">💡 <b>Savet:</b> ${esc(r.tip)}</div>` : ''}`}
+        ${r.tip ? `<div class="rec-tip">💡 <b>Savet:</b> ${esc(r.tip)}</div>` : ''}
+        ${safetyBlock(r)}`}
+      ${reviewBadge('recipes', r.id)}
+      <button class="btn block small" data-r="report" style="margin-top:6px">🚩 Prijavi grešku u receptu</button>
       <div class="foot"><button class="btn" data-r="close">Zatvori</button></div></div>`;
   };
   const mount = () => $('#recWrap').addEventListener('click', (e) => {
@@ -269,6 +278,7 @@ function openRecipe(id) {
     }
     if (a === 'timer') return startKitchenTimer(+b.dataset.m, b.dataset.l);
     if (a === 'cook') return cookMode(r);
+    if (a === 'report') return reportProblem('recipes', r.id, r.name, () => openRecipe(r.id));
     $('#sheet').innerHTML = draw(); mount();
   });
   openSheet(draw(), mount);
@@ -366,6 +376,7 @@ function hTrain() {
     <div class="next-card"><div><small>${todayDone ? 'DANAS URAĐENO ✅' : sched[todayIdx] ? 'DANAS' : 'SLEDEĆI TRENING'}</small><b>${esc(next.name)}</b><span>~${workoutMinutes(next)} min · ${(next.items || []).filter(([, o]) => o.sets).length || '⏱'} ${next.items ? 'vežbi' : 'intervalni'}</span></div>
       <button class="btn primary" data-h="start" data-p="${prog.id}" data-w="${ni}">▶ Počni</button></div>
     <div class="stat-row"><div><b>${thisWeek.length}/${prog.days.length}</b><small>ove nedelje</small></div><div><b>${streak}</b><small>nedelja u nizu</small></div><div><b>${Math.round(totMin / 60 * 10) / 10} h</b><small>ukupno</small></div>${totVol ? `<div><b>${totVol >= 1000 ? fmtNum(Math.round(totVol / 100) / 10) + ' t' : totVol + ' kg'}</b><small>podignuto</small></div>` : ''}</div>
+    ${whoCard(h)}
     <div class="grp-h">📊 Treninzi po nedeljama</div>
     <div class="bars">${wk.map((n, i) => `<div><span style="height:${Math.round((n / maxW) * 100)}%">${n || ''}</span><small>${i === 7 ? 'ova' : '-' + (7 - i)}</small></div>`).join('')}</div>
     ${prog.note ? `<div class="banner" style="margin-top:12px"><span>🧑‍🏫 <b>Saveti trenera:</b> ${esc(prog.note)}</span></div>` : ''}
@@ -388,6 +399,9 @@ function openProgram(id) {
     <h2>Nedeljni raspored</h2><div class="wk-strip big">${sched.map((n, i) => `<div class="${n ? 'train' : ''}"><small>${WD_SHORT[(i + 1) % 7]}</small><span>${n ? esc(n.replace(/^Trening /, '')) : 'odmor'}</span></div>`).join('')}</div>
     <h2>Oprema</h2><p style="margin:0">${t.equipment.length ? esc(t.equipment.join(', ')) : '🏠 Nije potrebna – samo prostor i podloga'}</p>
     ${t.note ? `<div class="rec-tip">🧑‍🏫 <b>Kako napredovati:</b> ${esc(t.note)}</div>` : ''}
+    ${safetyTrainBlock()}
+    ${reviewBadge('programs', t.id)}
+    <button class="btn block small" data-g="report" style="margin-top:6px">🚩 Prijavi grešku u programu</button>
     <h2>Treninzi</h2>${t.workouts.map((w) => `<div class="wcard-s"><b>${esc(w.name)}</b> <span class="meta">~${workoutMinutes(w)} min</span><div class="h-ex">${(w.items || w.intervals.filter((x, k, a) => k === 0 || x[0] !== a[k - 1][0]).slice(0, 6)).map(([e, o]) => `<div data-g="ex" data-v="${e}"><span>${EXERCISES[e].icon} ${esc(EXERCISES[e].name)} <i>ⓘ</i></span><b>${w.items ? (o.sets ? `${o.sets}× ${o.reps || fmtSec(o.sec)}` : fmtSec(o.sec)) : fmtSec(o)}</b></div>`).join('')}</div></div>`).join('')}
     <div class="foot"><button class="btn" data-g="x">Zatvori</button>${sel ? '<button class="btn danger" data-g="leave">Napusti program</button>' : '<button class="btn primary" data-g="pick">✓ Izaberi program</button>'}</div></div>`, () => {
     $('#pgWrap').addEventListener('click', (e) => {
@@ -395,6 +409,8 @@ function openProgram(id) {
       const a = b.dataset.g;
       if (a === 'x') return closeSheet();
       if (a === 'ex') return openExercise(b.dataset.v, () => openProgram(id));
+      if (a === 'parq') return parqSheet(() => openProgram(id));
+      if (a === 'report') return reportProblem('programs', t.id, t.name, () => openProgram(id));
       if (a === 'pick') { h.program = id; h.progStart = Date.now(); h.showProgs = false; save(false); closeSheet(); render(); toast(`Program „${t.name}“ izabran 💪`); }
       if (a === 'leave') { if (!confirm('Napustiti program? Istorija ostaje sačuvana.')) return; h.program = null; save(false); closeSheet(); render(); }
     });

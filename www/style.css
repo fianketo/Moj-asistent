@@ -484,3 +484,30 @@ nav button { font-size: 10.5px; }
 .pl-w small { color: var(--muted); font-size: 12px; }
 .pl-main { padding: 10px 8px; }
 .p-prog > div:first-child b { display: inline; font-size: 15px; margin: 0; }
+
+/* ---- Nutritivne vrednosti, alergeni, bezbednost, stručni pregled ---- */
+.nut, .alg, .safe, .who { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin: 12px 0; }
+.nut-h { font-weight: 700; font-size: 15px; display: flex; align-items: baseline; gap: 6px; }
+.nut-h small { color: var(--muted); font-weight: 500; font-size: 12px; }
+.nut-kcal { font-size: 13px; color: var(--muted); margin: 4px 0 6px; }
+.nut-kcal b { font-size: 26px; color: var(--text); }
+.nut-bar { display: flex; height: 8px; border-radius: 6px; overflow: hidden; gap: 2px; margin-bottom: 8px; }
+.nut-bar .p { background: #22c55e; } .nut-bar .c { background: #eab308; } .nut-bar .f { background: #f97316; }
+.nut-grid > div { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 14px; white-space: pre; }
+.nut-grid > div:last-child { border-bottom: 0; }
+.nut-src { margin: 8px 0 0; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+.alg-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.alg-chips span { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; border-radius: 999px; padding: 4px 10px; font-size: 13px; font-weight: 600; }
+.safe ul { list-style: none; padding: 0; margin: 8px 0 0; }
+.safe li { display: flex; gap: 8px; font-size: 13.5px; line-height: 1.45; padding: 4px 0; }
+.safe li > span { flex: none; width: 20px; text-align: center; }
+.rv { display: flex; flex-direction: column; gap: 2px; font-size: 12.5px; color: var(--muted); background: var(--bg); border-radius: 12px; padding: 9px 12px; margin-top: 12px; line-height: 1.4; }
+.rv b { color: var(--text); }
+.rv.ok { background: var(--ok-soft); color: var(--ok); } .rv.ok b { color: var(--ok); }
+.who-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: 13px; }
+.who-row > div:first-child { min-width: 86px; } .who-row b { font-size: 18px; }
+.who-row .progress { flex: 1; margin: 0; }
+.pq { padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; line-height: 1.4; }
+.pq .seg { margin-top: 6px; max-width: 200px; position: static; margin-bottom: 0; }
+.linkbtn { background: none; border: 0; color: var(--accent); font: inherit; font-weight: 600; padding: 0 4px; cursor: pointer; }
+@media (prefers-color-scheme: dark) { .alg-chips span { background: #431407; color: #fdba74; border-color: #7c2d12; } }
