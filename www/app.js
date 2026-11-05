@@ -99,8 +99,8 @@ function save(resync = true) {
 }
 
 // ---------------------------------------------------------------- UI osnova
-let tab = 'podsetnici';
-const TITLES = { podsetnici: 'Podsetnici', kupovina: 'Kupovina', parking: 'Parking', zdravlje: 'Zdravlje', podesavanja: 'Podešavanja' };
+let tab = 'danas';
+const TITLES = { danas: 'Danas', podsetnici: 'Podsetnici', kupovina: 'Kupovina', parking: 'Parking', zdravlje: 'Zdravlje', podesavanja: 'Podešavanja' };
 
 function toast(msg, ms = 2600, action) {
   const t = $('#toast');
@@ -131,20 +131,22 @@ function smsUrl(number, body) {
 
 function setTab(t) {
   tab = t;
-  $$('#nav button').forEach((b) => b.classList.toggle('active', b.dataset.tab === t));
-  $('#title').textContent = TITLES[t];
-  $('#fab').hidden = !(t === 'podsetnici');
+  $$('#nav button, #hdSettings').forEach((b) => b.classList.toggle('active', b.dataset.tab === t));
+  $('#title').textContent = t === 'danas' ? greeting() : TITLES[t];
+  $('#fab').hidden = t !== 'podsetnici';
+  clearInterval(homeTimer);
   document.body.dataset.tab = t;
   render();
   window.scrollTo(0, 0);
 }
-$('#nav').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setTab(b.dataset.tab); });
-$('#fab').addEventListener('click', () => { if (tab === 'podsetnici') editReminder(); });
+$('#nav').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { haptic(); setTab(b.dataset.tab); } });
+$('#hdSettings').addEventListener('click', () => setTab(tab === 'podesavanja' ? 'danas' : 'podesavanja'));
+$('#fab').addEventListener('click', () => { if (tab === 'podsetnici' || tab === 'danas') editReminder(); });
 
 function render() {
   const d = new Date();
   $('#today').textContent = `${DAYS[d.getDay()]} ${d.getDate()}. ${MONTHS[d.getMonth()]}`;
-  ({ podsetnici: renderReminders, kupovina: renderShopping, parking: renderParking, zdravlje: () => renderHealth(), podesavanja: renderSettings })[tab]();
+  ({ danas: renderHome, podsetnici: renderReminders, kupovina: renderShopping, parking: renderParking, zdravlje: () => renderHealth(), podesavanja: renderSettings })[tab]();
 }
 
 // ================================================================ PODSETNICI
