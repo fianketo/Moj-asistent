@@ -805,7 +805,7 @@ function renderParking() {
   const P = S.parking, A = P.active;
   if (Geo && P.auto) Geo.status().then((st) => { const was = gpsOff; gpsOff = st.gps === false; if (was !== gpsOff && tab === 'parking') render(); }).catch(() => {});
   clearInterval(parkTimer);
-  if (!A && Date.now() - detect.at > 30e3) detectZone();
+  if (!A && Date.now() - detect.at > 30e3 && !window.PREVIEW) detectZone(); // ne traži lokaciju dok se samo pravi pregled za prevlačenje
   if (A) {
     const z = zoneById(A.zone) || { name: A.zoneName || 'Parking', color: '#64748b', sms: A.sms };
     const update = () => {

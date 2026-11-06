@@ -743,3 +743,12 @@ h2 { font-size: 14px; font-weight: 750; letter-spacing: .02em; text-transform: n
 .subv-dl { align-self: flex-start; font-size: 13px; font-weight: 800; padding: 4px 10px; border-radius: 999px; background: var(--gc); color: var(--on-gc); }
 .subv-dl.soon { background: var(--amber); color: var(--on-amber); } .subv-dl.past { background: var(--card); color: var(--muted); }
 .subv-tags { display: flex; flex-wrap: wrap; gap: 5px; } .subv-tags span { font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 8px; background: var(--card); }
+
+/* prevlačenje između tabova */
+#view { overflow-x: clip; }
+.sheet { overflow-x: hidden; }
+.sk-layer { will-change: transform; pointer-events: none; }
+.sk-main { max-width: 640px; margin: 0 auto; padding: 4px 16px 0; }
+.sk { display: flex; flex-direction: column; gap: 10px; padding-top: 6px; }
+.sk i { display: block; height: 96px; border-radius: 20px; background: var(--card); opacity: .8; }
+.sk i:nth-child(2) { height: 150px; } .sk i:nth-child(3) { height: 70px; }
