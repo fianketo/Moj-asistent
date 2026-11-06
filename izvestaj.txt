@@ -1,0 +1,12 @@
+Lidl: 3116 proizvoda (cenovnik 2026-11-06)
+Maxi: 6657 proizvoda (cenovnik 2026-11-06)
+Idea: 20462 proizvoda (cenovnik 2026-11-06)
+Mercator: 20462 proizvoda (cenovnik 2026-11-06)
+Roda: 20462 proizvoda (cenovnik 2026-11-06)
+Univerexport: 16728 proizvoda (cenovnik 2026-11-06)
+Aman: 7136 proizvoda (cenovnik 2026-11-06)
+Gomex: 7182 proizvoda (cenovnik 2026-11-06)
+dm: 15957 proizvoda (cenovnik 2026-11-02)
+Lilly: 12182 proizvoda (cenovnik 2026-11-06)
+proizvoda: 59132 MB: 8.73 gzip MB: 1.98
+u više lanaca: 24208
