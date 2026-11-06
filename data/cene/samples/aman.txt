@@ -1,0 +1,46 @@
+URL https://lpfr.blob.core.windows.net/cene/cene_proizvoda_AMAN%20DOO.csv?sv=2025-07-05&spr=https&st=2026-10-14T11%3A04%3A33Z&se=2040-12-31T12%3A04%3A00Z&sr=b&sp=r&sig=YS0tjYdECfbCZNJpDrcjhG74bGKqbS%2BrKXxsVlNCqeg%3D
+bajtova 4870328 enc utf-8-sig delim ';' redova 29018
+
+KOLONE
+  [0] 'KATEGORIJA': 25 različitih; npr. [('1', 3949), ('11', 3849), ('2', 3469)]
+  [1] 'NAZIV KATEGORIJE': 25 različitih; npr. [('Mleko, mlečni i mešoviti proizvodi, jaja', 3949), ('Slatki konditori i cerealije', 3849), ('Bezalkoholna pića, kafa, čaj', 3469)]
+  [2] 'Naziv proizvoda': 7587 različitih; npr. [('ALPINESSE NAMAZNI NESLANI 250G MEGGLE', 4), ('ALPINESSE SLANI 250G MEGGLE', 4), ('ALPRO MIX PAKET(BADEM BEZ SECERA, BADEM PECENI I KOKOS BEZ SECERA)', 4)]
+  [3] 'Robna marka': 717 različitih; npr. [('OSTALO', 2460), ('PL', 864), ('FRIKOM', 659)]
+  [4] 'Barkod proizvoda': 7468 različitih; npr. [('0000000000000', 175), ('4034900008190', 4), ('4034900008206', 4)]
+  [5] 'Jedinica mere': 4 različitih; npr. [('KOM', 27377), ('KG', 1619), ('M', 12)]
+  [6] 'Naziv trgovca - formata': 1 različitih; npr. [('AMAN DOO Cenovnik_trgovina', 29017)]
+  [7] 'Datum cenovnika': 4 različitih; npr. [('01-11-2026', 7587), ('01-09-2026', 7151), ('01-10-2026', 7143)]
+  [8] 'Redovna cena': 809 različitih; npr. [('199.99', 1213), ('99.99', 1096), ('299.99', 982)]
+  [9] 'Cena po jedinici mere': 3718 različitih; npr. [('199.99', 238), ('299.99', 205), ('199.98', 203)]
+  [10] 'Snižena cena': 160 različitih; npr. [('', 25043), ('199.99', 195), ('99.99', 175)]
+  [11] 'Datum početka sniženja': 64 različitih; npr. [('', 25043), ('26-10-2026', 712), ('01-09-2026', 334)]
+  [12] 'Datum kraja sniženja': 77 različitih; npr. [('', 25043), ('08-11-2026', 748), ('15-11-2026', 360)]
+  [13] 'Stopa PDV': 3 različitih; npr. [('20', 24722), ('10', 4294), ('8', 1)]
+  [14] 'VRSTA_CENOVNIKA': 2 različitih; npr. [('MESECNI_PRESEK', 21881), ('VAZECI_CENOVNIK', 7136)]
+
+PRVIH 25
+KATEGORIJA;NAZIV KATEGORIJE;Naziv proizvoda;Robna marka;Barkod proizvoda;Jedinica mere;Naziv trgovca - formata;Datum cenovnika;Redovna cena;Cena po jedinici mere;Snižena cena;Datum početka sniženja;Datum kraja sniženja;Stopa PDV;VRSTA_CENOVNIKA
+1;Mleko, mlečni i mešoviti proizvodi, jaja;ALPINESSE NAMAZNI NESLANI 250G MEGGLE;MEGGLE;4034900008190;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;517.99;2071.96;379.99;31-08-2026;13-09-2026;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;ALPINESSE SLANI 250G MEGGLE;MEGGLE;4034900008206;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;509.99;2039.96;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;ALPRO MIX PAKET(BADEM BEZ SECERA, BADEM PECENI I KOKOS BEZ SECERA);ALPRO;5411188130529;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;1899.99;1899.99;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;ALPRO OVSENO I BADEMOVO MLEKO 1L;ALPRO;5411188124726;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;329.99;329.99;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;ALPSKO MLEKO 3.5% 1L;SOMBOLED;3838800040578;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;189.99;189.99;159.99;24-08-2026;06-09-2026;10;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;ALPSKO MLEKO BEZ LAKTOZE 1.5% 1L;SOMBOLED;3838800049922;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;220.99;220.99;189.99;01-09-2026;15-09-2026;10;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;ANCHO HOT SOS 285ML;PEMY FAMILY;8606106810769;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;219.99;771.89;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;AYRAN 2.2% MM 1KG;MEGGLE;8606107983998;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;189.99;189.99;;;;10;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BALANS+ KEFIR, 250G PET;IMLEK-BALANS+;8601500136750;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;69.99;279.96;;;;10;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BELA 400G BELANOVA;BELANOVA;8606107577012;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;224.99;562.48;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BILJNI NAPITAK OD BADEMA 1L TB IMLEK;IMLEK-BELLO;8601500138143;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;339.99;339.99;319.99;24-08-2026;06-09-2026;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BILJNI NAPITAK OD OVSA 1L TB IMLEK;IMLEK-BELLO;8601500138167;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;339.99;339.99;319.99;24-08-2026;06-09-2026;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BILJNI SLAG U SPREJU 250G HULALA;DIJAMANT- IFFCO;8007990601868;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;319.99;1279.96;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BIOJOGURT 1L MLEKARA GLOZANE;MLEKARA GLOZANE;8606100114054;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;129.99;129.99;;;;10;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BIOJOGURT 2.8% GLOZANE 1.5L MLEKARA GLOZANE;MLEKARA GLOZANE;8606100114771;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;184.99;123.33;;;;10;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BIOJOGURT GLOZANE 0.500ML MLEKARA GLOZANE;MLEKARA GLOZANE;8606100114061;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;79.99;159.98;;;;10;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BIOJOGURT LIGHT 1L GLOZAN;MLEKARA GLOZANE;8606100114481;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;113.99;113.99;;;;10;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BISER BUTTERFLY MLECNI NAMAZ 250G;MLEKOPRODUKT- BISER;8606004663788;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;423.99;1695.96;299.99;01-09-2026;15-09-2026;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BISER BUTTERFLY SA MORSKOM SOLJU 250G;MLEKOPRODUKT- BISER;8606004663801;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;423.99;1695.96;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BISER KACKAVALJ 1.5KG;MLEKOPRODUKT- BISER;0000002704213;KG;AMAN DOO Cenovnik_trgovina;01-09-2026;1599.99;1599.99;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BISER KACKAVALJ 200G;MLEKOPRODUKT- BISER;8606004660213;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;349.99;1749.95;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BISER SELEKTA 200 G;MLEKOPRODUKT- BISER;8606004663399;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;599.99;2999.95;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BISER SELEKTA 4.5 KG;OSTALO;0000002704174;KG;AMAN DOO Cenovnik_trgovina;01-09-2026;2599.99;2599.99;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;CAFFE CAPPUCICINO 230ML IMLEK NERA;IMLEK-CAFFELATE;8601500140399;KOM;AMAN DOO Cenovnik_trgovina;01-09-2026;154.99;673.87;;;;10;MESECNI_PRESEK

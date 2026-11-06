@@ -1,0 +1,46 @@
+URL https://tsmdelhaizeserbia.delhaize.rs/PublicDoc/cene_proizvoda_Delhaize.csv
+bajtova 16259432 enc utf-8-sig delim ';' redova 111467
+
+KOLONE
+  [0] 'KATEGORIJA': 25 različitih; npr. [('11', 15197), ('21', 13654), ('2', 11827)]
+  [1] 'NAZIV KATEGORIJE': 25 različitih; npr. [('Slatki konditori i cerealije', 15197), ('Lična higijena i kozmetika', 13654), ('Bezalkoholna pića, kafa, čaj', 11827)]
+  [2] 'Naziv proizvoda': 12461 različitih; npr. [('Krem duo mlecni i kakao Maxi 400g', 24), ('Dimljena svinjska spic rebra Maxi', 24), ('Zacin C 250g', 20)]
+  [3] 'Robna marka': 1223 različitih; npr. [('Maxi', 9850), ('', 5414), ("Nature's Promise", 2742)]
+  [4] 'Barkod proizvoda': 12490 različitih; npr. [('8607100116604', 20), ('8600005000016', 20), ('8607100332332', 20)]
+  [5] 'Jedinica mere': 5 različitih; npr. [('kg', 69030), ('lit', 34766), ('kom', 7028)]
+  [6] 'Naziv trgovca - formata': 5 različitih; npr. [('Mega Maxi', 44418), ('Maxi', 27149), ('Maxi Online', 24369)]
+  [7] 'Datum cenovnika': 4 različitih; npr. [('01-10-2026', 28402), ('01-09-2026', 28089), ('01-11-2026', 27560)]
+  [8] 'Redovna cena': 2369 različitih; npr. [('199.99', 1897), ('99.99', 1421), ('299.99', 1150)]
+  [9] 'Cena po jedinici mere': 2369 različitih; npr. [('199.99', 1897), ('99.99', 1421), ('299.99', 1150)]
+  [10] 'Snižena cena': 614 različitih; npr. [('', 94971), ('199.99', 533), ('99.99', 497)]
+  [11] 'Datum početka sniženja': 45 različitih; npr. [('', 94971), ('29-10-2026', 3051), ('01-10-2026', 1767)]
+  [12] 'Datum kraja sniženja': 58 različitih; npr. [('', 94971), ('18-11-2026', 2798), ('09-09-2026', 1945)]
+  [13] 'Stopa PDV': 2 različitih; npr. [('20', 98080), ('10', 13386)]
+  [14] 'VRSTA_CENOVNIKA': 2 različitih; npr. [('MESECNI_PRESEK', 84051), ('VAZECI_CENOVNIK', 27415)]
+
+PRVIH 25
+KATEGORIJA;NAZIV KATEGORIJE;Naziv proizvoda;Robna marka;Barkod proizvoda;Jedinica mere;Naziv trgovca - formata;Datum cenovnika;Redovna cena;Cena po jedinici mere;Snižena cena;Datum početka sniženja;Datum kraja sniženja;Stopa PDV;VRSTA_CENOVNIKA
+18;Supe, so, začini i prilozi jelima;Pizza paradajz sos zacinj.Mutti 400g;Mutti;8005110551215;kg;Maxi;01-09-2026;399.99;399.99;;;;20;MESECNI_PRESEK
+18;Supe, so, začini i prilozi jelima;Pizza paradajz sos zacinj.Mutti 400g;Mutti;8005110551215;kg;Maxi Online;01-09-2026;399.99;399.99;;;;20;MESECNI_PRESEK
+18;Supe, so, začini i prilozi jelima;Pizza paradajz sos zacinj.Mutti 400g;Mutti;8005110551215;kg;Mega Maxi;01-09-2026;399.99;399.99;;;;20;MESECNI_PRESEK
+4;Prerada voća i povrća i biljni namazi;Paradajz pulpa u konzervi Mutti 400g;Mutti;0000080042556;kg;Maxi;01-09-2026;307.99;307.99;;;;20;MESECNI_PRESEK
+4;Prerada voća i povrća i biljni namazi;Paradajz pulpa u konzervi Mutti 400g;Mutti;0000080042556;kg;Maxi Online;01-09-2026;307.99;307.99;;;;20;MESECNI_PRESEK
+4;Prerada voća i povrća i biljni namazi;Paradajz pulpa u konzervi Mutti 400g;Mutti;0000080042556;kg;Mega Maxi;01-09-2026;307.99;307.99;;;;20;MESECNI_PRESEK
+6;Mahunarke;Crveni pasulj Bonduelle 400g;Bonduelle;3083680009508;kg;Maxi;01-09-2026;332.99;332.99;229.99;13-08-2026;02-09-2026;20;MESECNI_PRESEK
+6;Mahunarke;Crveni pasulj Bonduelle 400g;Bonduelle;3083680009508;kg;Maxi Online;01-09-2026;332.99;332.99;229.99;13-08-2026;02-09-2026;20;MESECNI_PRESEK
+6;Mahunarke;Crveni pasulj Bonduelle 400g;Bonduelle;3083680009508;kg;Mega Maxi;01-09-2026;332.99;332.99;229.99;13-08-2026;02-09-2026;20;MESECNI_PRESEK
+6;Mahunarke;Crveni pasulj Bonduelle 400g;Bonduelle;3083680009508;kg;Shop and Go;01-09-2026;345.99;345.99;229.99;13-08-2026;02-09-2026;20;MESECNI_PRESEK
+18;Supe, so, začini i prilozi jelima;Senf C delikates kantica 1kg;Mustard ( C Senf );8607100565136;kg;Maxi Online;01-09-2026;629.99;629.99;;;;20;MESECNI_PRESEK
+18;Supe, so, začini i prilozi jelima;Senf C delikates kantica 1kg;Mustard ( C Senf );8607100565136;kg;Mega Maxi;01-09-2026;647.99;647.99;;;;20;MESECNI_PRESEK
+4;Prerada voća i povrća i biljni namazi;Kecap ljuti Gurman 450g;Gurman;8600101523754;kg;Mega Maxi;01-09-2026;147.99;147.99;;;;20;MESECNI_PRESEK
+2;Bezalkoholna pića, kafa, čaj;Prolom voda NG Planinka 0,5l;Prolom;8600169600046;lit;Maxi;01-09-2026;57.99;57.99;;;;20;MESECNI_PRESEK
+2;Bezalkoholna pića, kafa, čaj;Prolom voda NG Planinka 0,5l;Prolom;8600169600046;lit;Maxi Online;01-09-2026;57.99;57.99;;;;20;MESECNI_PRESEK
+2;Bezalkoholna pića, kafa, čaj;Prolom voda NG Planinka 0,5l;Prolom;8600169600046;lit;Mega Maxi;01-09-2026;57.99;57.99;;;;20;MESECNI_PRESEK
+2;Bezalkoholna pića, kafa, čaj;Prolom voda NG Planinka 0,5l;Prolom;8600169600046;lit;Shop and Go;01-09-2026;59.99;59.99;;;;20;MESECNI_PRESEK
+2;Bezalkoholna pića, kafa, čaj;Sok Orange Golf  1,5L;Golf;8600037000558;lit;Mega Maxi;01-09-2026;115.99;115.99;;;;20;MESECNI_PRESEK
+24;Alkoholna pića;Vino belo Temjanika 0.75L;Tikves;5310008007273;lit;Maxi;01-09-2026;924.99;924.99;;;;20;MESECNI_PRESEK
+24;Alkoholna pića;Vino belo Temjanika 0.75L;Tikves;5310008007273;lit;Maxi Online;01-09-2026;924.99;924.99;;;;20;MESECNI_PRESEK
+24;Alkoholna pića;Vino belo Temjanika 0.75L;Tikves;5310008007273;lit;Mega Maxi;01-09-2026;924.99;924.99;;;;20;MESECNI_PRESEK
+24;Alkoholna pića;Vino belo Temjanika 0.75L;Tikves;5310008007273;lit;Shop and Go;01-09-2026;961.99;961.99;;;;20;MESECNI_PRESEK
+24;Alkoholna pića;Vino Vranac Vinoprodukt Coka 1l ;Vinoprodukt Coka;8600102938069;lit;Mega Maxi;01-09-2026;567.99;567.99;;;;20;MESECNI_PRESEK
+24;Alkoholna pića;Vino Zdrepceva krv Vinoprod.Coka 0,187l;Vinoprodukt Coka;8606107899558;lit;Maxi;01-09-2026;247.99;247.99;;;;20;MESECNI_PRESEK

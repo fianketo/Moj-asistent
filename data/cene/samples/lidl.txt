@@ -1,0 +1,46 @@
+URL https://www.lidl.rs/explore/assets/webPriceData/rs/cene_proizvoda_Lidl.csv
+bajtova 1874366 enc utf-8-sig delim ';' redova 12473
+
+KOLONE
+  [0] 'KATEGORIJA': 25 različitih; npr. [('11', 1568), ('1', 1320), ('8', 1280)]
+  [1] 'NAZIV KATEGORIJE': 25 različitih; npr. [('Slatki konditori i cerealije', 1568), ('Mleko, mlečni i mešoviti proizvodi, jaja', 1320), ('Sveže i prerađeno meso', 1280)]
+  [2] 'Naziv proizvoda': 3111 različitih; npr. [('Jabuka crvena, rinfuz 1kg', 8), ('Dinja medena, rinfuz 1kg', 8), ('Džem od šljiva MK12 450g', 8)]
+  [3] 'Robna marka': 152 različitih; npr. [('Brend', 3000), ('RM NIJE DEFINISANA', 1532), ('Pilos', 540)]
+  [4] 'Barkod proizvoda': 3528 različitih; npr. [('0000000000000', 420), ('4056489789246', 4), ('4335619014442', 4)]
+  [5] 'Jedinica mere': 8 različitih; npr. [('kg', 4320), ('g', 3200), ('kom.', 2500)]
+  [6] 'Naziv trgovca – formata': 1 različitih; npr. [('Lidl Srbija KD', 12472)]
+  [7] 'Datum cenovnika': 4 različitih; npr. [('06-11-2026', 3118), ('01-09-2026', 3118), ('01-10-2026', 3118)]
+  [8] 'Redovna cena': 618 različitih; npr. [('199.99', 474), ('299.99', 446), ('99.99', 400)]
+  [9] 'Cena po jedinici mere': 1835 različitih; npr. [('199.99', 106), ('499.98', 101), ('666.65', 84)]
+  [10] 'Snižena cena': 93 različitih; npr. [('', 12230), ('129.99', 11), ('49.99', 10)]
+  [11] 'Datum početka sniženja': 23 različitih; npr. [('', 12230), ('01-10-2026', 50), ('29-10-2026', 41)]
+  [12] 'Datum kraja sniženja': 24 različitih; npr. [('', 12230), ('02-09-2026', 33), ('01-11-2026', 31)]
+  [13] 'Stopa PDV': 2 različitih; npr. [('20', 9833), ('10', 2639)]
+  [14] 'VRSTA_CENOVNIKA': 2 različitih; npr. [('MESECNI_PRESEK', 9354), ('VAZECI_CENOVNIK', 3118)]
+
+PRVIH 25
+KATEGORIJA;NAZIV KATEGORIJE;Naziv proizvoda;Robna marka;Barkod proizvoda;Jedinica mere;Naziv trgovca – formata;Datum cenovnika;Redovna cena;Cena po jedinici mere;Snižena cena;Datum početka sniženja;Datum kraja sniženja;Stopa PDV;VRSTA_CENOVNIKA
+18;Supe, so, začini i prilozi jelima;Krompir pire (sa muskantnim orahom) 500g;Harvest Basket;4056489789246;g;Lidl Srbija KD;06-11-2026;269.99;539.98;;;;20;VAZECI_CENOVNIK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;Ml. dezert na bazi sira sa jog. SK1 500g;Milbona;4056489515982;kg;Lidl Srbija KD;06-11-2026;269.99;539.98;;;;20;VAZECI_CENOVNIK
+4;Prerada voća i povrća i biljni namazi;Pasta gotovo jelo SK53 750g;Chef Select;4335619084926;kg;Lidl Srbija KD;06-11-2026;402.49;536.65;;;;20;VAZECI_CENOVNIK
+10;Slani konditori;Kal.pistaći pečeni i slani MK30 250g;Alesto Selection;4335619014442;g;Lidl Srbija KD;06-11-2026;549.99;2199.96;;;;20;VAZECI_CENOVNIK
+11;Slatki konditori i cerealije;Musli bar SK63 200g;Crownfield;4056489204060;kg;Lidl Srbija KD;06-11-2026;214.49;1072.45;;;;20;VAZECI_CENOVNIK
+7;Smrznuti proizvodi;Premium sladoled SK112 1000ml;Bon Gelati;4056489657149;ml;Lidl Srbija KD;06-11-2026;329.99;329.99;;;;20;VAZECI_CENOVNIK
+4;Prerada voća i povrća i biljni namazi;Kikiriki puter SK4 MK12 454g;Maribel;4335619432307;g;Lidl Srbija KD;06-11-2026;449.99;991.17;;;;20;VAZECI_CENOVNIK
+7;Smrznuti proizvodi;Sladoled Classic van. i čok. SK41 6x100ml;Bon Gelati;4335619343801;ml;Lidl Srbija KD;06-11-2026;399.99;666.65;;;;20;VAZECI_CENOVNIK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;Sirni namaz sa pavlakom, natur MK18 200g;Milbona;0000020064440;g;Lidl Srbija KD;06-11-2026;169.99;849.95;;;;20;VAZECI_CENOVNIK
+11;Slatki konditori i cerealije;Biskvit SK20 400g;Confiserie Firenze;4335619203228;kg;Lidl Srbija KD;06-11-2026;269.99;674.98;;;;20;VAZECI_CENOVNIK
+21;Lična higijena i kozmetika;Kremasti sapun SK1 2x150g;Cien;4335619207837;kg;Lidl Srbija KD;06-11-2026;144.99;483.30;;;;20;VAZECI_CENOVNIK
+24;Alkoholna pića;Rizling Mozel polusu. belo vino MK6 0,75l;RM NIJE DEFINISANA;4056489972419;ml;Lidl Srbija KD;06-11-2026;499.99;666.65;;;;20;VAZECI_CENOVNIK
+24;Alkoholna pića;Irish Whiskey 40 % Vol. MK6 0,7l;Dundalgan;4335619217669;l;Lidl Srbija KD;06-11-2026;1399.99;1999.99;;;;20;VAZECI_CENOVNIK
+10;Slani konditori;Teddy's Hit Krom flips - slani MK18 125g;Snack Day;4335619150898;g;Lidl Srbija KD;06-11-2026;168.99;1351.92;;;;20;VAZECI_CENOVNIK
+19;Kućna hemija;Čvrsti osveživač za WC šolju SK9 4x40g;W5;4335619316904;kom.;Lidl Srbija KD;06-11-2026;118.99;29.75;;;;20;VAZECI_CENOVNIK
+24;Alkoholna pića;Cava Semi Seco DO/MK6 0.75l;Arestel;4056489849407;l;Lidl Srbija KD;06-11-2026;699.99;933.32;;;;20;VAZECI_CENOVNIK
+20;Papirna i kuhinjska galanterija;Krpe perforirane MK20 10kom.;W5;0000020007560;kom.;Lidl Srbija KD;06-11-2026;118.99;11.90;;;;20;VAZECI_CENOVNIK
+7;Smrznuti proizvodi;Sladoled Nocciolata MK12 900ml;Bon Gelati;0000020106911;ml;Lidl Srbija KD;06-11-2026;329.99;366.66;;;;20;VAZECI_CENOVNIK
+2;Bezalkoholna pića, kafa, čaj;Ledena kafa SK36 330ml;Pilos;4335619175174;ml;Lidl Srbija KD;06-11-2026;119.99;363.61;;;;20;VAZECI_CENOVNIK
+4;Prerada voća i povrća i biljni namazi;Extra džem jag-van/jag-mal SK1 450g;Maribel;4335619161467;kg;Lidl Srbija KD;06-11-2026;259.99;577.76;;;;20;VAZECI_CENOVNIK
+24;Alkoholna pića;Rioja DOCa C. šp. crv.suvo vino MK6 0,75l;Cepa Lebrel;4056489114215;l;Lidl Srbija KD;06-11-2026;499.99;666.65;;;;20;VAZECI_CENOVNIK
+21;Lična higijena i kozmetika;Balzam za usne 3kom SK4 3 kom;Cien;4056489442172;kom.;Lidl Srbija KD;06-11-2026;199.99;66.66;;;;20;VAZECI_CENOVNIK
+24;Alkoholna pića;Gold Pils 4,9% Vol. MK24 0,33l;Perlenbacher;4335619162174;l;Lidl Srbija KD;06-11-2026;69.99;212.09;;;;20;VAZECI_CENOVNIK
+11;Slatki konditori i cerealije;Čoko mesec/čoko školjke SK117 750g;Crownfield;4335619104488;g;Lidl Srbija KD;06-11-2026;399.99;533.32;;;;20;VAZECI_CENOVNIK

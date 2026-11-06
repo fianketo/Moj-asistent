@@ -1,0 +1,46 @@
+URL https://www.dm.rs/prikaz-cena-dm
+bajtova 10283779 enc utf-8-sig delim ';' redova 62410
+
+KOLONE
+  [0] 'KATEGORIJA': 22 različitih; npr. [('21', 47667), ('19', 4259), ('20', 3164)]
+  [1] 'NAZIV KATEGORIJE': 22 različitih; npr. [('Lična higijena i kozmetika', 47667), ('Kućna hemija', 4259), ('Papirna i kuhinjska galanterija', 3164)]
+  [2] 'Naziv proizvoda': 16315 različitih; npr. [('wet n wild Color Icon bronzer', 16), ('alverde kajal i ajlajner Perfect Precise', 12), ('wet n wild megalast  mat ruž za usne', 12)]
+  [3] 'Robna marka': 921 različitih; npr. [('Balea', 3079), ('essence', 2810), ('trend !t up', 2763)]
+  [4] 'Barkod proizvoda': 16475 različitih; npr. [('3830081425334', 4), ('3830081425372', 4), ('5411188081852', 4)]
+  [5] 'Jedinica mere': 17 različitih; npr. [('1kom', 30723), ('100ml', 18773), ('100g', 6575)]
+  [6] 'Naziv trgovca - formata': 1 različitih; npr. [('dm drogerie markt', 62409)]
+  [7] 'Datum cenovnika': 4 različitih; npr. [('01-11-2026', 16136), ('02-11-2026', 15957), ('01-10-2026', 15286)]
+  [8] 'Redovna cena': 559 različitih; npr. [('199.00', 2419), ('349.00', 1914), ('399.00', 1887)]
+  [9] 'Cena po jedinici mere': 3843 različitih; npr. [('199.00', 1619), ('349.00', 1181), ('399.00', 1083)]
+  [10] 'Snižena cena': 137 različitih; npr. [('', 55909), ('199.00', 583), ('249.00', 522)]
+  [11] 'Datum početka sniženja': 57 različitih; npr. [('', 55909), ('12-03-2026', 674), ('21-09-2026', 605)]
+  [12] 'Datum kraja sniženja': 4 različitih; npr. [('', 55909), ('31-12-9999', 6495), ('31-12-2026', 3)]
+  [13] 'Stopa PDV': 2 različitih; npr. [('20', 61799), ('10', 610)]
+  [14] 'VRSTA_CENOVNIKA': 2 različitih; npr. [('MESECNI_PRESEK', 46452), ('VAZECI_CENOVNIK', 15957)]
+
+PRVIH 25
+KATEGORIJA;NAZIV KATEGORIJE;Naziv proizvoda;Robna marka;Barkod proizvoda;Jedinica mere;Naziv trgovca - formata;Datum cenovnika;Redovna cena;Cena po jedinici mere;Snižena cena;Datum početka sniženja;Datum kraja sniženja;Stopa PDV;VRSTA_CENOVNIKA
+1;Mleko, mlečni i mešoviti proizvodi, jaja;100% NATURAL WHEY PROTEIN čokolada 400g;Proteini.si;3830081425334;100g;dm drogerie markt;01-09-2026;3099.00;774.75;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;100% NATURAL WHEY PROTEIN vanila 400g;Proteini.si;3830081425372;100g;dm drogerie markt;01-09-2026;3099.00;774.75;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;alpro  SOYA VANILA napitak 1l;alpro;5411188081852;1l;dm drogerie markt;01-09-2026;519.00;519.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;alpro BARISTA OVAS napitak 1l;alpro;5411188130550;1l;dm drogerie markt;01-09-2026;479.00;479.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;alpro biljni napitak pečeni badem 1l;alpro;5411188110835;1l;dm drogerie markt;01-09-2026;449.00;449.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;alpro napitak       kokos pirinač 1l;alpro;5411188116592;1l;dm drogerie markt;01-09-2026;419.00;419.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;alpro napitak badem bez šećera 1l;alpro;5411188112709;1l;dm drogerie markt;01-09-2026;499.00;499.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;Alpro napitak kokos i badem 1l;alpro;5411188118732;1l;dm drogerie markt;01-09-2026;529.00;529.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;alpro NOT MILK napitak 3,5 MM 1L;alpro;5411188134985;1l;dm drogerie markt;01-09-2026;539.00;539.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BATTERY WHEY PROTEIN CHOCOLATE 30g;BATTERY;0702811673335;10g;dm drogerie markt;01-09-2026;219.00;73.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BATTERY WHEY PROTEIN COOKIES 30g;BATTERY;0702811673359;10g;dm drogerie markt;01-09-2026;219.00;73.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BATTERY WHEY PROTEIN VANILLA 30g;BATTERY;0702811673342;10g;dm drogerie markt;01-09-2026;219.00;73.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BOOM BOX org. napitak ovas i kokos 1l;BOOM BOX;3858890476958;1l;dm drogerie markt;01-09-2026;299.00;299.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BOOM BOX org.napit.od pirinča sa lešn.1l;BOOM BOX;3856027801949;1l;dm drogerie markt;01-09-2026;299.00;299.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BOOM BOX org.napitak ovas barista 500ml;BOOM BOX;3856027801543;100ml;dm drogerie markt;01-09-2026;179.00;35.80;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BOOM BOX org.napitak ovas i badem 1l;BOOM BOX;3858890476927;1l;dm drogerie markt;01-09-2026;299.00;299.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BOOM BOX org.napitak ovas i badem 500ml;BOOM BOX;3858890478792;100ml;dm drogerie markt;01-09-2026;179.00;35.80;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BOOM BOX org.napitak ovas i lešnik 500ml;BOOM BOX;3858890478815;100ml;dm drogerie markt;01-09-2026;179.00;35.80;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BOOM BOX organski napi.ovas i vani.500ml;BOOM BOX;3856027800249;100ml;dm drogerie markt;01-09-2026;179.00;35.80;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BOOM BOX organski napitak od ovsa 1l;BOOM BOX;3858890477504;1l;dm drogerie markt;01-09-2026;279.00;279.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BOOM BOX organski napitak od pirinča 1l;BOOM BOX;3856027801963;1l;dm drogerie markt;01-09-2026;279.00;279.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BOOM BOX Prof.baris.org.napit.od ovsa 1l;BOOM BOX;3858890478778;1l;dm drogerie markt;01-09-2026;299.00;299.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;Čokolino WHEY PROTEIN POWER 350g;Lino;3856020264789;100g;dm drogerie markt;01-09-2026;499.00;142.57;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;dmBio Barista napit. od ovsa i soje 1l;dmBio;4066447577327;1l;dm drogerie markt;01-09-2026;179.00;179.00;;;;20;MESECNI_PRESEK

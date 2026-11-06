@@ -1,0 +1,46 @@
+URL https://aswcene.gomex.rs/upload/cene_proizvoda_gomex.csv
+bajtova 4322052 enc utf-8-sig delim ';' redova 28638
+
+KOLONE
+  [0] 'KATEGORIJA': 25 različitih; npr. [('11', 4808), ('2', 3065), ('21', 2723)]
+  [1] 'NAZIV KATEGORIJE': 25 različitih; npr. [('Slatki konditori i cerealije', 4808), ('Bezalkoholna pića, kafa, čaj', 3065), ('Lična higijena i kozmetika', 2723)]
+  [2] 'Naziv proizvoda': 7181 različitih; npr. [('KEKS BAMBI MEDENJAK PLAZMA OD SRCA ORAH 100G', 8), ('BM BILJNI PROIZVOD MAMAS TOAST 2.5KG RF', 4), ('SIR GOLLANDSKY\xa0PREMIUM SYR 45%MM 3.5KG RF', 4)]
+  [3] 'Robna marka': 550 različitih; npr. [('1KROZ1', 788), ('IMLEK', 648), ('SLOJAL', 532)]
+  [4] 'Barkod proizvoda': 7182 različitih; npr. [('5213000351788', 4), ('4810099007841', 4), ('0000028166500', 4)]
+  [5] 'Jedinica mere': 4 različitih; npr. [('kg', 18983), ('l', 6834), ('kom', 2772)]
+  [6] 'Naziv trgovca - formata': 1 različitih; npr. [('Gomex doo', 28637)]
+  [7] 'Datum cenovnika': 4 različitih; npr. [('01-11-2026', 7182), ('06-11-2026', 7182), ('01-10-2026', 7161)]
+  [8] 'Redovna cena': 2114 različitih; npr. [('199.99', 587), ('99.99', 565), ('149.99', 464)]
+  [9] 'Cena po jedinici mere': 4547 različitih; npr. [('199.99', 173), ('199.98', 115), ('1299.99', 106)]
+  [10] 'Snižena cena': 274 različitih; npr. [('', 27499), ('99.99', 43), ('169.99', 39)]
+  [11] 'Datum početka sniženja': 33 različitih; npr. [('', 27499), ('19-08-2026', 165), ('26-10-2026', 140)]
+  [12] 'Datum kraja sniženja': 31 različitih; npr. [('', 27499), ('01-09-2026', 180), ('22-11-2026', 140)]
+  [13] 'Stopa PDV': 2 različitih; npr. [('20', 24900), ('10', 3737)]
+  [14] 'VRSTA_CENOVNIKA': 2 različitih; npr. [('MESECNI_PRESEK', 21455), ('VAZECI_CENOVNIK', 7182)]
+
+PRVIH 25
+KATEGORIJA;NAZIV KATEGORIJE;Naziv proizvoda;Robna marka;Barkod proizvoda;Jedinica mere;Naziv trgovca - formata;Datum cenovnika;Redovna cena;Cena po jedinici mere;Snižena cena;Datum početka sniženja;Datum kraja sniženja;Stopa PDV;VRSTA_CENOVNIKA
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BM BILJNI PROIZVOD MAMAS TOAST 2.5KG RF;ADT NETO NETO;5213000351788;kg;Gomex doo;01-09-2026;634.99;634.99;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR GOLLANDSKY PREMIUM SYR 45%MM 3.5KG RF;ADT NETO NETO;4810099007841;kg;Gomex doo;01-09-2026;1149.99;1149.99;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR POLUTVRDI PUNOMASNI BERGOLA EDAMER 45%MM 3.5KG RF;ADT NETO NETO;0000028166500;kg;Gomex doo;01-09-2026;1099.99;1099.99;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR POLUTVRDI PUNOMASNI BERGOLA GAUDA 45%MM 3.5KG RF;ADT NETO NETO;4810099042040;kg;Gomex doo;01-09-2026;1099.99;1099.99;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;TVRDI PUNOMASNI SIR GOLLANDSKY PREMIUM SYR 45%MM 250G;ADT NETO NETO;8607000491818;kg;Gomex doo;01-09-2026;324.99;1299.96;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;ŠLAG PENA ALEVA SA UKUSOM SLATKE PAVLAKE SUPER PONUDA 160G;ALEVA;8600947909156;kg;Gomex doo;01-09-2026;264.99;1656.19;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;ŠLAG PENA ALEVA SA VODOM 40G;ALEVA;8600947902935;kg;Gomex doo;01-09-2026;89.99;2249.75;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;ŠLAG PENA ALEVA 40G;ALEVA;8600947900023;kg;Gomex doo;01-09-2026;84.99;2124.75;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;NAPITAK ALPRO BADEM BEZ ŠEĆERA 1L;ALPRO;5411188112709;l;Gomex doo;01-09-2026;483.30;483.30;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;NAPITAK ALPRO BADEM 1L;ALPRO;5411188110835;l;Gomex doo;01-09-2026;483.30;483.30;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;NAPITAK ALPRO SOYA BEZ ŠECERA I SOLI 1L;ALPRO;5411188543398;l;Gomex doo;01-09-2026;415.80;415.80;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BM MEŠOVITI ACTIVE COW LACTIMA 120G;BELFOOD;5901126008008;kom;Gomex doo;01-09-2026;156.00;156.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BM MEŠOVITI PERLA WARMII;BELFOOD;0000002754819;kg;Gomex doo;01-09-2026;859.95;859.95;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR CHEDDAR MLEKOVITA 50% MM 2 KG;BELFOOD;0000002808750;kg;Gomex doo;01-09-2026;2145.00;2145.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR GAUDA RFS BLOK MLEKOVITA;BELFOOD;0000002720679;kg;Gomex doo;01-09-2026;1206.19;1206.19;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR KAČKAVALJ DIMLJENI 300G MLEKOVITA;BELFOOD;5906217001555;kom;Gomex doo;01-09-2026;532.50;532.50;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR LAZUR BLUE SA PLAVOM PLESNI 100G;BELFOOD;5907070001065;kom;Gomex doo;01-09-2026;209.99;209.99;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR LAZUR GOLD SA PLAVOM PLESNI 100G;BELFOOD;5907070003137;kg;Gomex doo;01-09-2026;209.99;2099.90;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR MLEKOVITA EDAMER POLUTVRDI 45% SLICE 150G;BELFOOD;5900512110165;kg;Gomex doo;01-09-2026;231.75;1545.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR MLEKOVITA GAUDA POLUTVRDI 45% SLICE 150G;BELFOOD;5900512110158;kg;Gomex doo;01-09-2026;231.75;1545.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR MLEKOVITA MAZDAMER POLUTVRDI 45% SLICE 150G;BELFOOD;5900512110530;kg;Gomex doo;01-09-2026;231.75;1545.00;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR SLAJS LAZUR BLUE SA PLAVOM PLESNI 100G;BELFOOD;5907070001096;kom;Gomex doo;01-09-2026;249.99;249.99;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;SIR SLAJS LAZUR GOLD SA PLAVOM PLESNI 100G;BELFOOD;5907070006121;kom;Gomex doo;01-09-2026;249.99;249.99;;;;20;MESECNI_PRESEK
+1;Mleko, mlečni i mešoviti proizvodi, jaja;BIO NAPITAK OVSENI BOOMBOX PIRINAČ 1L;BOOM BOX;3856027801963;l;Gomex doo;01-09-2026;355.99;355.99;;;;20;MESECNI_PRESEK
