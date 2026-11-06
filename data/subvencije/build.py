@@ -82,7 +82,12 @@ prev = {}
 try: prev = {x['id']: x for x in json.loads(get(PREV % sys.argv[2], 30))['items']}
 except Exception as e: report.append(f'(nema prethodnog fajla: {e!r})')
 seen_titles, out = set(), []
+def relevant(it):
+    tl = it['title'].lower()
+    if re.search(NOISE, tl): return False
+    return it['src'] == 'Uprava za agrarna plaćanja' or bool(re.search(AGRI, tl + ' ' + it.get('summary', '').lower()[:300]))
 for it in items + list(prev.values()):
+    if not relevant(it): continue
     key = re.sub(r'[^a-z0-9]', '', it['title'].lower())[:70]
     if it['id'] in {x['id'] for x in out} or key in seen_titles: continue
     seen_titles.add(key)
