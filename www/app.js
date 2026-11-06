@@ -362,12 +362,13 @@ const catIcon = (cat) => (CATALOG.find((g) => g.cat === cat) || {}).icon || '�
 
 function renderShopping() {
   const L = curList();
+  if (!PR && L.items.some((i) => i.pk)) loadPrices().then(() => tab === 'kupovina' && render()).catch(() => {});
   const open = L.items.filter((i) => !i.done), bought = L.items.filter((i) => i.done);
   const total = L.items.length, pct = total ? Math.round((bought.length / total) * 100) : 0;
   let html = `<div class="shop-head">
       <button class="list-switch" data-act="list-switch"><span>${esc(L.name)}</span><span class="caret">▾</span></button>
       <div class="grow"></div>
-      ${total ? '<button class="iconbtn" data-act="share" title="Pošalji listu">📤</button>' : ''}
+      ${total ? '<button class="iconbtn" data-act="prices" title="Uporedi cene">💰</button><button class="iconbtn" data-act="share" title="Pošalji listu">📤</button>' : ''}
       <button class="iconbtn" data-act="list-menu" title="Još">⋯</button>
     </div>
     ${total ? `<div class="progress-row"><span>${open.length ? `Ostalo <b>${open.length}</b> · u korpi ${bought.length} od ${total}` : '🎉 Sve je u korpi!'}</span></div>
@@ -462,7 +463,7 @@ function itemRow(i) {
   const q = fmtQty(i);
   return `<div class="item-row ${i.done ? 'done' : ''}" data-item="${i.id}" data-act="item-toggle">
     <span class="tick">${i.done ? '✓' : ''}</span>
-    <span class="nm">${esc(i.name)}</span>
+    <span class="nm">${esc(i.name)}${itemPriceTag(i)}</span>
     ${q ? `<button class="qty-pill" data-act="item-edit">${esc(q)}</button>` : `<button class="qty-pill empty" data-act="item-edit">＋</button>`}
   </div>`;
 }
@@ -476,7 +477,7 @@ function editItem(item) {
     </div>
     <div class="q-units">${UNITS.map((u) => `<button class="chip ${u === (item.unit || 'kom') ? 'on' : ''}" data-u="${u}">${u}</button>`).join('')}</div>
     <div class="row" style="margin-top:14px">
-      <button class="btn grow" id="ePrice">💰 Cene (Cenoteka)</button>
+      <button class="btn grow" id="ePrice">💰 Cene u prodavnicama</button>
       <button class="btn danger grow" id="eDel">🗑 Obriši</button>
     </div>
     <div class="foot"><button class="btn primary" id="eSave">Gotovo</button></div></div>`;
@@ -495,7 +496,7 @@ function editItem(item) {
       if (b.dataset.u) { item.unit = b.dataset.u; item.qty = defaultQty(item.unit); }
       save(false); $('#sheet').innerHTML = draw(); mount(); render();
     });
-    $('#ePrice').onclick = () => openExternal(cenotekaUrl(item.name));
+    $('#ePrice').onclick = () => { commit(); priceSheet(item, () => editItem(item)); };
     $('#eDel').onclick = () => { closeSheet(); deleteItem(item); };
     $('#eSave').onclick = () => { commit(); closeSheet(); render(); };
   };
@@ -1022,6 +1023,7 @@ $('#view').addEventListener('click', async (e) => {
       const L = { id: uid(), name: n.trim(), items: [] }; S.lists.push(L); S.activeList = L.id; save(false); return render();
     }
     case 'share': return shareList();
+    case 'prices': return compareSheet();
     case 'paste-import': return pasteImport();
     case 'clear-bought': {
       const L = curList(), prev = L.items.slice();

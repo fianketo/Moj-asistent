@@ -688,3 +688,21 @@ h2 { font-size: 14px; font-weight: 750; letter-spacing: .02em; text-transform: n
 .rl-row.rl-done .rl-check { background: var(--accent); border-color: var(--accent); border-radius: 50%; }
 .rl-more { all: unset; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--accent); padding: 8px 2px 4px; }
 .t-rem.empty { grid-column: 1 / -1; grid-row: auto; min-height: 0; }
+/* cene iz zvaničnih cenovnika */
+.pr-wrap h3 { margin-bottom: 8px; }
+.pr-card { background: var(--card2); border-radius: 18px; padding: 12px; margin: 8px 0; display: flex; flex-direction: column; gap: 8px; border: 2px solid transparent; }
+.pr-card.on { border-color: var(--accent); background: var(--accent-soft); }
+.pr-top b { font-size: 15px; font-weight: 750; display: block; line-height: 1.25; }
+.pr-top small { color: var(--muted); font-size: 12.5px; }
+.pr-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pr-chips span { background: var(--card); border-radius: 10px; padding: 5px 9px; font-size: 13px; display: flex; flex-direction: column; line-height: 1.2; }
+.pr-chips span b { font-variant-numeric: tabular-nums; }
+.pr-chips span.min { background: var(--gc); color: var(--on-gc); }
+.pr-chips span i { font-style: normal; font-size: 11px; color: var(--danger); font-weight: 700; }
+.pr-card .btn { align-self: flex-start; }
+.cmp-list { display: flex; flex-direction: column; gap: 6px; }
+.cmp-row { display: flex; align-items: center; gap: 10px; background: var(--card2); border-radius: 14px; padding: 10px 12px; }
+.cmp-row.best { background: var(--gc); color: var(--on-gc); }
+.cmp-n { width: 24px; height: 24px; border-radius: 50%; background: var(--card); display: grid; place-items: center; font-size: 12px; font-weight: 800; color: var(--text); }
+.cmp-sum { font-size: 17px; font-variant-numeric: tabular-nums; }
+.it-price { display: block; font-size: 12px; color: var(--ok); font-weight: 600; margin-top: 1px; }

@@ -44,12 +44,17 @@ for key, url, fmt, label in CHAINS:
     hdr = [h.strip().upper() for h in rows[0]]
     rows = [r for r in rows[1:] if len(r) >= 14]
     cur = [r for r in rows if 'VA' in r[14].upper() and 'ECI' in r[14].upper()] if len(hdr) > 14 else rows
+    if len(cur) < 1000: cur = rows  # npr. Lilly: važeći cenovnik ima samo izmene – uzmi i mesečni presek
     if fmt: cur = [r for r in cur if r[6].strip() == fmt]
     elif cur:  # jedan format: najčešći (npr. jedna prodavnica Lilly)
         top = collections.Counter(r[6].strip() for r in cur).most_common(1)[0][0]; cur = [r for r in cur if r[6].strip() == top]
     if not cur: report.append(f'{label}: nema važećeg cenovnika'); continue
+    # poslednja cena za svaki proizvod (važeći cenovnik sadrži najnoviji datum)
     last = max((dt(r[7]) for r in cur if dt(r[7])), default=None)
-    cur = [r for r in cur if dt(r[7]) == last]
+    byp = {}
+    for r in sorted(cur, key=lambda r: dt(r[7]) or datetime.date.min):
+        byp[(r[4].strip(), r[2].strip())] = r
+    cur = list(byp.values())
     n = 0
     for r in cur:
         name, brand, ean, unit = r[2].strip(), r[3].strip(), re.sub(r'\D', '', r[4]), r[5].strip().lower()
