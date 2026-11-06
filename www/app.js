@@ -368,7 +368,8 @@ function renderShopping() {
   let html = `<div class="shop-head">
       <button class="list-switch" data-act="list-switch"><span>${esc(L.name)}</span><span class="caret">▾</span></button>
       <div class="grow"></div>
-      ${total ? '<button class="iconbtn" data-act="prices" title="Uporedi cene">💰</button><button class="iconbtn" data-act="share" title="Pošalji listu">📤</button>' : ''}
+      <button class="iconbtn" data-act="cheapest" title="Gde je najjeftinije">🏷️</button>
+      ${total ? '<button class="iconbtn" data-act="prices" title="Cene za moju listu">💰</button><button class="iconbtn" data-act="share" title="Pošalji listu">📤</button>' : ''}
       <button class="iconbtn" data-act="list-menu" title="Još">⋯</button>
     </div>
     ${total ? `<div class="progress-row"><span>${open.length ? `Ostalo <b>${open.length}</b> · u korpi ${bought.length} od ${total}` : '🎉 Sve je u korpi!'}</span></div>
@@ -1024,6 +1025,7 @@ $('#view').addEventListener('click', async (e) => {
     }
     case 'share': return shareList();
     case 'prices': return compareSheet();
+    case 'cheapest': return cheapestSheet();
     case 'paste-import': return pasteImport();
     case 'clear-bought': {
       const L = curList(), prev = L.items.slice();

@@ -706,3 +706,8 @@ h2 { font-size: 14px; font-weight: 750; letter-spacing: .02em; text-transform: n
 .cmp-n { width: 24px; height: 24px; border-radius: 50%; background: var(--card); display: grid; place-items: center; font-size: 12px; font-weight: 800; color: var(--text); }
 .cmp-sum { font-size: 17px; font-variant-numeric: tabular-nums; }
 .it-price { display: block; font-size: 12px; color: var(--ok); font-weight: 600; margin-top: 1px; }
+.fx-row { margin: 6px 0 0; }
+.fx-row > small { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin: 0 2px 2px; }
+.fx-row .chips { padding-bottom: 4px; }
+.fx-sort { display: flex; align-items: center; gap: 6px; margin: 10px 0 2px; font-size: 13px; color: var(--muted); font-weight: 600; }
+.pr-chips span em { font-style: normal; font-size: 11px; opacity: .75; }
