@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Vazduh (SEPA, satni neverifikovani podaci) i polen (SEPA Polen API) za Novi Sad → okolina.json."""
-import json, urllib.request, csv, io, sys, datetime as D, math
+import json, urllib.request, urllib.parse, csv, io, sys, datetime as D, math
 UA = {'User-Agent': 'moj-asistent/1.0 (licna aplikacija)'}
 def get(url, timeout=180):
     with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=timeout) as r: return r.read()
@@ -15,19 +15,15 @@ def level(code, v):
 try:
     st = json.loads(get('https://opendata.kosava.cloud/api/v1/stations'))
     ns = {s['station_id']: s for s in st if (s.get('municipality') or '').strip().lower() == 'novi sad' and s.get('active', True)}
-    bulk = json.loads(get('https://opendata.kosava.cloud/api/v1/bulk'))
-    url = next(r['download_url'] for r in bulk['resources'] if r['name'].endswith('last30days.csv'))
-    txt = get(url, 300).decode('utf-8-sig', 'replace')
     since = now - D.timedelta(hours=30)
     rows = {}
-    for r in csv.DictReader(io.StringIO(txt)):
-        if r.get('station_id') not in ns: continue
-        t = D.datetime.fromisoformat(r['time_end_utc'].replace('Z', '+00:00'))
-        if t < since: continue
-        code = r['parameter_code'].replace('PM2,5', 'PM2.5').upper().replace('PM25', 'PM2.5')
-        try: v = float(r['value'])
-        except Exception: continue
-        rows.setdefault(r['station_id'], {}).setdefault(code, []).append((t, v))
+    for sid in ns:  # satna merenja za poslednjih 30 h (API se osvežava svakog sata)
+        q = urllib.parse.urlencode({'station_id': sid, 'from': since.strftime('%Y-%m-%dT%H:%M:%SZ')})
+        for r in json.loads(get('https://opendata.kosava.cloud/api/v1/observations?' + q)).get('data', []):
+            t = D.datetime.fromisoformat(r['time_end_utc'].replace('Z', '+00:00'))
+            if t < since or r.get('value') is None: continue
+            code = r['parameter_code'].replace('PM2,5', 'PM2.5').upper().replace('PM25', 'PM2.5')
+            rows.setdefault(sid, {}).setdefault(code, []).append((t, float(r['value'])))
     stations = []
     for sid, params in rows.items():
         s = {'name': ns[sid]['station_name'], 'lat': ns[sid]['latitude'], 'lng': ns[sid]['longitude'], 'values': {}}
