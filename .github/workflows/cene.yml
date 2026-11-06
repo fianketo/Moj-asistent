@@ -1,0 +1,25 @@
+name: Cene iz zvaničnih cenovnika (data.gov.rs)
+
+on:
+  push:
+    branches: [claude/personal-assistant-app-3yx3up]
+    paths: ['.github/workflows/cene.yml', 'data/cene/*.py']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Istraži skupove podataka sa cenovnicima
+        run: python3 data/cene/explore.py | tee data/cene/explore.txt
+      - name: Sačuvaj u granu
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/cene
+          git commit -m "Podaci: spisak zvaničnih cenovnika sa data.gov.rs" || exit 0
+          git pull --rebase -q && git push
