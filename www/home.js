@@ -53,15 +53,15 @@ function renderHome() {
     const dz = detect.ns ? zoneById('ns-' + detect.ns.zone) : detect.spot ? zoneById(detect.spot.zone) : null;
     parkTile = `<button class="tile t-park idle" data-home="parking">
       <small>${ico('park')} Parking</small>
-      <div class="t-big">${dz ? `Ovde je ${esc(dz.name)}` : 'Nisi parkiran'}</div>
-      <div class="t-row"><span>${P.auto ? 'Automatsko prepoznavanje uključeno' : 'Dodirni kad parkiraš'}</span><span class="t-cta" data-home="park-start">Parkirao sam</span></div></button>`;
+      <div class="t-big">${dz ? `Ovde je ${esc(dz.name)}` : 'Nema plaćenog parkinga'}</div>
+      <div class="t-row"><span>${dz ? 'Nemaš plaćen parking u ovoj zoni' : P.auto ? 'Javiću ti kad parkiraš u zoni naplate' : 'Dodirni kad parkiraš u zoni naplate'}</span><span class="t-cta" data-home="park-start">Plati parking</span></div></button>`;
   }
 
   const remTile = late.length || next
     ? `<button class="tile t-rem ${late.length ? 'late' : ''}" data-home="podsetnici">
         <small>${ico('alarm')} ${late.length ? 'Kasni' : dayDiff(next.d) === 0 ? 'Sledeće danas' : 'Sledeće'}</small>
         <div><div class="t-time">${late.length ? hm(late[0].d) : dayDiff(next.d) === 0 ? hm(next.d) : esc(fmtWhen(next.d).split(' ')[0])}</div>
-        <b class="t-title">${esc((late[0] || next).r.title)}</b></div>
+        <b class="t-title">${esc((late[0] || next).r.title)}</b>${!late.length && dayDiff(next.d) !== 0 ? `<small style="margin-top:4px">${esc(fmtWhen(next.d))}</small>` : ''}</div>
         <small class="t-foot">${late.length > 1 ? `+${late.length - 1} kasni` : todayCnt > 1 ? `+${todayCnt - 1} danas` : late.length && todayCnt ? `${todayCnt} danas` : ' '}</small></button>`
     : `<button class="tile t-rem empty" data-home="new-rem"><small>${ico('alarm')} Podsetnici</small><b class="t-title">Danas nema obaveza</b><small class="t-foot">+ Dodaj podsetnik</small></button>`;
 
@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => $('#view').addEventListener(
   const a = b.dataset.home;
   if (a === 'parking' || a === 'podsetnici' || a === 'kupovina') return setTab(a);
   if (a === 'new-rem') return editReminder();
-  if (a === 'park-start') { setTab('parking'); return startParking(); }
+  if (a === 'park-start') return setTab('parking'); // korisnik bira zonu i trajanje na ekranu Parking
   if (a === 'park-extend') { setTab('parking'); return extendParking(); }
   if (a === 'recipe') return openRecipe(b.dataset.id);
   if (a === 'treninzi') { hsub = 'treninzi'; return setTab('zdravlje'); }

@@ -846,7 +846,7 @@ function renderParking() {
       <label class="field">Napomena (sprat, ulica…)<input class="input" id="pNote" placeholder="(nije obavezno)"></label>
       <label class="switch"><input type="checkbox" id="pSms" ${zone.sms ? 'checked' : ''}> Otvori SMS za plaćanje</label>
       <label class="switch"><input type="checkbox" id="pLoc" checked> Zapamti gde sam parkirao</label>
-      <button class="btn primary block" style="margin-top:16px" data-act="park-start">🅿️ Parkirao sam</button>
+      <button class="btn primary block" style="margin-top:16px" data-act="park-start">🅿️ Plati parking</button>
     </div>
     <p style="font-size:13px;color:var(--muted)">Zone: ${esc(CITIES[P.city] ? CITIES[P.city].name : '')} – proveri SMS broj na tabli zone. Kad platiš ovde sa uključenom lokacijom, aplikacija zapamti zonu za ovo mesto i sledeći put je sama prepozna${P.auto ? ' i podseti te da platiš' : ''}. Grad i automatski podsetnik menjaš u Podešavanjima.</p>`;
   $('#pZones').addEventListener('click', (e) => {
