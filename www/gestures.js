@@ -15,51 +15,86 @@
   };
   const visible = (el) => el && el.offsetParent !== null;
 
-  function switchSeg(root, dir) {
+  // šta se menja prevlačenjem: tabovi u prozoru/na ekranu, ili ekrani donjeg menija
+  function target(inSheet) {
+    const root = document.getElementById(inSheet ? 'sheet' : 'view');
     const seg = [...root.querySelectorAll('.seg')].find(visible);
-    if (!seg) return false;
-    const btns = [...seg.querySelectorAll('button')].filter(visible);
-    const i = btns.findIndex((b) => b.classList.contains('on'));
-    const n = btns[i + dir];
-    if (!n) { nudge(root, dir); return true; }
-    try { navigator.vibrate && navigator.vibrate(6); } catch { /* */ }
-    n.click(); slideIn(root === document.getElementById('sheet') ? root : document.getElementById('view'), dir);
-    return true;
-  }
-  function switchMain(dir) {
+    if (seg) {
+      const btns = [...seg.querySelectorAll('button')].filter(visible), i = btns.findIndex((b) => b.classList.contains('on'));
+      return { root, go: (dir) => { const n = btns[i + dir]; if (!n) return false; n.click(); return true; }, has: (dir) => !!btns[i + dir] };
+    }
+    if (inSheet) return null;
     const i = MAIN_TABS.indexOf(tab);
-    if (i < 0) return;
-    const n = MAIN_TABS[i + dir];
-    if (!n) return nudge(document.getElementById('view'), dir);
-    try { navigator.vibrate && navigator.vibrate(6); } catch { /* */ }
-    setTab(n); slideIn(document.getElementById('view'), dir);
+    if (i < 0) return null;
+    return { root, go: (dir) => { const n = MAIN_TABS[i + dir]; if (!n) return false; setTab(n); return true; }, has: (dir) => !!MAIN_TABS[i + dir] };
   }
-  function slideIn(el, dir) {
-    if (!el || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    el.animate([{ transform: `translateX(${dir * 36}px)`, opacity: 0.4 }, { transform: 'none', opacity: 1 }], { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)' });
-  }
-  function nudge(el, dir) { // kraj liste tabova – mali „odskok“
-    if (!el) return;
-    el.animate([{ transform: 'none' }, { transform: `translateX(${-dir * 14}px)` }, { transform: 'none' }], { duration: 220, easing: 'ease-out' });
+  // delovi koji se pomeraju (fiksirani elementi – traka za unos u Kupovini – ostaju na mestu)
+  const parts = (root) => {
+    // u prozoru: pomera se sadržaj ispod naslova i tabova (naslov, tabovi i dugmad na dnu stoje)
+    if (root.id === 'sheet' && root.children.length === 1) root = root.firstElementChild;
+    return [...root.children].filter((c) => { const p = getComputedStyle(c).position; return p !== 'fixed' && p !== 'sticky' && !c.matches('h3, .seg, .foot, .sheet-h'); });
+  };
+  const setX = (els, x, o) => els.forEach((el) => { el.style.transform = x ? `translate3d(${x}px,0,0)` : ''; el.style.opacity = o == null ? '' : o; el.style.willChange = x ? 'transform' : ''; });
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const EASE = 'cubic-bezier(.22,.9,.24,1)';
+  function animate(els, from, to, ms) {
+    return Promise.all(els.map((el) => el.animate([from, to], { duration: ms, easing: EASE, fill: 'forwards' }).finished.then((a) => a))).catch(() => {});
   }
 
-  // ---------------- vodoravno prevlačenje
-  let sx = 0, sy = 0, st = 0, skip = false, inSheet = false;
+  // ---------------- vodoravno prevlačenje: sadržaj prati prst
+  const H = { on: false };
   document.addEventListener('touchstart', (e) => {
-    if (e.touches.length !== 1) { skip = true; return; }
-    const t = e.touches[0]; sx = t.clientX; sy = t.clientY; st = Date.now();
-    const sheet = document.getElementById('sheet');
-    inSheet = !document.getElementById('sheetBg').hidden;
-    skip = hScroller(e.target, inSheet ? sheet : document.body) || (inSheet && !sheet.contains(e.target)) || sx < 18 || sx > innerWidth - 18; // ivice ekrana pripadaju sistemu
+    H.on = false; H.lock = null;
+    if (e.touches.length !== 1 || H.busy) return;
+    const t = e.touches[0], inSheet = !document.getElementById('sheetBg').hidden, sheet = document.getElementById('sheet');
+    if (inSheet && !sheet.contains(e.target)) return;
+    if (t.clientX < 18 || t.clientX > innerWidth - 18) return; // ivice ekrana: sistemski gest „nazad“
+    if (hScroller(e.target, inSheet ? sheet : document.body)) return;
+    const tg = target(inSheet); if (!tg) return;
+    Object.assign(H, { on: true, inSheet, tg, x0: t.clientX, y0: t.clientY, t0: Date.now(), dx: 0, els: null });
   }, { passive: true });
-  document.addEventListener('touchend', (e) => {
-    if (skip || drag.active) return;
-    const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy, dt = Date.now() - st;
-    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.6 || dt > 700) return;
-    const dir = dx < 0 ? 1 : -1; // prst ulevo → sledeći tab
-    if (inSheet) { switchSeg(document.getElementById('sheet'), dir); return; }
-    if (!switchSeg(document.getElementById('view'), dir)) switchMain(dir);
-  }, { passive: true });
+  document.addEventListener('touchmove', (e) => {
+    if (!H.on || drag.active) return;
+    const t = e.touches[0], dx = t.clientX - H.x0, dy = t.clientY - H.y0;
+    if (!H.lock) {
+      if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+      H.lock = Math.abs(dx) > Math.abs(dy) * 1.3 ? 'x' : 'y';
+      if (H.lock === 'y') { H.on = false; return; }
+      H.els = parts(H.tg.root);
+      H.els.forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
+    }
+    if (e.cancelable) e.preventDefault(); // vodoravno: ne skroluj stranu
+    const dir = dx < 0 ? 1 : -1;
+    // na kraju liste tabova – otpor (guma)
+    H.dx = H.tg.has(dir) ? dx : dx * 0.28;
+    setX(H.els, H.dx, 1 - Math.min(0.35, Math.abs(H.dx) / innerWidth * 0.6));
+  }, { passive: false });
+  const hEnd = async () => {
+    if (!H.on || H.lock !== 'x') { H.on = false; return; }
+    H.on = false;
+    const els = H.els, dx = H.dx, dir = dx < 0 ? 1 : -1, v = Math.abs(dx) / Math.max(1, Date.now() - H.t0);
+    const cur = { transform: `translate3d(${dx}px,0,0)`, opacity: els[0] ? els[0].style.opacity || 1 : 1 };
+    setX(els, 0);
+    if (!H.tg.has(dir) || (Math.abs(dx) < innerWidth * 0.22 && v < 0.45)) { // vrati nazad
+      await animate(els, cur, { transform: 'translate3d(0,0,0)', opacity: 1 }, 260);
+      els.forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
+      return;
+    }
+    H.busy = true;
+    const W = innerWidth;
+    await animate(els, cur, { transform: `translate3d(${-dir * W * 0.45}px,0,0)`, opacity: 0 }, reduce() ? 1 : 140);
+    try { navigator.vibrate && navigator.vibrate(6); } catch { /* */ }
+    H.tg.go(dir);
+    const root = H.tg.root, fresh = parts(root);
+    fresh.forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
+    root.style.minHeight = '';
+    if (!reduce()) await animate(fresh, { transform: `translate3d(${dir * W * 0.35}px,0,0)`, opacity: 0 }, { transform: 'translate3d(0,0,0)', opacity: 1 }, 260);
+    fresh.forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
+    els.forEach((el) => el.isConnected && el.getAnimations().forEach((a) => a.cancel()));
+    H.busy = false;
+  };
+  document.addEventListener('touchend', hEnd, { passive: true });
+  document.addEventListener('touchcancel', hEnd, { passive: true });
 
   // ---------------- povlačenje prozora nadole = zatvaranje
   const drag = { active: false, y0: 0, t0: 0, dy: 0 };
@@ -75,6 +110,7 @@
     sheet.addEventListener('touchmove', (e) => {
       if (!drag.can) return;
       const dy = e.touches[0].clientY - drag.y0;
+      if (H.lock === 'x') return; // već prevlačiš vodoravno
       if (!drag.active) {
         if (dy < 8) { if (dy < -4) drag.can = false; return; } // gore = obično skrolovanje
         if (hScroller(e.target, sheet) && Math.abs(dy) < 20) return;
