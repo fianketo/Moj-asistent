@@ -1,0 +1,24 @@
+name: Vazduh i polen (Novi Sad)
+on:
+  push:
+    branches: [claude/personal-assistant-app-3yx3up]
+    paths: ['.github/workflows/okolina.yml', 'data/okolina/build.py']
+  schedule:
+    - cron: '17 * * * *'   # svaki sat
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: claude/personal-assistant-app-3yx3up }
+      - run: mkdir -p /tmp/out && python3 data/okolina/build.py /tmp/out/okolina.json | tee /tmp/out/izvestaj.txt
+      - name: Objavi na granu okolina-data
+        run: |
+          cd /tmp/out && git init -q -b okolina-data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add . && git commit -q -m "Okolina $(date -u +%FT%H:%M)"
+          git push -f -q "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" okolina-data
