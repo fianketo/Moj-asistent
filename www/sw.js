@@ -1,5 +1,5 @@
 // Service worker (web verzija): instalacija, rad bez interneta i klik na obaveštenje.
-const CACHE = 'asistent-v22';
+const CACHE = 'asistent-v23';
 const SHELL = ['./', './index.html', './style.css', './home.js', './app.js', './fonts/roboto-flex-latin.woff2', './fonts/roboto-flex-latin-ext.woff2', './catalog.js', './health.js', './recipes2.js', './recipes3.js', './steps.js', './nutrition.js', './safety.js', './reviews.js', './exercises-pro.js', './health-ui.js', './zones-ns.json', './vendor/capacitor.js', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {

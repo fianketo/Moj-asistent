@@ -85,13 +85,23 @@ function renderHome() {
       <div class="t-row"><span>${dz ? 'Nemaš plaćen parking u ovoj zoni' : P.auto ? 'Javiću ti kad parkiraš u zoni naplate' : 'Dodirni kad parkiraš u zoni naplate'}</span><span class="t-cta" data-home="park-start">Plati parking</span></div></button>`;
   }
 
-  const remTile = late.length || next
-    ? `<button class="tile t-rem ${late.length ? 'late' : ''}" data-home="podsetnici">
-        <small>${ico('alarm')} ${late.length ? 'Kasni' : dayDiff(next.d) === 0 ? 'Sledeće danas' : 'Sledeće'}</small>
-        <div><div class="t-time">${late.length ? hm(late[0].d) : dayDiff(next.d) === 0 ? hm(next.d) : esc(fmtWhen(next.d).split(' ')[0])}</div>
-        <b class="t-title">${esc((late[0] || next).r.title)}</b>${!late.length && dayDiff(next.d) !== 0 ? `<small style="margin-top:4px">${esc(fmtWhen(next.d))}</small>` : ''}</div>
-        <small class="t-foot">${late.length > 1 ? `+${late.length - 1} kasni` : todayCnt > 1 ? `+${todayCnt - 1} danas` : late.length && todayCnt ? `${todayCnt} danas` : ' '}</small></button>`
-    : `<button class="tile t-rem empty" data-home="new-rem"><small>${ico('alarm')} Podsetnici</small><b class="t-title">Danas nema obaveza</b><small class="t-foot">+ Dodaj podsetnik</small></button>`;
+  // podsetnici: sve što kasni + svi za danas; ako danas nema ničeg, prvi sledeći dan sa podsetnicima
+  const todayUp = upcoming.filter((x) => dayDiff(x.d) === 0);
+  const dayUp = todayUp.length || late.length ? todayUp : next ? upcoming.filter((x) => dayDiff(x.d) === dayDiff(next.d)) : [];
+  const dd = dayUp.length ? dayDiff(dayUp[0].d) : 0;
+  const dayLbl = late.length || dd === 0 ? 'Danas' : dd === 1 ? 'Sutra' : `${WD[dayUp[0].d.getDay()]}, ${dayUp[0].d.getDate()}. ${MONTHS[dayUp[0].d.getMonth()]}`;
+  const items = [...late, ...dayUp], MAXR = 6;
+  const remRow = (x, isLate) => `<div class="rl-row ${isLate ? 'late' : ''}" data-home="rem-edit" data-id="${x.r.id}">
+      <button class="rl-check" data-home="rem-done" data-id="${x.r.id}" aria-label="Završeno"></button>
+      <span class="rl-time">${isLate && dayDiff(x.d) !== 0 ? esc(fmtWhen(x.d).replace(/ u /, ' ')) : hm(x.d)}</span>
+      <span class="rl-title">${esc(x.r.title)}${x.r.repeat ? ' <i>🔁</i>' : ''}</span></div>`;
+  const remTile = items.length
+    ? `<div class="tile t-rem-list ${late.length ? 'has-late' : ''}">
+        <div class="rl-head"><small>${ico('alarm')} ${dayLbl}${late.length ? ` · <b class="rl-late">${late.length} kasni</b>` : ''}</small>
+          <span class="rl-count">${items.length}</span><button class="rl-add" data-home="new-rem" aria-label="Dodaj podsetnik">+</button></div>
+        ${late.slice(0, MAXR).map((x) => remRow(x, true)).join('')}${dayUp.slice(0, Math.max(0, MAXR - late.length)).map((x) => remRow(x, false)).join('')}
+        ${items.length > MAXR ? `<button class="rl-more" data-home="podsetnici">+${items.length - MAXR} još · svi podsetnici ›</button>` : ''}</div>`
+    : `<button class="tile t-rem empty" data-home="new-rem"><small>${ico('alarm')} Podsetnici</small><b class="t-title">Nema zakazanih obaveza</b><small class="t-foot">+ Dodaj podsetnik</small></button>`;
 
   const shopTile = `<button class="tile t-shop" data-home="kupovina"><small>${ico('cart')} ${esc(L.name)}</small>
       <div class="t-num">${tot ? `${got}<span>/${tot}</span>` : '0'}</div>
@@ -130,6 +140,13 @@ document.addEventListener('DOMContentLoaded', () => $('#view').addEventListener(
   const a = b.dataset.home;
   if (a === 'parking' || a === 'podsetnici' || a === 'kupovina') return setTab(a);
   if (a === 'new-rem') return editReminder();
+  if (a === 'rem-edit') return editReminder(S.reminders.find((r) => r.id === b.dataset.id));
+  if (a === 'rem-done') {
+    const r = S.reminders.find((x) => x.id === b.dataset.id); if (!r) return;
+    const row = b.closest('.rl-row'); if (row) row.classList.add('rl-done');
+    completeReminder(r); save(); haptic(15);
+    return setTimeout(renderHome, 260);
+  }
   if (a === 'park-start') return setTab('parking');
   if (a === 'park-map') return openExternal(`https://www.google.com/maps/search/?api=1&query=${b.dataset.ll}`); // korisnik bira zonu i trajanje na ekranu Parking
   if (a === 'park-extend') { setTab('parking'); return extendParking(); }

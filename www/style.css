@@ -666,3 +666,25 @@ h2 { font-size: 14px; font-weight: 750; letter-spacing: .02em; text-transform: n
 .t-park.idle.warn { background: var(--amber); color: var(--on-amber); }
 .t-park.idle.warn small { color: color-mix(in srgb, var(--on-amber) 70%, transparent); }
 .t-park.idle.warn .t-cta { background: var(--on-amber); color: var(--amber); }
+/* podsetnici na početnom ekranu – lista za ceo dan */
+.t-rem-list { grid-column: 1 / -1; cursor: default; gap: 2px; padding: 12px 12px 8px 14px; }
+.t-rem-list.has-late { box-shadow: inset 0 0 0 2px var(--danger-soft); }
+.rl-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.rl-head small { flex: 1; font-size: 13.5px !important; color: var(--text) !important; font-weight: 800 !important; }
+.rl-late { color: var(--danger); font-weight: 800; }
+.rl-count { min-width: 26px; height: 26px; border-radius: 13px; background: var(--accent-soft); color: var(--on-soft); font-size: 13px; font-weight: 800; display: grid; place-items: center; padding: 0 7px; }
+.rl-add { width: 34px; height: 34px; border-radius: 12px; border: 0; background: var(--pc); color: var(--on-pc); font-size: 22px; line-height: 1; cursor: pointer; font-family: inherit; transition: border-radius .3s var(--ease), transform .15s var(--ease); }
+.rl-add:active { transform: scale(.9); border-radius: 17px; }
+.rl-row { display: flex; align-items: center; gap: 10px; padding: 9px 2px; border-top: 1px solid var(--line); cursor: pointer; transition: opacity .25s, transform .25s; }
+.rl-row:first-of-type { border-top: 0; }
+.rl-check { flex: none; width: 24px; height: 24px; border-radius: 8px; border: 2px solid var(--muted); background: none; padding: 0; cursor: pointer; transition: border-radius .3s var(--ease), background .2s; }
+.rl-check:active { transform: scale(.85); }
+.rl-time { flex: none; min-width: 48px; font-weight: 900; font-stretch: 115%; font-size: 16px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.rl-title { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rl-title i { font-style: normal; font-size: 12px; }
+.rl-row.late .rl-time { color: var(--danger); }
+.rl-row.late .rl-check { border-color: var(--danger); }
+.rl-row.rl-done { opacity: .35; transform: translateX(12px); }
+.rl-row.rl-done .rl-check { background: var(--accent); border-color: var(--accent); border-radius: 50%; }
+.rl-more { all: unset; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--accent); padding: 8px 2px 4px; }
+.t-rem.empty { grid-column: 1 / -1; grid-row: auto; min-height: 0; }
