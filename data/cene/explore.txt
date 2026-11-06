@@ -1,0 +1,80 @@
+79 skupova
+Aksa d.o.o                                    | Cenovnici Aksa i Aksa Premium                                          | 330 res | 2026-10-23T13:14:18.655000+00:00
+Aksa d.o.o                                    | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-11-06T08:08:34.371000+00:00
+Aman d.o.o.                                   | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T08:05:10.808000+00:00
+Arteks D.O.O.                                 | Cenovnik 28.04.2026.                                                   | 5 res | 2026-10-16T13:11:32.114000+00:00
+BB Trade doo                                  | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:43:51.279000+00:00
+BRICO S DOO                                   | Brico S DOO  Cenovnik                                                  | 1 res | 2026-11-06T03:29:55.987000+00:00
+Beltorg DOO                                   | Ценовници производа према Правилнику о условима, садржају и начину обј | 2 res | 2026-10-23T13:29:44.496000+00:00
+CASH & CARRY PLUS DOO KULA                    | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:49:02.688000+00:00
+DELHAIZE SERBIA DOO BEOGRAD                   | Ценовници производа према Правилнику о условима, садржају и начину обј | 2 res | 2026-10-22T07:48:38.996000+00:00
+DOO TISA UGOSTITELJSKO PREDUZEĆE SENTA        | A la carte Cenovnik                                                    | 1 res | 2026-10-16T13:20:35.879000+00:00
+DOO TISA UGOSTITELJSKO PREDUZEĆE SENTA        | Cenovnik Pića                                                          | 1 res | 2026-11-06T08:50:54.557000+00:00
+Domaca trgovina doo                           | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-11-06T11:15:21.833000+00:00
+Društvo za proizvodnju promet i usluge "Vum"  | Ценовници производа према Правилнику о условима, садржају и начину обј | 3 res | 2026-11-03T14:08:20.278000+00:00
+EUROPROM DOO                                  | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:42:05.786000+00:00
+Fitco doo                                     | Cenovnici proizvoda po Uredbi o obaveznoj evidenciji i dostavljanju ce | 1 res | 2026-10-23T13:13:19.979000+00:00
+Fortuna Market DOO                            | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T08:00:44.172000+00:00
+Gomex DOO                                     | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:47:22.309000+00:00
+IDEA MARKETI doo                              | Ценовници производа према Правилнику о условима, садржају и начину обј | 2 res | 2026-10-22T07:44:15.911000+00:00
+Industrija mesa Matijević                     | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T08:02:46.648000+00:00
+Konovo doo                                    | Cenovnik u digitalnom obliku — Konovo d.o.o.                           | 1 res | 2026-11-06T11:15:06.970000+00:00
+Laguna d.o.o.                                 | Cenovnik - Laguna d.o.o.                                               | 1 res | 2026-11-06T11:00:36.926000+00:00
+Leon Conditors DOO                            |  Ценовници производа према Правилнику о условима, садржају и начину об | 1 res | 2026-10-22T07:44:45.359000+00:00
+Librum Market                                 | Librum Market — cenovnik (mašinski čitljiv)                            | 1 res | 2026-10-21T08:05:35.640000+00:00
+Lidl                                          | Ценовници производа према Правилнику о условима, садржају и начину обј | 2 res | 2026-10-22T08:17:27.760000+00:00
+Lilly Drogerie                                | Aktivne cene Lilly Drogerie DOO                                        | 1 res | 2026-10-19T07:51:23.368000+00:00
+METRO Cash&Carry doo Beograd                  | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-11-06T06:19:30.607000+00:00
+Medius d.o.o. Nova Pazova                     | Ценовници производа према Правилнику о условима, садржају и начину обј | 2 res | 2026-11-05T10:39:30.216000+00:00
+Metalac Proleter društvo sa ograničenom odgov | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:49:42.708000+00:00
+Moto Dane Centar                              | Cenovnik.csv                                                           | 1 res | 2026-10-21T08:18:57.894000+00:00
+NEMANJA ERDELJAN PR TRGOVINA NA MALO POSREDST | Cenovnik                                                               | 1 res | 2026-10-21T08:34:14.680000+00:00
+NEMANJA NOVAKOVIĆ PR LUPUS 1204               | Cenovnici proizvoda po Uredbi o obaveznoj evidenciji i dostavljanju ce | 2 res | 2026-10-21T08:29:14.069000+00:00
+Nemanja Zupanc PR veterinarska apoteka Pseća  | Cenovnik                                                               | 1 res | 2026-10-16T13:13:10.533000+00:00
+Okov International                            | Cenovnik proizvoda po Uredbi o obaveznoj evidenciji i dostavljanju cen | 1 res | 2026-11-01T06:20:51.756000+00:00
+PREDUZEĆE ZA TRGOVINU I USLUGE URADI SAM DOO  | Cenovnik                                                               | 1 res | 2026-10-16T13:24:22.052000+00:00
+PREDUZEĆE ZA TRGOVINU NA VELIKO I MALO DOO LA | Cenovnik                                                               | 1 res | 2026-10-16T13:13:28.043000+00:00
+PRIVREDNO DRUŠTVO ZA TRGOVINU, POSREDOVANJE,  | Cenovnik proizvoda po Uredbi o obaveznoj evidenciji i dostavljanju cen | 1 res | 2026-11-05T15:19:55.158000+00:00
+PRIVREDNO DRUŠTVO ZA TRGOVINU, POSREDOVANJE,  | Cenovnik proizvoda po Uredbi o obaveznoj evidenciji i dostavljanju cen | 1 res | 2026-11-06T04:01:33.573000+00:00
+PRIVREDNO DRUŠTVO ZA TRGOVINU, POSREDOVANJE,  | Cenovnik proizvoda po Uredbi o obaveznoj evidenciji i dostavljanju cen | 1 res | 2026-11-05T13:39:05.981000+00:00
+PRIVREDNO DRUŠTVO ZA TRGOVINU, POSREDOVANJE,  | Cenovnik proizvoda po Uredbi o obaveznoj evidenciji i dostavljanju cen | 1 res | 2026-11-06T09:31:43.162000+00:00
+PRIVREDNO DRUŠTVO ZA TRGOVINU, POSREDOVANJE,  | Cenovnik proizvoda po Uredbi o obaveznoj evidenciji i dostavljanju cen | 1 res | 2026-11-06T06:46:11.075000+00:00
+PRIVREDNO DRUŠTVO ZA TRGOVINU, POSREDOVANJE,  | Cenovnik proizvoda po Uredbi o obaveznoj evidenciji i dostavljanju cen | 1 res | 2026-11-06T09:33:52.515000+00:00
+PRIVREDNO DRUŠTVO ZA TRGOVINU, POSREDOVANJE,  | Cenovnik proizvoda po Uredbi o obaveznoj evidenciji i dostavljanju cen | 1 res | 2026-11-06T08:39:40.384000+00:00
+PWW DOO NIŠ                                   | Ценовник услуга PWW DOO NIŠ                                            | 3 res | 2026-10-16T13:22:06.693000+00:00
+PWW Jagodina doo Jagodina                     | Ценовник услуга PWW Jagodina doo                                       | 1 res | 2026-10-16T13:22:13.444000+00:00
+PWW Leskovac doo Leskovac                     | Ценовник услуга PWW Leskovac doo                                       | 5 res | 2026-10-16T13:22:16.257000+00:00
+Pet Shop Moja Mačkica doo                     | Cenovnici proizvoda - PET SHOP MOJA MAČKICA doo Beograd-Zvezdara       | 5 res | 2026-10-21T05:48:42.167000+00:00
+Planeta Sport                                 | Cenovnici proizvoda prema Pravilniku o uslovima, sadržaju i načinu obj | 1 res | 2026-10-21T08:34:02.729000+00:00
+Podunavlje                                    | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:54:22.183000+00:00
+Pr. Robert Nađ, trgovina preko interneta, Ame | Ametrin - cenovnik                                                     | 1 res | 2026-10-21T08:21:52.712000+00:00
+Prima Nova doo                                |  Ценовници производа према Правилнику о условима, садржају и начину об | 2 res | 2026-10-22T07:48:03.482000+00:00
+Proizvodno-trgovinsko preduzeće Euro Ša M doo | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:39:23.227000+00:00
+Qvattro Company                               | Ценовници производа према Правилнику о условима, садржају и начину обј | 2 res | 2026-10-22T08:06:39.046000+00:00
+RIČ doo Prokuplje                             | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-11-05T21:45:41.770000+00:00
+ROS PRODUKT SERVIS                            | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-11-05T10:46:23.781000+00:00
+SENTA-PROMET DOO                              | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:53:04.673000+00:00
+Soulfood doo Beograd                          | Ценовници производа према Правилнику о условима, садржају и начину обј | 2 res | 2026-10-22T07:58:33.298000+00:00
+Statovac                                      | Cenovnici - Statovac                                                   | 39 res | 2026-11-06T03:30:31.972000+00:00
+TEA BOOKS DOO                                 | Cenovnik                                                               | 1 res | 2026-10-16T13:22:18.819000+00:00
+TRGOVINSKO PREDUZEĆE MORAVA DOO,KRAGUJEVAC    | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:45:49.256000+00:00
+Tekijanka doo Tekija                          | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T08:03:19.944000+00:00
+Transkom 94                                   | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:50:33.475000+00:00
+Trnava Promet DOO Kragujevac                  | Ценовници производа према Правилнику о условима, садржају и начину обј | 2 res | 2026-10-23T13:18:41.900000+00:00
+UNIVEREXPORT EXPORT-IMPORT DOO                | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:53:24.563000+00:00
+VP DIMA                                       | Ценовници производа према Правилнику о условима, садржају и начину обј | 2 res | 2026-10-22T08:06:01.325000+00:00
+Veropoulos doo                                | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:59:47.817000+00:00
+Vladimir Bandović Preduzetnik Sliced Gifts    | Cenovnik proizvoda                                                     | 1 res | 2026-10-21T08:22:03.045000+00:00
+YUHOR D.O.O.                                  | Cenovnik proizvoda Yuhor                                               | 1 res | 2026-10-16T13:27:25.084000+00:00
+YUHOR D.O.O.                                  | Cenovnik proizvoda Yuhor                                               | 1 res | 2026-10-16T13:27:20.768000+00:00
+YUHOR D.O.O.                                  | Cenovnik proizvoda u maloprodajnim objektima Yuhor ducan               | 1 res | 2026-10-16T13:27:56.657000+00:00
+YUHOR D.O.O.                                  | Yuhor cenovnik                                                         | 1 res | 2026-10-16T13:27:53.224000+00:00
+YUHOR D.O.O.                                  | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-23T05:43:58.726000+00:00
+Yala Habibi doo                               | Cenovnik Nargila Shop                                                  | 1 res | 2026-10-16T13:13:20.515000+00:00
+dm drogerie markt                             | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:51:04.391000+00:00
+Šumadija market d.o.o.                        | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:42:47.936000+00:00
+ДРУШТВО ЗА ПРОИЗВОДЊУ ТРГОВИНУ И УСЛУГЕ ЗАМ Д | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T08:04:50.075000+00:00
+Земљорадничка задруга Трговина Трлић          | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T08:03:47.687000+00:00
+Луки комерц Д.О.О.                            | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:46:08.840000+00:00
+Микромаркет НС доо                            | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T07:43:31.086000+00:00
+Привредно друштво за промет и услуге ЧУТУРА П | Ценовници производа према Правилнику о условима, садржају и начину обј | 1 res | 2026-10-22T08:05:38.391000+00:00
