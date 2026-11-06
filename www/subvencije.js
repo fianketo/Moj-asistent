@@ -31,15 +31,15 @@ function subvTileHtml() {
   const soon = open.filter((x) => x.deadline && daysTo(x.deadline) <= 7).sort((a, b) => a.deadline.localeCompare(b.deadline))[0];
   return `<button class="tile t-subv" data-home="subv"><small>🌾 Subvencije za poljoprivrednike${fresh.length ? ` · <b class="rl-late">${fresh.length} novo</b>` : ''}</small>
     <div class="t-row" style="align-items:flex-end"><div><div class="t-num">${open.length}</div><small>${open.length === 1 ? 'otvoren poziv' : 'otvorenih poziva'}</small></div>
-    ${soon ? `<span class="subv-soon">⏳ ${esc(soon.title.slice(0, 48))}${soon.title.length > 48 ? '…' : ''} – rok za ${daysTo(soon.deadline)} d</span>` : ''}</div></button>`;
+    ${soon ? `<span class="subv-soon">⏳ ${esc(soon.title.slice(0, 48))}${soon.title.length > 48 ? '…' : ''} – ${daysTo(soon.deadline) ? 'rok za ' + daysTo(soon.deadline) + ' d' : 'rok ističe danas'}</span>` : ''}</div></button>`;
 }
 function subvItem(x) {
   const d = x.deadline && daysTo(x.deadline), open = isOpen(x);
   const kindLbl = { poziv: open ? '🟢 Otvoren poziv' : '⚪ Poziv', isplata: '💸 Isplata', rezultat: '📋 Rezultati', vest: '📰 Vest' }[x.kind];
   return `<div class="subv-card ${x.first_seen > (SV().seen || '') ? 'new' : ''}">
-    <div class="subv-meta"><span>${kindLbl}</span><span>${esc(x.src)} · ${dmy(x.date)}</span></div>
+    <div class="subv-meta"><span>${kindLbl}</span><span>${esc(x.src.replace(/^https?:\/\/(www\.)?|\/$/g, ''))} · ${dmy(x.date)}</span></div>
     <b>${esc(x.title)}</b>
-    ${x.deadline ? `<span class="subv-dl ${d < 0 ? 'past' : d <= 7 ? 'soon' : ''}">${d < 0 ? 'Rok je istekao ' : 'Rok: '}${dmy(x.deadline)}${d >= 0 ? ` (još ${d} ${d === 1 ? 'dan' : 'dana'})` : ''}</span>` : ''}
+    ${x.deadline ? `<span class="subv-dl ${d < 0 ? 'past' : d <= 7 ? 'soon' : ''}">${d < 0 ? 'Rok je istekao ' : 'Rok: '}${dmy(x.deadline)}${d > 0 ? ` (još ${d} ${d === 1 ? 'dan' : 'dana'})` : d === 0 ? ' – ističe danas' : ''}</span>` : ''}
     ${x.summary && x.summary !== x.title ? `<p>${esc(x.summary)}</p>` : ''}
     ${x.tags.length ? `<div class="subv-tags">${x.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</div>` : ''}
     <div class="row"><button class="btn small" data-sv="open" data-u="${esc(x.url)}">Otvori ›</button>${x.deadline && d >= 1 ? `<button class="btn small" data-sv="rem" data-id="${x.id}">⏰ Podseti me na rok</button>` : ''}</div></div>`;

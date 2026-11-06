@@ -34,7 +34,7 @@ TAGS = {'Stočarstvo': r'stoč|stoc|tov|grla|krav|mlek|svinj|ovac|ovc|koz|jagnj|
 NOISE = r'anketa|evaluac|edukac|sajam|izložb|cene stoke|startap|takmičen|brisel|\beu\b|evropsk[aeo] uni|kanalizac|jgsp|prevoz|beograd'
 AGRI = r'poljopriv|agrar|gazdinstv|stoč|stoc|ratar|voć|voc|povrt|organsk|pčel|pcel|ipard|paor|seosk|ruraln|hran|mleko|mleka|grla|navodnj|mehaniz|vinogr|setv|zemlj'
 def item(src, title, url, date, text):
-    t = lat(clean(title)); body = lat(clean(text)); low = (t + ' ' + body[:600]).lower()
+    t = lat(clean(title)); body = re.sub(r'The post .*? appeared (first )?on .*$', '', lat(clean(text))).strip(); low = (t + ' ' + body[:600]).lower()
     kind = next((k for k, rx in KIND if re.search(rx, t.lower())), 'vest')
     return {'id': hashlib.sha1(url.encode()).hexdigest()[:12], 'src': src, 'title': t, 'url': url, 'date': date,
             'kind': kind, 'tags': [k for k, rx in TAGS.items() if re.search(rx, low)], 'deadline': deadline(body) if kind == 'poziv' else None,
