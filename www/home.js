@@ -25,7 +25,24 @@ function parkLeftTxt(ms) {
   return h ? `${h}:${pad(m)}` : `${pad(m)}:${pad(s)}`;
 }
 
+// poslednje parkiranje koje je telefon sam prepoznao (Bluetooth / kretanje), dok ponovo ne kreneš autom
+let geoHome = null;
+function homePark() {
+  const g = geoHome; if (!g || !g.lastParkAt) return null;
+  if (g.driving || (g.lastVehicle && g.lastVehicle > g.lastParkAt + 60e3)) return null; // ponovo vozi
+  if (Date.now() - g.lastParkAt > 18 * HOUR) return null;
+  return { at: g.lastParkAt, zone: g.lastParkZone, loc: g.lastParkLoc };
+}
+function refreshGeoHome() {
+  if (typeof Geo === 'undefined' || !Geo || !S.parking.auto) return;
+  Geo.status().then((st) => {
+    const key = (x) => x && [x.lastParkAt, x.lastParkZone, x.driving, x.lastVehicle].join('|');
+    const changed = key(st) !== key(geoHome); geoHome = st;
+    if (changed && tab === 'danas' && $('#sheetBg').hidden) renderHome();
+  }).catch(() => {});
+}
 function renderHome() {
+  refreshGeoHome();
   const now = Date.now(), P = S.parking, A = P.active;
   // podsetnici
   const open = S.reminders.filter((r) => !r.done && r.at).map((r) => ({ r, d: parseLocal(r.at) })).filter((x) => x.d).sort((a, b) => a.d - b.d);
@@ -49,6 +66,17 @@ function renderHome() {
       <small>${ico('park')} ${esc(z.name)}${A.plate ? ' · ' + esc(A.plate) : ''}</small>
       <div class="t-count" id="homePark">${parkLeftTxt(left)}</div>
       <div class="t-row"><span>ističe u <b>${hm(new Date(A.end))}</b></span><span class="t-cta" data-home="park-extend">Produži</span></div></button>`;
+  } else if (homePark()) {
+    const lp = homePark(), lat = lp.loc && lp.loc.split(',');
+    parkTile = lp.zone
+      ? `<button class="tile t-park idle warn" data-home="parking">
+          <small>${ico('park')} Parkirani ste od ${hm(new Date(lp.at))}</small>
+          <div class="t-big">${esc(lp.zone)}</div>
+          <div class="t-row"><span>Parking još nije plaćen</span><span class="t-cta" data-home="park-start">Plati parking</span></div></button>`
+      : `<button class="tile t-park idle free" data-home="parking">
+          <small>${ico('park')} Parkirani ste od ${hm(new Date(lp.at))}</small>
+          <div class="t-big">Van zone naplate parkinga</div>
+          <div class="t-row"><span>Ne treba da plaćate parking</span>${lat ? `<span class="t-cta" data-home="park-map" data-ll="${esc(lp.loc)}">Gde je auto?</span>` : ''}</div></button>`;
   } else {
     const dz = detect.ns ? zoneById('ns-' + detect.ns.zone) : detect.spot ? zoneById(detect.spot.zone) : null;
     parkTile = `<button class="tile t-park idle" data-home="parking">
@@ -102,7 +130,8 @@ document.addEventListener('DOMContentLoaded', () => $('#view').addEventListener(
   const a = b.dataset.home;
   if (a === 'parking' || a === 'podsetnici' || a === 'kupovina') return setTab(a);
   if (a === 'new-rem') return editReminder();
-  if (a === 'park-start') return setTab('parking'); // korisnik bira zonu i trajanje na ekranu Parking
+  if (a === 'park-start') return setTab('parking');
+  if (a === 'park-map') return openExternal(`https://www.google.com/maps/search/?api=1&query=${b.dataset.ll}`); // korisnik bira zonu i trajanje na ekranu Parking
   if (a === 'park-extend') { setTab('parking'); return extendParking(); }
   if (a === 'recipe') return openRecipe(b.dataset.id);
   if (a === 'treninzi') { hsub = 'treninzi'; return setTab('zdravlje'); }

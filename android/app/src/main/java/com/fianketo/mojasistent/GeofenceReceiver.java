@@ -183,6 +183,9 @@ public class GeofenceReceiver extends BroadcastReceiver {
                 }
             }
             log(p, zoneName == null ? "parkirao van zone naplate – bez obaveštenja" : "parkirao: " + zoneName + " – obaveštenje poslato");
+            // poslednje parkiranje – prikazuje se na početnom ekranu aplikacije
+            p.edit().putLong("lastParkAt", System.currentTimeMillis()).putString("lastParkZone", zoneName == null ? "" : zoneName)
+                .putString("lastParkLoc", lat + "," + lng).apply();
             if (zoneName == null) return;
             notifyPay(ctx, "auto", zoneName, sms, p.getString("plate", ""), extra);
             p.edit().putLong("lastAutoNotify", System.currentTimeMillis()).apply();

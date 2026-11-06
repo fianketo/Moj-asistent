@@ -265,6 +265,11 @@ public class ParkingGeofencePlugin extends Plugin {
         ret.put("enabled", p.getBoolean("enabled", false));
         ret.put("lastRegister", p.getString("lastRegister", ""));
         ret.put("lastEvent", p.getString("lastEvent", ""));
+        ret.put("lastParkAt", p.getLong("lastParkAt", 0));
+        ret.put("lastParkZone", p.getString("lastParkZone", ""));
+        ret.put("lastParkLoc", p.getString("lastParkLoc", ""));
+        ret.put("lastVehicle", p.getLong("lastVehicle", 0));
+        ret.put("driving", p.getBoolean("driving", false));
         try { ret.put("log", new JSArray(p.getString("log", "[]"))); } catch (Exception ignored) { }
         call.resolve(ret);
     }

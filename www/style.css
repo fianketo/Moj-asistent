@@ -660,3 +660,9 @@ h2 { font-size: 14px; font-weight: 750; letter-spacing: .02em; text-transform: n
 .t-train .t-cta { background: var(--on-accent); color: var(--accent); }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+.t-park.idle.free { background: var(--gc); color: var(--on-gc); }
+.t-park.idle.free small { color: color-mix(in srgb, var(--on-gc) 72%, transparent); }
+.t-park.idle.free .t-cta { background: var(--on-gc); color: var(--gc); }
+.t-park.idle.warn { background: var(--amber); color: var(--on-amber); }
+.t-park.idle.warn small { color: color-mix(in srgb, var(--on-amber) 70%, transparent); }
+.t-park.idle.warn .t-cta { background: var(--on-amber); color: var(--amber); }
