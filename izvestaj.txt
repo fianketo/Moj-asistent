@@ -1,0 +1,2 @@
+vazduh: [('Novi Sad Rumenačka', 'Loš', 'PM10'), ('Novi Sad Liman', 'Prihvatljiv', 'O3')]
+polen: Sremska Mitrovica 2026-10-31 [('Ambrozija', 1, 0), ('Štirevi/pepeljuge', 1, 0), ('Četinari', 1, 0), ('Javor', 0, 0), ('Jova', 0, 0)]
