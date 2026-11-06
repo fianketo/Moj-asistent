@@ -1,0 +1,505 @@
+{
+ "Novi Sad": [],
+ "Нови Сад": [],
+ "kvalitet vazduha": [],
+ "квалитет ваздуха": [
+  {
+   "title": "КВАЛИТЕТ ВАЗДУХА ",
+   "org": "Агенција за заштиту животне средине",
+   "slug": "kvalitet-vazdukha",
+   "modified": "2026-10-15",
+   "freq": "annual",
+   "res": [
+    [
+     "xlsx",
+     "https://data.gov.rs/s/resources/kvalitet-vazdukha/20260316-080003/2024.xlsx"
+    ],
+    [
+     "xlsx",
+     "https://data.gov.rs/s/resources/kvalitet-vazdukha/20250317-122034/2023.xlsx"
+    ],
+    [
+     "xlsx",
+     "https://data.gov.rs/s/resources/kvalitet-vazdukha-verifikovani-dnevni-podatsi/20250211-101416/2022.xlsx"
+    ]
+   ],
+   "n": 14
+  },
+  {
+   "title": "Квалитет ваздуха (фебруар 2025.)",
+   "org": "Општина Трстеник",
+   "slug": "kvalitet-vazdukha-februar-2025",
+   "modified": "2026-10-16",
+   "freq": "irregular",
+   "res": [
+    [
+     "xlsx",
+     "https://data.gov.rs/s/resources/kvalitet-vazdukha-februar-2025/20250408-111254/vazduhfebruar2025.xlsx"
+    ]
+   ],
+   "n": 1
+  },
+  {
+   "title": "Квалитет ваздуха (јануар 2025.)",
+   "org": "Општина Трстеник",
+   "slug": "kvalitet-vazdukha-januar-2025",
+   "modified": "2026-10-16",
+   "freq": "irregular",
+   "res": [
+    [
+     "xlsx",
+     "https://data.gov.rs/s/resources/kvalitet-vazdukha-januar-2025/20250408-105303/vazduh01012025.xlsx"
+    ]
+   ],
+   "n": 1
+  },
+  {
+   "title": "КВАЛИТЕТ ВАЗДУХА — сатне вредности (неверификовани подаци), последњих 30 дана",
+   "org": "Агенција за заштиту животне средине",
+   "slug": "kvalitet-vazduha-satne-vrednosti-neverifikovani-podaci-poslednjih-30-dana",
+   "modified": "2026-10-21",
+   "freq": "continuous",
+   "res": [
+    [
+     "json",
+     "https://opendata.kosava.cloud/api/v1/data-dictionary"
+    ],
+    [
+     "json",
+     "https://opendata.kosava.cloud/api/v1/metadata"
+    ],
+    [
+     "json",
+     "https://opendata.kosava.cloud/api/v1/bulk"
+    ]
+   ],
+   "n": 6
+  },
+  {
+   "title": "Подаци о квалитету ваздуха на територији града Панчева",
+   "org": "Удружење „Пансеј“",
+   "slug": "podatsi-o-kvalitetu-vazdukha-na-teritoriji-grada-pancheva",
+   "modified": "2026-10-16",
+   "freq": "monthly",
+   "res": [
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/podatsi-o-kvalitetu-vazdukha-na-teritoriji-grada-pancheva/20220630-172101/pancevo-zelenog-ruzmarina-2022.csv"
+    ]
+   ],
+   "n": 1
+  }
+ ],
+ "polen": [],
+ "полен": [
+  {
+   "title": "ПОЛЕН - API",
+   "org": "Агенција за заштиту животне средине",
+   "slug": "polen-api",
+   "modified": "2026-09-02",
+   "freq": "weekly",
+   "res": [
+    [
+     "html",
+     "http://77.46.150.200/api/opendata/schema"
+    ],
+    [
+     "json",
+     "http://77.46.150.200/api/opendata/allergen-types/"
+    ],
+    [
+     "json",
+     "http://77.46.150.200/api/opendata/allergens/"
+    ]
+   ],
+   "n": 6
+  },
+  {
+   "title": "ПОЛЕН  - ОБЈЕДИЊЕНИ ПОДАЦИ ОД 2016. ГОДИНЕ",
+   "org": "Агенција за заштиту животне средине",
+   "slug": "polen-objedinjeni-podatsi-od-2016-godine",
+   "modified": "2026-11-06",
+   "freq": "weekly",
+   "res": [
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/polen-objedinjeni-podatsi-od-2016-godine/20261106-092743/pollen-concentration.csv"
+    ],
+    [
+     "xlsx",
+     "https://data.gov.rs/s/resources/alergeni-polen/20250210-182653/polen-lokacije.xlsx"
+    ],
+    [
+     "xlsx",
+     "https://data.gov.rs/s/resources/alergeni-polen/20250210-182811/polen-alergeni.xlsx"
+    ]
+   ],
+   "n": 3
+  }
+ ],
+ "gorivo": [],
+ "гориво": [],
+ "apoteke": [],
+ "апотеке": [
+  {
+   "title": "Здравствене установе и апотеке",
+   "org": "Град Зрењанин",
+   "slug": "zdravstvene-ustanove-i-apoteke",
+   "modified": "2026-10-16",
+   "freq": "irregular",
+   "res": [
+    [
+     "geojson",
+     "https://data.gov.rs/s/resources/zdravstvene-ustanove-i-apoteke/20220211-174253/zrenjanin-zdravstveneustanove-tac.geojson"
+    ],
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/zdravstvene-ustanove-i-apoteke/20220211-174243/zrenjanin-zdravstveneustanove-tac.csv"
+    ]
+   ],
+   "n": 2
+  }
+ ],
+ "lekovi": [],
+ "лекови": [
+  {
+   "title": "ЛЕКОВИ ЗА УПОТРЕБУ У ХУМАНОЈ МЕДИЦИНИ",
+   "org": "Агенција за лекове и медицинска средства Србије",
+   "slug": "lekovi-za-upotrebu-u-khumanoj-meditsini",
+   "modified": "2026-10-20",
+   "freq": "daily",
+   "res": [
+    [
+     "json",
+     "https://api.alims.gov.rs/RegistarOdobrenaKlinickaIspitivanjaREST/odobrenaklinickaispitivanja"
+    ],
+    [
+     "xlsx",
+     "https://www.alims.gov.rs/lekovi/Defekt-kvaliteta-leka.xlsx"
+    ],
+    [
+     "xls",
+     "https://www.alims.gov.rs/lekovi/KlinickaRegistar_grid1.xls"
+    ]
+   ],
+   "n": 12
+  },
+  {
+   "title": "ЛЕКОВИ ЗА УПОТРЕБУ У ВЕТЕРИНАРСКОЈ МЕДИЦИНИ",
+   "org": "Агенција за лекове и медицинска средства Србије",
+   "slug": "lekovi-za-upotrebu-u-veterinarskoj-meditsini",
+   "modified": "2026-10-20",
+   "freq": "continuous",
+   "res": [
+    [
+     "json",
+     "https://api.alims.gov.rs/RegistarVeterinarskihMedicinskihSredstavaREST/veterinarskamedicinskasredstva"
+    ],
+    [
+     "xls",
+     "https://www.alims.gov.rs/lekovi/certifikati_veterina.xls"
+    ],
+    [
+     "json",
+     "https://api.alims.gov.rs/RegistarSertifikatiKvalitetVeterinaREST/sertifikatikvalitetaveterina"
+    ]
+   ],
+   "n": 6
+  }
+ ],
+ "praznici": [],
+ "нерадни дани": [],
+ "GTFS": [
+  {
+   "title": "GTFS Крагујевац",
+   "org": "Град Крагујевац",
+   "slug": "gtfs-kragujevats",
+   "modified": "2026-10-16",
+   "freq": "irregular",
+   "res": [
+    [
+     "zip",
+     "https://data.gov.rs/s/resources/gtfs-kragujevats/20260626-074216/gtfs-kragujevac.zip"
+    ]
+   ],
+   "n": 1
+  },
+  {
+   "title": "GTFS Суботица",
+   "org": "Град Суботица",
+   "slug": "gtfs-subotitsa",
+   "modified": "2026-10-16",
+   "freq": "punctual",
+   "res": [
+    [
+     "zip",
+     "https://data.gov.rs/s/resources/gtfs-subotitsa/20220611-231509/gtfs.zip"
+    ],
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/gtfs-subotitsa/20220207-031032/subotica-gtfs-route-lin.csv"
+    ],
+    [
+     "geojson",
+     "https://data.gov.rs/s/resources/gtfs-subotitsa/20220207-031116/subotica-gtfs-route-lin.geojson"
+    ]
+   ],
+   "n": 5
+  },
+  {
+   "title": "GTFS Ужице",
+   "org": "Град Ужице",
+   "slug": "gtfs-uzhitse",
+   "modified": "2026-10-16",
+   "freq": "irregular",
+   "res": [
+    [
+     "zip",
+     "https://data.gov.rs/s/resources/gtfs-uzhitse/20220705-083449/uzicerazvoj-uzice-rs.zip"
+    ],
+    [
+     "geojson",
+     "https://data.gov.rs/s/resources/gtfs-uzhitse/20220207-030611/uzice-gtfs-stops-tac.geojson"
+    ],
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/gtfs-uzhitse/20220207-030634/uzice-gtfs-stops-tac.csv"
+    ]
+   ],
+   "n": 5
+  },
+  {
+   "title": "Јавни превоз и GTFS",
+   "org": "Град Ниш",
+   "slug": "javni-prevoz-i-gtfs",
+   "modified": "2026-10-16",
+   "freq": "irregular",
+   "res": [
+    [
+     "zip",
+     "https://data.gov.rs/s/resources/javni-prevoz-i-gtfs/20260121-081857/gtfs-nis-2026.zip"
+    ],
+    [
+     "geojson",
+     "https://data.gov.rs/s/resources/javni-prevoz-i-gtfs/20220207-030807/nis-gtfs-stops-tac.geojson"
+    ],
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/javni-prevoz-i-gtfs/20220207-030830/nis-gtfs-stops-tac.csv"
+    ]
+   ],
+   "n": 5
+  },
+  {
+   "title": "Градски јавни превоз у Београду (GTFS)",
+   "org": "Градска управа града Београда",
+   "slug": "gradski-javni-prevoz-u-beogradu-gtfs",
+   "modified": "2026-11-05",
+   "freq": "irregular",
+   "res": [
+    [
+     "zip",
+     "https://data.gov.rs/s/resources/gradski-javni-prevoz-u-beogradu-gtfs/20261105-115729/bgprev-belgrade-rs-3-.zip"
+    ]
+   ],
+   "n": 1
+  },
+  {
+   "title": "Приградски јавни превоз у  у Београду (GTFS)",
+   "org": "Градска управа града Београда",
+   "slug": "prigradski-javni-prevoz-u-u-beogradu-gtfs",
+   "modified": "2026-11-05",
+   "freq": "irregular",
+   "res": [
+    [
+     "zip",
+     "https://data.gov.rs/s/resources/prigradski-javni-prevoz-u-u-beogradu-gtfs/20261105-115922/bgprevsuburb-belgrade-rs-1-.zip"
+    ]
+   ],
+   "n": 1
+  }
+ ],
+ "javni prevoz": [],
+ "parking": [],
+ "паркинг": [
+  {
+   "title": "Паркинг",
+   "org": "Град Ниш",
+   "slug": "parking",
+   "modified": "2026-10-16",
+   "freq": "irregular",
+   "res": [
+    [
+     "geojson",
+     "https://data.gov.rs/s/resources/parking/20220116-212828/nis-parking-zona2-tac.geojson"
+    ],
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/parking/20220116-212821/nis-parking-zona2-tac.csv"
+    ],
+    [
+     "geojson",
+     "https://data.gov.rs/s/resources/parking/20220116-212812/nis-parking-zona1-tac.geojson"
+    ]
+   ],
+   "n": 15
+  },
+  {
+   "title": "Паркинг",
+   "org": "Град Зрењанин",
+   "slug": "parking-1",
+   "modified": "2026-10-16",
+   "freq": "irregular",
+   "res": [
+    [
+     "geojson",
+     "https://data.gov.rs/s/resources/parking-1/20220115-025408/zuta-zona-2019-08-10-2019.geojson"
+    ],
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/parking-1/20220115-025400/zuta-zona-2019-08-10-2019.csv"
+    ],
+    [
+     "geojson",
+     "https://data.gov.rs/s/resources/parking-1/20220115-025351/zelena-zona-2019-08-10-2019.geojson"
+    ]
+   ],
+   "n": 10
+  },
+  {
+   "title": "Паркинг зоне",
+   "org": "Град Суботица",
+   "slug": "parking-zone",
+   "modified": "2026-10-16",
+   "freq": "irregular",
+   "res": [
+    [
+     "geojson",
+     "https://data.gov.rs/s/resources/parking-zone/20220209-190050/subotica-parkingzone-lin.geojson"
+    ],
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/parking-zone/20220209-190039/subotica-parkingzone-lin.csv"
+    ]
+   ],
+   "n": 2
+  },
+  {
+   "title": "Паркинг - Крагујевац",
+   "org": "Град Крагујевац",
+   "slug": "parking-kragujevats",
+   "modified": "2026-10-16",
+   "freq": "irregular",
+   "res": [
+    [
+     "xlsx",
+     "https://data.gov.rs/s/resources/parking-kragujevats/20200731-123005/kragujevac-parkiralista.xlsx"
+    ],
+    [
+     "geojson",
+     "https://data.gov.rs/s/resources/parking-kragujevats/20220128-170512/kragujevac-parkinggaraza-poli.geojson"
+    ],
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/parking-kragujevats/20220128-170425/kragujevac-parkinggaraza-poli.csv"
+    ]
+   ],
+   "n": 17
+  },
+  {
+   "title": "Саобраћајне зоне - Паркинг зоне и посебне саобраћајне зоне",
+   "org": "Град Врање",
+   "slug": "saobratshajne-zone-parking-zone-i-posebne-saobratshajne-zone",
+   "modified": "2026-10-16",
+   "freq": "irregular",
+   "res": [
+    [
+     "json",
+     "https://data.gov.rs/s/resources/saobratshajne-zone-parking-zone-i-posebne-saobratshajne-zone/20220505-155851/gisvranje-put-plava-zona-.json"
+    ],
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/saobratshajne-zone-parking-zone-i-posebne-saobratshajne-zone/20220505-160147/gisvranje-put-plava-zona-.csv"
+    ],
+    [
+     "json",
+     "https://data.gov.rs/s/resources/saobratshajne-zone-parking-zone-i-posebne-saobratshajne-zone/20220505-155205/gisvranje-put-pesacka-zona-.json"
+    ]
+   ],
+   "n": 8
+  },
+  {
+   "title": "Паркинг места по врстама и зонама и подаци о СУ бициклама",
+   "org": "Град Суботица",
+   "slug": "parking-mesta-po-vrstama-i-zonama-i-podatsi-o-su-bitsiklama-1",
+   "modified": "2026-10-16",
+   "freq": "annual",
+   "res": [
+    [
+     "xlsx",
+     "https://data.gov.rs/s/resources/parking-mesta-po-vrstama-i-zonama-i-podatsi-o-su-bitsiklama-1/20200211-084440/ukupan-broj-parking-mesta-na-otvorenom-i-zatvorenom-prostoru-u-subotici.xlsx"
+    ],
+    [
+     "xlsx",
+     "https://data.gov.rs/s/resources/parking-mesta-po-vrstama-i-zonama-i-podatsi-o-su-bitsiklama-1/20180829-075827/Ukupan_broj_parking_mesta_na_otvorenom_i_zatvorenom_prostoru_u_Subotici.xlsx"
+    ],
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/parking-mesta-po-vrstama-i-zonama-i-podatsi-o-su-bitsiklama-1/20200211-084428/ukupan-broj-parking-mesta-na-otvorenom-i-zatvorenom-prostoru-u-subotici.csv"
+    ]
+   ],
+   "n": 5
+  }
+ ],
+ "saobraćajne nezgode": [],
+ "саобраћајне незгоде": [],
+ "vodovod": [],
+ "voda za piće": [],
+ "вода за пиће": [],
+ "struja": [],
+ "temperatura": [],
+ "meteorološki": [],
+ "хидролошки": [],
+ "Dunav vodostaj": [],
+ "kupališta": [],
+ "plaže": [],
+ "zdravstvene ustanove": [],
+ "здравствене установе": [
+  {
+   "title": "Здравствене установе и апотеке",
+   "org": "Град Зрењанин",
+   "slug": "zdravstvene-ustanove-i-apoteke",
+   "modified": "2026-10-16",
+   "freq": "irregular",
+   "res": [
+    [
+     "geojson",
+     "https://data.gov.rs/s/resources/zdravstvene-ustanove-i-apoteke/20220211-174253/zrenjanin-zdravstveneustanove-tac.geojson"
+    ],
+    [
+     "csv",
+     "https://data.gov.rs/s/resources/zdravstvene-ustanove-i-apoteke/20220211-174243/zrenjanin-zdravstveneustanove-tac.csv"
+    ]
+   ],
+   "n": 2
+  }
+ ],
+ "domovi zdravlja": [],
+ "vrtići": [],
+ "škole": [],
+ "adresni registar": [],
+ "ulice": [],
+ "biciklističke staze": [],
+ "punionice": [],
+ "električna vozila": [],
+ "radarske kontrole": [],
+ "kamere": [],
+ "nadzemni": [],
+ "buka": [],
+ "ambrozija": [],
+ "UV indeks": [],
+ "cene hrane": [],
+ "pijace": [],
+ "zelene pijace": [],
+ "cene na pijacama": []
+}

@@ -1,0 +1,123 @@
+
+### Novi Sad (0)
+
+### Нови Сад (0)
+
+### kvalitet vazduha (0)
+
+### квалитет ваздуха (5)
+- КВАЛИТЕТ ВАЗДУХА  | Агенција за заштиту животне средине | 2026-10-15 | annual | 14 res | [('xlsx', 'https://data.gov.rs/s/resources/kvalitet-vazdukha/20260316-080003/2024.xlsx')]
+- Квалитет ваздуха (фебруар 2025.) | Општина Трстеник | 2026-10-16 | irregular | 1 res | [('xlsx', 'https://data.gov.rs/s/resources/kvalitet-vazdukha-februar-2025/20250408-111254/vazduhfebruar2025.xlsx')]
+- Квалитет ваздуха (јануар 2025.) | Општина Трстеник | 2026-10-16 | irregular | 1 res | [('xlsx', 'https://data.gov.rs/s/resources/kvalitet-vazdukha-januar-2025/20250408-105303/vazduh01012025.xlsx')]
+- КВАЛИТЕТ ВАЗДУХА — сатне вредности (неверификовани подаци), последњих 30 дана | Агенција за заштиту животне средине | 2026-10-21 | continuous | 6 res | [('json', 'https://opendata.kosava.cloud/api/v1/data-dictionary')]
+- Подаци о квалитету ваздуха на територији града Панчева | Удружење „Пансеј“ | 2026-10-16 | monthly | 1 res | [('csv', 'https://data.gov.rs/s/resources/podatsi-o-kvalitetu-vazdukha-na-teritoriji-grada-pancheva/20220630-172101/pancevo-zelenog-ruzmarina-2022.csv')]
+
+### polen (0)
+
+### полен (2)
+- ПОЛЕН - API | Агенција за заштиту животне средине | 2026-09-02 | weekly | 6 res | [('html', 'http://77.46.150.200/api/opendata/schema')]
+- ПОЛЕН  - ОБЈЕДИЊЕНИ ПОДАЦИ ОД 2016. ГОДИНЕ | Агенција за заштиту животне средине | 2026-11-06 | weekly | 3 res | [('csv', 'https://data.gov.rs/s/resources/polen-objedinjeni-podatsi-od-2016-godine/20261106-092743/pollen-concentration.csv')]
+
+### gorivo (0)
+
+### гориво (0)
+
+### apoteke (0)
+
+### апотеке (1)
+- Здравствене установе и апотеке | Град Зрењанин | 2026-10-16 | irregular | 2 res | [('geojson', 'https://data.gov.rs/s/resources/zdravstvene-ustanove-i-apoteke/20220211-174253/zrenjanin-zdravstveneustanove-tac.geojson')]
+
+### lekovi (0)
+
+### лекови (2)
+- ЛЕКОВИ ЗА УПОТРЕБУ У ХУМАНОЈ МЕДИЦИНИ | Агенција за лекове и медицинска средства Србије | 2026-10-20 | daily | 12 res | [('json', 'https://api.alims.gov.rs/RegistarOdobrenaKlinickaIspitivanjaREST/odobrenaklinickaispitivanja')]
+- ЛЕКОВИ ЗА УПОТРЕБУ У ВЕТЕРИНАРСКОЈ МЕДИЦИНИ | Агенција за лекове и медицинска средства Србије | 2026-10-20 | continuous | 6 res | [('json', 'https://api.alims.gov.rs/RegistarVeterinarskihMedicinskihSredstavaREST/veterinarskamedicinskasredstva')]
+
+### praznici (0)
+
+### нерадни дани (0)
+
+### GTFS (6)
+- GTFS Крагујевац | Град Крагујевац | 2026-10-16 | irregular | 1 res | [('zip', 'https://data.gov.rs/s/resources/gtfs-kragujevats/20260626-074216/gtfs-kragujevac.zip')]
+- GTFS Суботица | Град Суботица | 2026-10-16 | punctual | 5 res | [('zip', 'https://data.gov.rs/s/resources/gtfs-subotitsa/20220611-231509/gtfs.zip')]
+- GTFS Ужице | Град Ужице | 2026-10-16 | irregular | 5 res | [('zip', 'https://data.gov.rs/s/resources/gtfs-uzhitse/20220705-083449/uzicerazvoj-uzice-rs.zip')]
+- Јавни превоз и GTFS | Град Ниш | 2026-10-16 | irregular | 5 res | [('zip', 'https://data.gov.rs/s/resources/javni-prevoz-i-gtfs/20260121-081857/gtfs-nis-2026.zip')]
+- Градски јавни превоз у Београду (GTFS) | Градска управа града Београда | 2026-11-05 | irregular | 1 res | [('zip', 'https://data.gov.rs/s/resources/gradski-javni-prevoz-u-beogradu-gtfs/20261105-115729/bgprev-belgrade-rs-3-.zip')]
+- Приградски јавни превоз у  у Београду (GTFS) | Градска управа града Београда | 2026-11-05 | irregular | 1 res | [('zip', 'https://data.gov.rs/s/resources/prigradski-javni-prevoz-u-u-beogradu-gtfs/20261105-115922/bgprevsuburb-belgrade-rs-1-.zip')]
+
+### javni prevoz (0)
+
+### parking (0)
+
+### паркинг (6)
+- Паркинг | Град Ниш | 2026-10-16 | irregular | 15 res | [('geojson', 'https://data.gov.rs/s/resources/parking/20220116-212828/nis-parking-zona2-tac.geojson')]
+- Паркинг | Град Зрењанин | 2026-10-16 | irregular | 10 res | [('geojson', 'https://data.gov.rs/s/resources/parking-1/20220115-025408/zuta-zona-2019-08-10-2019.geojson')]
+- Паркинг зоне | Град Суботица | 2026-10-16 | irregular | 2 res | [('geojson', 'https://data.gov.rs/s/resources/parking-zone/20220209-190050/subotica-parkingzone-lin.geojson')]
+- Паркинг - Крагујевац | Град Крагујевац | 2026-10-16 | irregular | 17 res | [('xlsx', 'https://data.gov.rs/s/resources/parking-kragujevats/20200731-123005/kragujevac-parkiralista.xlsx')]
+- Саобраћајне зоне - Паркинг зоне и посебне саобраћајне зоне | Град Врање | 2026-10-16 | irregular | 8 res | [('json', 'https://data.gov.rs/s/resources/saobratshajne-zone-parking-zone-i-posebne-saobratshajne-zone/20220505-155851/gisvranje-put-plava-zona-.json')]
+- Паркинг места по врстама и зонама и подаци о СУ бициклама | Град Суботица | 2026-10-16 | annual | 5 res | [('xlsx', 'https://data.gov.rs/s/resources/parking-mesta-po-vrstama-i-zonama-i-podatsi-o-su-bitsiklama-1/20200211-084440/ukupan-broj-parking-mesta-na-otvorenom-i-zatvorenom-prostoru-u-subotici.xlsx')]
+
+### saobraćajne nezgode (0)
+
+### саобраћајне незгоде (0)
+
+### vodovod (0)
+
+### voda za piće (0)
+
+### вода за пиће (0)
+
+### struja (0)
+
+### temperatura (0)
+
+### meteorološki (0)
+
+### хидролошки (0)
+
+### Dunav vodostaj (0)
+
+### kupališta (0)
+
+### plaže (0)
+
+### zdravstvene ustanove (0)
+
+### здравствене установе (1)
+- Здравствене установе и апотеке | Град Зрењанин | 2026-10-16 | irregular | 2 res | [('geojson', 'https://data.gov.rs/s/resources/zdravstvene-ustanove-i-apoteke/20220211-174253/zrenjanin-zdravstveneustanove-tac.geojson')]
+
+### domovi zdravlja (0)
+
+### vrtići (0)
+
+### škole (0)
+
+### adresni registar (0)
+
+### ulice (0)
+
+### biciklističke staze (0)
+
+### punionice (0)
+
+### električna vozila (0)
+
+### radarske kontrole (0)
+
+### kamere (0)
+
+### nadzemni (0)
+
+### buka (0)
+
+### ambrozija (0)
+
+### UV indeks (0)
+
+### cene hrane (0)
+
+### pijace (0)
+
+### zelene pijace (0)
+
+### cene na pijacama (0)
