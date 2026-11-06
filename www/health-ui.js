@@ -25,8 +25,8 @@ function mealPool(plan, m) {
   const rule = PLAN_RULES[plan.id] || (() => true);
   // glavni obroci moraju biti dovoljno hranljivi (prilozi i lake čorbe ne mogu biti ceo ručak)
   const minK = { dorucak: 180, rucak: 280, vecera: 200, uzina: 0 }[m];
-  const pool = RECIPES.filter((r) => r.meal.includes(m) && r.type !== 'desert' && r.kcal >= minK && rule(r, m));
-  return pool.length ? pool : RECIPES.filter((r) => r.meal.includes(m));
+  const pool = RECIPES.filter((r) => !r.extra && r.meal.includes(m) && r.type !== 'desert' && r.kcal >= minK && rule(r, m));
+  return pool.length ? pool : RECIPES.filter((r) => !r.extra && r.meal.includes(m));
 }
 // 7 dana × 4 obroka; prva nedelja programa je ručno složena, ostale se slažu po pravilima programa
 function planWeek(plan, w) {
@@ -136,7 +136,8 @@ function nextDayName(prog) {
 
 // ---------------------------------------------------------------- RECEPTI
 const TYPE_COLOR = { corba: ['#fde68a', '#f59e0b'], meso: ['#fecaca', '#dc2626'], piletina: ['#fed7aa', '#ea580c'], riba: ['#bae6fd', '#0284c7'], testenina: ['#fef3c7', '#d97706'],
-  povrce: ['#bbf7d0', '#16a34a'], salata: ['#d9f99d', '#65a30d'], pita: ['#fde68a', '#b45309'], dorucak: ['#fef9c3', '#ca8a04'], desert: ['#fbcfe8', '#db2777'], namaz: ['#e9d5ff', '#7c3aed'] };
+  povrce: ['#bbf7d0', '#16a34a'], salata: ['#d9f99d', '#65a30d'], pita: ['#fde68a', '#b45309'], dorucak: ['#fef9c3', '#ca8a04'], desert: ['#fbcfe8', '#db2777'], namaz: ['#e9d5ff', '#7c3aed'],
+  rostilj: ['#fdba74', '#c2410c'], svetska: ['#a5f3fc', '#0e7490'], zimnica: ['#fca5a5', '#b91c1c'] };
 const grad = (r) => { const c = TYPE_COLOR[r.type] || ['#e2e8f0', '#64748b']; return `background:linear-gradient(135deg, ${c[0]}, ${c[1]}33)`; };
 const fmtMin = (m) => (m >= 60 ? fmtNum(Math.round(m / 6) / 10) + ' h' : m + ' min');
 function badges(r) {
@@ -274,7 +275,7 @@ function openRecipe(id) {
     const b = e.target.closest('[data-r]'); if (!b) return;
     const a = b.dataset.r;
     if (a === 'close') { closeSheet(); if (tab === 'zdravlje' && hsub === 'recepti') render(); return; }
-    if (a === '+') serv = Math.min(12, serv + 1);
+    if (a === '+') serv = Math.min(Math.max(12, r.serv * 2), serv + 1);
     if (a === '-') serv = Math.max(1, serv - 1);
     if (a === 'tab') { tabR = b.dataset.v; $('#sheet').scrollTo(0, 0); }
     if (a === 'have') { const n = b.dataset.n; have.has(n) ? have.delete(n) : have.add(n); }

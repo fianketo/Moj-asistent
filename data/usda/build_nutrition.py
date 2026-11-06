@@ -6,7 +6,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 from map import M, IGNORE
 from resolve import load
 
-FRY = {'karadjordjeva': 0.2, 'becka': 0.2, 'kordon-blu': 0.2, 'mekike': 0.2}  # duboko przenje: upije se ~20% ulja
+FRY = {'karadjordjeva': 0.2, 'becka': 0.2, 'kordon-blu': 0.2, 'mekike': 0.2, 'pomfrit': 0.12, 'tikvice-pohovane-pivo': 0.15,
+       'sampinjoni-pohovani': 0.15, 'lignje-przene': 0.12, 'langos': 0.15, 'tulumbe': 0.15}  # duboko przenje: upije se ~20% ulja
 SPOON = {'kašika': 10, 'kašike': 10, 'kašičica': 4, 'kašičice': 4}
 KEYS = ['kcal', 'p', 'c', 'f', 'fib', 'na', 'sug']
 

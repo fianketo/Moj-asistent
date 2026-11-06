@@ -2,7 +2,7 @@
 // Upotreba: node data/review/export.js [--raw] > izlaz.json   (--raw = bez USDA vrednosti, za build_nutrition.py)
 global.window = {}; const fs = require('fs'), path = require('path');
 const W = path.join(__dirname, '../../www/'), raw = process.argv.includes('--raw');
-const files = ['catalog', 'health', 'recipes2', 'steps', 'exercises-pro', ...(raw ? [] : ['nutrition']), 'safety', 'reviews'];
+const files = ['catalog', 'health', 'recipes2', 'recipes3', 'steps', 'exercises-pro', ...(raw ? [] : ['nutrition']), 'safety', 'reviews'];
 global.esc = (s) => String(s);
 eval(files.map((f) => fs.readFileSync(W + f + '.js', 'utf8')).join('\n') + `
 globalThis.OUT = raw ? RECIPES.map((r) => ({ id: r.id, name: r.name, serv: r.serv, kcal: r.kcal, prot: r.prot, ing: r.ing })) : {

@@ -310,7 +310,7 @@ function stepMinutes(t) {
 }
 
 // ---- oznake za ishranu i težina pripreme
-const ING_GLUTEN = new Set(['Brašno T-400', 'Brašno T-500', 'Integralno brašno', 'Hleb', 'Beli hleb', 'Polubeli hleb', 'Crni / integralni hleb', 'Raženi hleb', 'Tost hleb', 'Kifle', 'Pecivo', 'Lepinje', 'Somun', 'Baguet', 'Burek', 'Pita', 'Kroasan', 'Đevrek', 'Tortilje', 'Prezle', 'Kore za pitu', 'Lisnato testo', 'Kore za lazanje', 'Špagete', 'Testenina (penne)', 'Makarone', 'Rezanci za supu', 'Griz', 'Kus-kus', 'Bulgur', 'Ječam', 'Pšenica (žito)', 'Kornfleks / musli', 'Ovsene pahuljice', 'Keks', 'Petit beurre keks', 'Piškote', 'Krekeri', 'Njoke', 'Hlebne mrvice', 'Pivo', 'Soja sos', 'Riblji štapići', 'Napolitanke', 'Kvasac']);
+const ING_GLUTEN = new Set(['Plazma keks', 'Oblande', 'Brašno T-400', 'Brašno T-500', 'Integralno brašno', 'Hleb', 'Beli hleb', 'Polubeli hleb', 'Crni / integralni hleb', 'Raženi hleb', 'Tost hleb', 'Kifle', 'Pecivo', 'Lepinje', 'Somun', 'Baguet', 'Burek', 'Pita', 'Kroasan', 'Đevrek', 'Tortilje', 'Prezle', 'Kore za pitu', 'Lisnato testo', 'Kore za lazanje', 'Špagete', 'Testenina (penne)', 'Makarone', 'Rezanci za supu', 'Griz', 'Kus-kus', 'Bulgur', 'Ječam', 'Pšenica (žito)', 'Kornfleks / musli', 'Ovsene pahuljice', 'Keks', 'Petit beurre keks', 'Piškote', 'Krekeri', 'Njoke', 'Hlebne mrvice', 'Pivo', 'Soja sos', 'Riblji štapići', 'Napolitanke', 'Kvasac']);
 const ING_LACTOSE = new Set([...ING_DAIRY_EGG].filter((x) => x !== 'Jaja' && x !== 'Margarin'));
 for (const r of RECIPES) {
   const names = r.ing.map(([n]) => n);
