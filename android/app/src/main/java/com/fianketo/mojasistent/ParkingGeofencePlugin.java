@@ -244,6 +244,20 @@ public class ParkingGeofencePlugin extends Plugin {
         call.resolve(r);
     }
 
+    /** Subvencije: praćenje novih objava (isti pozadinski posao kao vazduh i polen). */
+    @PluginMethod
+    public void subvConfigure(PluginCall call) {
+        SharedPreferences.Editor e = prefs(getContext()).edit()
+            .putString("subvUrl", call.getString("url", ""))
+            .putBoolean("subvOn", call.getBoolean("on", false))
+            .putString("subvTags", call.getString("tags", ""));
+        if (prefs(getContext()).getString("subvSeen", "").isEmpty())
+            e.putString("subvSeen", new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", java.util.Locale.US) {{ setTimeZone(java.util.TimeZone.getTimeZone("UTC")); }}.format(new java.util.Date()));
+        e.apply();
+        try { EnvWorker.schedule(getContext()); } catch (Exception ex) { call.reject(ex.getMessage()); return; }
+        call.resolve();
+    }
+
     /** Vazduh i polen: podešavanja upozorenja + pozadinska provera (WorkManager, svaka 2 sata). */
     @PluginMethod
     public void envConfigure(PluginCall call) {

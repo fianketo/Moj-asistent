@@ -728,3 +728,18 @@ h2 { font-size: 14px; font-weight: 750; letter-spacing: .02em; text-transform: n
 .aq-hero { background: var(--aq); color: var(--on-aq); border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; margin: 6px 0 4px; }
 .aq-hero b { font-size: 26px; font-weight: 900; font-stretch: 120%; }
 .aq-hero span { font-size: 14px; line-height: 1.4; }
+
+/* subvencije */
+.t-subv { grid-column: 1 / -1; background: #fdebc8; color: #3d2a00; }
+.t-subv small { color: #6b4d0a; }
+@media (prefers-color-scheme: dark) { .t-subv { background: #4a3a12; color: #ffe8b0; } .t-subv small { color: #f1d692; } }
+.subv-soon { font-size: 12.5px; font-weight: 700; background: rgba(255,255,255,.55); border-radius: 10px; padding: 6px 9px; max-width: 62%; text-align: right; }
+@media (prefers-color-scheme: dark) { .subv-soon { background: rgba(0,0,0,.25); } }
+.subv-card { background: var(--card2); border-radius: 18px; padding: 12px 14px; margin: 10px 0; display: flex; flex-direction: column; gap: 6px; border: 2px solid transparent; }
+.subv-card.new { border-color: var(--accent); }
+.subv-card > b { font-size: 15.5px; line-height: 1.3; font-weight: 750; }
+.subv-card p { margin: 0; font-size: 13.5px; color: var(--muted); line-height: 1.45; }
+.subv-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 700; color: var(--muted); flex-wrap: wrap; }
+.subv-dl { align-self: flex-start; font-size: 13px; font-weight: 800; padding: 4px 10px; border-radius: 999px; background: var(--gc); color: var(--on-gc); }
+.subv-dl.soon { background: var(--amber); color: var(--on-amber); } .subv-dl.past { background: var(--card); color: var(--muted); }
+.subv-tags { display: flex; flex-wrap: wrap; gap: 5px; } .subv-tags span { font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 8px; background: var(--card); }

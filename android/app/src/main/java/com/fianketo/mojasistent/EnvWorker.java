@@ -46,6 +46,7 @@ public class EnvWorker extends Worker {
     public Result doWork() {
         Context ctx = getApplicationContext();
         SharedPreferences p = ParkingGeofencePlugin.prefs(ctx);
+        try { checkSubv(ctx, p); } catch (Exception ignored) { }
         String url = p.getString("envUrl", "");
         if (url.isEmpty()) return Result.success();
         try {
@@ -84,6 +85,41 @@ public class EnvWorker extends Worker {
         } catch (Exception e) {
             return Result.retry();
         }
+    }
+
+    static String fetch(String url) throws Exception {
+        HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+        con.setConnectTimeout(20000); con.setReadTimeout(30000);
+        InputStream in = con.getInputStream(); ByteArrayOutputStream bo = new ByteArrayOutputStream();
+        byte[] buf = new byte[8192]; int n; while ((n = in.read(buf)) > 0) bo.write(buf, 0, n); in.close();
+        return bo.toString("UTF-8");
+    }
+
+    /** Nove objave o subvencijama (pozivi, isplate, rezultati) za izabrane oblasti. */
+    static void checkSubv(Context ctx, SharedPreferences p) throws Exception {
+        if (!p.getBoolean("subvOn", false) || p.getString("subvUrl", "").isEmpty()) return;
+        JSONArray items = new JSONObject(fetch(p.getString("subvUrl", ""))).getJSONArray("items");
+        String seen = p.getString("subvSeen", ""), max = seen;
+        String tagsStr = p.getString("subvTags", "");
+        Set<String> tags = new HashSet<>(Arrays.asList(tagsStr.split(",")));
+        java.util.List<String> fresh = new java.util.ArrayList<>();
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject it = items.getJSONObject(i);
+            String fs = it.optString("first_seen");
+            if (fs.compareTo(max) > 0) max = fs;
+            if (fs.compareTo(seen) <= 0 || "vest".equals(it.optString("kind"))) continue;
+            boolean match = tagsStr.isEmpty();
+            JSONArray t = it.optJSONArray("tags");
+            for (int k = 0; !match && t != null && k < t.length(); k++) if (tags.contains(t.getString(k))) match = true;
+            if (match) fresh.add(it.optString("title"));
+        }
+        if (!fresh.isEmpty()) {
+            String title = fresh.size() == 1 ? "🌾 " + fresh.get(0) : "🌾 " + fresh.size() + " nove objave o subvencijama";
+            StringBuilder body = new StringBuilder();
+            for (int i = 0; i < Math.min(3, fresh.size()); i++) body.append(i > 0 ? "\n" : "").append(fresh.get(i));
+            notify(ctx, 7103, title, fresh.size() == 1 ? "Otvori aplikaciju za rok i detalje." : body.toString());
+        }
+        p.edit().putString("subvSeen", max).apply();
     }
 
     static void notify(Context ctx, int id, String title, String text) {

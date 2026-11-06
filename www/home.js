@@ -130,8 +130,8 @@ function renderHome() {
   }
 
   const envTiles = airTileHtml().replace('<button', '<button id="envAir"') + pollenTileHtml().replace('<button', '<button id="envPollen"');
-  $('#view').innerHTML = notifBanner() + `<div class="bento">${parkTile}${remTile}${shopTile}${whoTile}${envTiles}${mealTile}${trainTile}</div>`;
-  refreshEnvHome();
+  $('#view').innerHTML = notifBanner() + `<div class="bento">${parkTile}${remTile}${subvTileHtml().replace('<button', '<button id="subvTile"')}${shopTile}${whoTile}${envTiles}${mealTile}${trainTile}</div>`;
+  refreshEnvHome(); refreshSubvHome();
   clearInterval(homeTimer);
   if (A) homeTimer = setInterval(() => { const el = $('#homePark'); if (!el || tab !== 'danas') return clearInterval(homeTimer); el.textContent = parkLeftTxt(A.end - Date.now()); }, 1000);
 }
@@ -143,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => $('#view').addEventListener(
   if (a === 'parking' || a === 'podsetnici' || a === 'kupovina') return setTab(a);
   if (a === 'new-rem') return editReminder();
   if (a === 'air') return loadEnv().then(airSheet).catch(() => toast('Podaci o vazduhu trenutno nisu dostupni'));
+  if (a === 'subv') return subvSheet();
   if (a === 'pollen') return loadEnv().then(pollenSheet).catch(() => toast('Podaci o polenu trenutno nisu dostupni'));
   if (a === 'rem-edit') return editReminder(S.reminders.find((r) => r.id === b.dataset.id));
   if (a === 'rem-done') {

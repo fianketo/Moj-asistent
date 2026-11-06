@@ -31,7 +31,8 @@ TAGS = {'Stočarstvo': r'stoč|stoc|tov|grla|krav|mlek|svinj|ovac|ovc|koz|jagnj|
         'Biljna proizvodnja': r'biljn|hektar|seme|sadn|voć|voc|povrt|vinogr|plastenik|zaštićen|zasticen|setv|ratar', 'Mehanizacija i oprema': r'mehaniz|mašin|masin|traktor|oprem|priključ',
         'Navodnjavanje': r'navodnj|bunar|irigac', 'IPARD': r'ipard', 'Krediti': r'kredit', 'Ruralni razvoj': r'ruraln|infrastrukt|turiz|selo|sela',
         'Organska proizvodnja': r'organsk', 'Mladi poljoprivrednici': r'mlad[ih]+ poljopr|mladi '}
-NOISE = r'anketa|evaluac|edukac|sajam|izložb|cene stoke|startap|takmičen'
+NOISE = r'anketa|evaluac|edukac|sajam|izložb|cene stoke|startap|takmičen|brisel|\beu\b|evropsk[aeo] uni|kanalizac|jgsp|prevoz|beograd'
+AGRI = r'poljopriv|agrar|gazdinstv|stoč|stoc|ratar|voć|voc|povrt|organsk|pčel|pcel|ipard|paor|seosk|ruraln|hran|mleko|mleka|grla|navodnj|mehaniz|vinogr|setv|zemlj'
 def item(src, title, url, date, text):
     t = lat(clean(title)); body = lat(clean(text)); low = (t + ' ' + body[:600]).lower()
     kind = next((k for k, rx in KIND if re.search(rx, t.lower())), 'vest')
@@ -58,7 +59,8 @@ except Exception as e: report.append(f'UAP GREŠKA {e!r}')
 try:
     n = 0
     for t, l, d, body, _ in rss('https://www.agronews.rs/feed/'):
-        if re.search(r'konkurs|javni poziv|podstic|subvenc|bespovrat|rok za|prijav', lat(t).lower()) and not re.search(NOISE, lat(t).lower()):
+        tl = lat(t).lower()
+        if re.search(r'konkurs|javni poziv|podstic|subvenc|bespovrat|rok za|prijav', tl) and re.search(AGRI, tl + ' ' + lat(clean(body))[:300].lower()) and not re.search(NOISE, tl):
             items.append(item('Agronews', t, l, d, body)); n += 1
     report.append(f'Agronews: {n}')
 except Exception as e: report.append(f'Agronews GREŠKA {e!r}')
@@ -69,7 +71,8 @@ for q in ['"Pokrajinski sekretarijat za poljoprivredu" konkurs', 'konkurs poljop
         for t, l, d, body, srcname in rss('https://news.google.com/rss/search?' + urllib.parse.urlencode({'q': q + ' when:60d', 'hl': 'sr-Latn', 'gl': 'RS', 'ceid': 'RS:sr-Latn'})):
             if (today - D.date.fromisoformat(d)).days > 60: continue
             title = re.sub(r'\s+-\s+[^-]+$', '', clean(t))
-            if not re.search(r'konkurs|javni poziv|podstic|subvenc|bespovrat|sredstv', lat(title).lower()): continue
+            tl = lat(title).lower()
+            if not re.search(r'konkurs|javni poziv|podstic|subvenc|bespovrat|sredstv', tl) or not re.search(AGRI, tl) or re.search(NOISE, tl): continue
             it = item(lat(clean(srcname)) or 'Vesti', title, l, d, title); it['via'] = 'Google News'; items.append(it); n += 1
         report.append(f'Google News „{q}“: {n}')
     except Exception as e: report.append(f'Google News GREŠKA {e!r}')

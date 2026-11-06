@@ -911,6 +911,8 @@ function renderSettings() {
       ${IS_NATIVE ? '' : `<p style="margin-top:10px">ℹ️ U pregledaču obaveštenja stižu samo dok je aplikacija otvorena ili u pozadini. Za pouzdane podsetnike i kad je ugašena, instaliraj Android aplikaciju (dole).</p>`}
     </div>
 
+    ${subvSettingsCard()}
+
     <h2>Parking</h2>
     <div class="card">
       <label class="field" style="margin-top:0">Upozori me pre isteka (minuta)
@@ -1026,6 +1028,7 @@ $('#view').addEventListener('click', async (e) => {
     case 'share': return shareList();
     case 'prices': return compareSheet();
     case 'cheapest': return cheapestSheet();
+    case 'subv-open': return subvSheet();
     case 'paste-import': return pasteImport();
     case 'clear-bought': {
       const L = curList(), prev = L.items.slice();
