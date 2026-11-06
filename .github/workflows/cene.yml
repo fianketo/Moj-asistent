@@ -14,8 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Istraži skupove podataka sa cenovnicima
-        run: python3 data/cene/explore.py | tee data/cene/explore.txt
+      - name: Uzorci cenovnika velikih lanaca
+        run: python3 data/cene/sample.py
       - name: Sačuvaj u granu
         run: |
           git config user.name "github-actions[bot]"
