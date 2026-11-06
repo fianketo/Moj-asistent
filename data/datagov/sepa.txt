@@ -1,0 +1,315 @@
+
+######## КВАЛИТЕТ ВАЗДУХА 
+Скуп података садржи верификоване дневне податке о квалитету ваздуха за период 2011–2024. године. Подаци су прикупљени путем аутоматских мерних станица Агенције за заштиту животне средине и обухватају мерења концентрација азот диоксида (NO₂), сумпор диоксида (SO₂), суспендованих честица PM10 и PM2.5, приземног озона (O₃) и угљен моноксида (CO).
+
+Структура скупа података обухвата податке о мерним локацијама, датумима мерења и измереним концентрацијама загађујућих материја. Концентрације NO₂, SO₂, PM10, PM2.5 и O₃ исказане су у μg/m3, док је концентрација CO исказана у mg/m3. За NO₂, SO₂, PM10 и PM2.5 приказане су средње дневне вредности концентрација, док су за O₃ и CO приказане максималне дневне осмочасовне средње вредности.
+
+Подаци омогућавају праћење стања квалитета ваздуха, анализу временских и просторних трендова загађења, подршку научним истраживањима и доношењу мера за заштиту здравља становништва и животне средине.
+
+**ИЗДАВАЧ**
+
+Агенција за заштиту животне средине
+
+**ТЕМАТСКА ОБЛАСТ**
+
+ENVI
+
+**ВРЕМЕНСКИ ОБУХВАТ**
+
+2011–2024
+
+**ГЕОГРАФСКИ ОБУХВАТ**
+
+Република Србија
+
+**УЧЕСТАЛОСТ АЖУРИРАЊА**
+
+Годишње
+
+**ДИСТРИБУЦИЈЕ**
+
+Назив и формат ресурса:
+
+- 2011 КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+2012. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+- 2013. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+- 2014. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+- 2015. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+- 2016. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+- 2017. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+- 2018. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+- 2019. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+- 2020. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+- 2021. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+- 2022. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+- 2023. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+- 2024. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци (XLSX)
+--- RES 2024. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци xlsx https://data.gov.rs/s/resources/kvalitet-vazdukha/20260316-080003/2024.xlsx
+Ресурс садржи верификоване дневне податке о концентрацијама загађујућих материја у ваздуху прикупљене са аутоматских мерних станица Агенције за заштиту животне средине. Подаци се односе на 2024. годину.
+--- RES 2023. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци xlsx https://data.gov.rs/s/resources/kvalitet-vazdukha/20250317-122034/2023.xlsx
+Верификовани дневни подаци Ресурс садржи верификоване дневне податке о концентрацијама загађујућих материја у ваздуху прикупљене са аутоматских мерних станица Агенције за заштиту животне средине. Подаци се односе на 2023. годину.
+--- RES 2022. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци xlsx https://data.gov.rs/s/resources/kvalitet-vazdukha-verifikovani-dnevni-podatsi/20250211-101416/2022.xlsx
+Ресурс садржи верификоване дневне податке о концентрацијама загађујућих материја у ваздуху прикупљене са аутоматских мерних станица Агенције за заштиту животне средине. Подаци се односе на 2022. годину.
+--- RES 2021. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци xlsx https://data.gov.rs/s/resources/kvalitet-vazdukha-verifikovani-dnevni-podatsi/20250211-101416/2021.xlsx
+Ресурс садржи верификоване дневне податке о концентрацијама загађујућих материја у ваздуху прикупљене са аутоматских мерних станица Агенције за заштиту животне средине. Подаци се односе на 2021. годину.
+--- RES 2020. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци xlsx https://data.gov.rs/s/resources/kvalitet-vazdukha-verifikovani-dnevni-podatsi/20250211-101416/2020.xlsx
+Ресурс садржи верификоване дневне податке о концентрацијама загађујућих материја у ваздуху прикупљене са аутоматских мерних станица Агенције за заштиту животне средине. Подаци се односе на 2020. годину.
+--- RES 2019. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци xlsx https://data.gov.rs/s/resources/kvalitet-vazdukha-verifikovani-dnevni-podatsi/20250211-101416/2019.xlsx
+Ресурс садржи верификоване дневне податке о концентрацијама загађујућих материја у ваздуху прикупљене са аутоматских мерних станица Агенције за заштиту животне средине. Подаци се односе на 2019. годину.
+--- RES 2018. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци xlsx https://data.gov.rs/s/resources/kvalitet-vazdukha-verifikovani-dnevni-podatsi/20250211-101416/2018.xlsx
+Ресурс садржи верификоване дневне податке о концентрацијама загађујућих материја у ваздуху прикупљене са аутоматских мерних станица Агенције за заштиту животне средине. Подаци се односе на 2018. годину.
+--- RES 2017. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци xlsx https://data.gov.rs/s/resources/kvalitet-vazdukha-verifikovani-dnevni-podatsi/20250211-101416/2017.xlsx
+Ресурс садржи верификоване дневне податке о концентрацијама загађујућих материја у ваздуху прикупљене са аутоматских мерних станица Агенције за заштиту животне средине. Подаци се односе на 2017. годину.
+--- RES 2016. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци xlsx https://data.gov.rs/s/resources/kvalitet-vazdukha-verifikovani-dnevni-podatsi/20250211-101416/2016.xlsx
+Ресурс садржи верификоване дневне податке о концентрацијама загађујућих материја у ваздуху прикупљене са аутоматских мерних станица Агенције за заштиту животне средине. Подаци се односе на 2016. годину.
+--- RES 2015. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци xlsx https://data.gov.rs/s/resources/kvalitet-vazdukha-verifikovani-dnevni-podatsi/20250211-101416/2015.xlsx
+Ресурс садржи верификоване дневне податке о концентрацијама загађујућих материја у ваздуху прикупљене са аутоматских мерних станица Агенције за заштиту животне средине. Подаци се односе на 2015. годину.
+--- RES 2014. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци xlsx https://data.gov.rs/s/resources/kvalitet-vazdukha-verifikovani-dnevni-podatsi/20250211-101416/2014.xlsx
+Ресурс садржи верификоване дневне податке о концентрацијама загађујућих материја у ваздуху прикупљене са аутоматских мерних станица Агенције за заштиту животне средине. Подаци се односе на 2014. годину.
+--- RES 2013. КВАЛИТЕТ ВАЗДУХА - Верификовани дневни подаци xlsx https://data.gov.rs/s/resources/kvalitet-vazdukha-verifikovani-dnevni-podatsi/20250211-101417/2013.xlsx
+Ресурс садржи верификоване дневне податке о концентрацијама загађујућих материја у ваздуху прикупљене са аутоматских мерних станица Агенције за заштиту животне средине. Подаци се односе на 2013. годину.
+
+######## КВАЛИТЕТ ВАЗДУХА — сатне вредности (неверификовани подаци), последњих 30 дана
+Овај скуп података садржи сатно упросечене концентрације загађујућих материја са мерних станица. Подаци су неверификовани (*preliminary*) и објављују се у информативне сврхе. Доступни су путем API-ја и као *bulk download* за последњих 30 дана. Нису намењени регулаторној процени или правним закључцима.
+
+**Подаци су доступни и путем специјализованог Open Data API портала за приступ и преузимање података:** [https://opendata.kosava.cloud/](https://opendata.kosava.cloud/)  
+
+**ИЗДАВАЧ**
+
+Агенција за заштиту животне средине (SEPA)
+
+**ТЕМАТСКА ОБЛАСТ**
+
+ENVI
+
+**HVD КАТЕГОРИЈА**
+
+Посматрање Земље и животна средина
+
+**ВРЕМЕНСКИ ОБУХВАТ**
+
+Од 12.04.2026.
+
+**ГЕОГРАФСКИ ОБУХВАТ**
+
+Република Србија
+
+**УЧЕСТАЛОСТ АЖУРИРАЊА**
+
+У реалном времену
+
+**ДИСТРИБУЦИЈЕ**
+
+Скуп података је доступан кроз три логичке дистрибуције:
+
+- Метаподаци мерних станица (Компонента A)  
+- Речник параметара (Компонента B)
+- Сатно упросечена мерења (Компонента C) 
+
+**Додатни ресурси**
+
+- Bulk download пакет
+- HVD опис скупа података 
+- Data Dictionary (речник поља)
+
+**Правни основ**
+
+Скуп података је објављен у складу са спроведеном уредбом Комисије (ЕУ) 2023/138 о успостављању листе посебних скупова података високе вредности.
+
+**Машински читљив опис**
+
+Пун машински читљив опис скупа података доступан је преко HVD *metadata* endpoint-а.
+--- RES Data Dictionary (речник поља) json https://opendata.kosava.cloud/api/v1/data-dictionary
+
+**Data Dictionary (речник поља)**  
+  Детаљно објашњава структуру података, укључујући називе поља, типове и значење вредности.
+
+{"language":"sr-Latn","supported_languages":["sr-Latn","sr-Cyrl","en"],"standard_reference":"Standard za High-Value Dataset (HVD) OpenData SEPA, Sekcija 11","forbidden_fields":["validated","qa_flag","compliance","exceedance"],"components":[{"name":"stations","title":"Stanice (HVD Komponenta A)","description":"Identifikacija i geolokacija mernih mesta. Endpoint /api/v1/stations vraća listu sa svim poljima ispod; bulk distribucije su stations.csv i stations.geojson.","standard_section":"5.1","fields":[{"name":"station_id","type":"string","required":true,"constant":null,"references":null,"definition":"Jedinstveni identifikator merne stanice. Stabilan kroz vreme i kroz snapshot generacije; služi kao primarni ključ za stanicu u svim distribucijama i kao referenca u observations.station_id."},{"name":"station_name","type":"string","required":true,"constant":null,"references":null,"definition":"Čovekoljudsko ime stanice (npr. „Kikinda Centar\"). Može sadržavati lokalnu transliteraciju."},{"name":"station_code","type":"string","required":false,"constant":null,"references":null,"definition":"Operatorski kod stanice (npr. „RS1002A\") koji se često koristi u izveštajnim sistemima. Dodatno stabilan identifier; nije deo HVD obaveznog skupa ali se emituje radi interoperabilnosti."},{"name":"latitude","type":"decimal","required":true,"constant":null,"references":null,"definition":"Geografska širina stanice u WGS84 koordinatnom sistemu, decimalni stepen."},{"name":"longitude","type":"decimal","required":true,"constant":null,"references":null,"definition":"Geografska dužina stanice u WGS84 koordinatnom sistemu, decimalni stepen."},{"name":"municipality","type":"string","required":true,"constant":null,"references":null,"definition":"Naziv opštine u kojoj se stanica nalazi. Može biti null kada izvor podataka ne raspolaže ovom informacijom (polje obavezno postoji u shemi)."},{"name":"station_type","type":"enum","required":true,"constant":null,"references":null,"definition":"Tip lokacije stanice po HVD klasifikaciji. Dozvoljene vrednosti: traffic, urban, background, industrial, rural, other. Može biti null ako tip nije poznat."},{"name":"operator","type":"string","required":true,"constant":null,"references":null,"definition":"Naziv organizacije koja operiše stanicom. Trenutno se izvodi iz organization.name na nivou portal instance."},{"name":"active","type":"boolean","required":true,"constant":null,"references":null,"definition":"Da li stanica trenutno aktiv
+--- RES HVD опис скупа података json https://opendata.kosava.cloud/api/v1/metadata
+
+**HVD опис скупа података**  
+  Садржи структуриран метаподатковни опис скупа у складу са HVD стандардима
+
+{"snapshot_schema_version":"1.2.0","hvd_schema_version":"1.0","schema_version":"1.2.0","dataset_version":"1.0","snapshot_id":"20261106010652","generated_at_utc":"2026-11-06T13:00:17Z","retention_days":30,"data_status":"preliminary","aggregation_type":"hourly_mean","averaging_period":"1h","supported_windows":["1h","1d","7d","14d","30d"],"counts":{"organizations":1,"networks":8,"stations":87,"components":15,"measurement_rows":21934},"applicable_legislation":"http://data.europa.eu/eli/reg_impl/2023/138/oj","license":{"name":"Otvoreni podaci po Zakonu o e-upravi (CC BY-equivalent)","url":"http://opendata.kosava.cloud/legal/license"},"terms_of_use_url":"http://opendata.kosava.cloud/legal/terms","qos_url":"http://opendata.kosava.cloud/legal/qos","contact_url":"http://opendata.kosava.cloud/legal/contact","dataset_description_url":"http://opendata.kosava.cloud/legal/dataset","documentation":{"human_url":"http://opendata.kosava.cloud/api-docs","openapi_url":"http://opendata.kosava.cloud/openapi.json","swagger_url":"http://opendata.kosava.cloud/docs","redoc_url":"http://opendata.kosava.cloud/redoc"},"components":[{"name":"stations","url":"http://opendata.kosava.cloud/api/v1/stations","description":"Monitoring stations metadata."},{"name":"parameters","url":"http://opendata.kosava.cloud/api/v1/parameters","description":"Pollutant and meteorological parameter dictionary."},{"name":"observations","url":"http://opendata.kosava.cloud/api/v1/observations","description":"Hourly preliminary measurement records."},{"name":"bulk","url":"http://opendata.kosava.cloud/api/v1/bulk","description":"Bulk download bundle for the rolling 30-day window."},{"name":"dcat","url":"http://opendata.kosava.cloud/api/v1/dcat","description":"DCAT-AP HVD JSON-LD catalog for harvesters."},{"name":"data_dictionary","url":"http://opendata.kosava.cloud/api/v1/data-dictionary","description":"HVD field-level data dictionary for stations, parameters, and observations."}],"changelog":[{"version":"1.0","date":"2026-05-07","notes":"Initial HVD release."}]}
+--- RES Bulk download пакет json https://opendata.kosava.cloud/api/v1/bulk
+
+**Bulk download пакет**  
+  Омогућава преузимање комплетног скупа података за одређени временски период (30 дана) у једном пакету.
+
+{"snapshot_id":"20261106010652","generated_at_utc":"2026-11-06T01:20:16Z","resources":[{"name":"stations.csv","format":"csv","content_type":"text/csv; charset=utf-8","size_bytes":12482,"sha256":"1307dd6d1fdd2ee03f774609cea482e6a2f37d2677f3f9d8e8a343f254b7761d","download_url":"http://opendata.kosava.cloud/api/v1/bulk/stations.csv"},{"name":"stations.geojson","format":"geojson","content_type":"application/geo+json; charset=utf-8","size_bytes":62730,"sha256":"efc5afa013db7845ea448182c39adcb68d16b3bfca1a77f177c6e2c17495ebdb","download_url":"http://opendata.kosava.cloud/api/v1/bulk/stations.geojson"},{"name":"parameters.csv","format":"csv","content_type":"text/csv; charset=utf-8","size_bytes":431,"sha256":"fdbb215ff5aeae2c16ed7c0c09d51812bde1a708bb250e5147ae5b59586f9304","download_url":"http://opendata.kosava.cloud/api/v1/bulk/parameters.csv"},{"name":"parameters.json","format":"json","content_type":"application/json; charset=utf-8","size_bytes":2564,"sha256":"8ba9252ce93391930b645a6ee99f6f23e5988fdfeaf9464e7f62eec532f68d41","download_url":"http://opendata.kosava.cloud/api/v1/bulk/parameters.json"},{"name":"observations_hourly_preliminary_last30days.csv","format":"csv","content_type":"text/csv; charset=utf-8","size_bytes":59569711,"sha256":"6c408423058de6eb628daf3cf61e284294ce121f4dd9c7acc51108247c7de4f8","download_url":"http://opendata.kosava.cloud/api/v1/bulk/observations_hourly_preliminary_last30days.csv"},{"name":"observations_hourly_preliminary_last30days.parquet","format":"parquet","content_type":"application/vnd.apache.parquet","size_bytes":4199744,"sha256":"1e2dbe7965091909595984e67064d08776ed5dc5b48346e6d03e77e5dc4d11f2","download_url":"http://opendata.kosava.cloud/api/v1/bulk/observations_hourly_preliminary_last30days.parquet"},{"name":"README.md","format":"markdown","content_type":"text/markdown; charset=utf-8","size_bytes":3002,"sha256":"d9bbcba5f0bffa793a25ef1686def2f581b91f4b2099e1df136be684e68e6bd4","download_url":"http://opendata.kosava.cloud/api/v1/bulk/README.md"},{"name":"data_dictionary.md","format":"markdown","content_type":"text/markdown; charset=utf-8","size_bytes":7001,"sha256":"d9957345c3b7523f06b189d53c7bfbb46315aed6d691ad03d909a67be148d5d8","download_url":"http://opendata.kosava.cloud/api/v1/bulk/data_dictionary.md"},{"name":"CHECKSUMS.sha256","format":"checksums","content_type":"text/plain; charset=utf-8","size_bytes":716,"sha256":"073ae3c9415b46d032a18d432acbc7ee7191b2cac4ac7eedfad2ff6d5e8f2bbb","download_url":"http://opendata.kosav
+--- RES Сатно упросечена мерења (Компонента C) json https://opendata.kosava.cloud/api/v1/observations
+
+**Сатно упросечена мерења (Компонента C)**  
+  Садржи сатно упросечене вредности измерених концентрација загађујућих материја по станицама.
+
+{"data":[{"station_id":"1","parameter_code":"CO","time_start_utc":"2026-10-07T14:00:00Z","time_end_utc":"2026-10-07T15:00:00Z","value":0.474793825,"unit":"mg.m-3","data_status":"preliminary","aggregation_type":"hourly_mean","published_at_utc":"2026-11-06T13:00:17Z","updated_at_utc":"2026-11-06T13:00:17Z","coverage":null},{"station_id":"1","parameter_code":"CO","time_start_utc":"2026-10-07T15:00:00Z","time_end_utc":"2026-10-07T16:00:00Z","value":0.478793315,"unit":"mg.m-3","data_status":"preliminary","aggregation_type":"hourly_mean","published_at_utc":"2026-11-06T13:00:17Z","updated_at_utc":"2026-11-06T13:00:17Z","coverage":null},{"station_id":"1","parameter_code":"CO","time_start_utc":"2026-10-07T16:00:00Z","time_end_utc":"2026-10-07T17:00:00Z","value":0.4519812,"unit":"mg.m-3","data_status":"preliminary","aggregation_type":"hourly_mean","published_at_utc":"2026-11-06T13:00:17Z","updated_at_utc":"2026-11-06T13:00:17Z","coverage":null},{"station_id":"1","parameter_code":"CO","time_start_utc":"2026-10-07T17:00:00Z","time_end_utc":"2026-10-07T18:00:00Z","value":0.618891955,"unit":"mg.m-3","data_status":"preliminary","aggregation_type":"hourly_mean","published_at_utc":"2026-11-06T13:00:17Z","updated_at_utc":"2026-11-06T13:00:17Z","coverage":null},{"station_id":"1","parameter_code":"CO","time_start_utc":"2026-10-07T18:00:00Z","time_end_utc":"2026-10-07T19:00:00Z","value":0.593613625,"unit":"mg.m-3","data_status":"preliminary","aggregation_type":"hourly_mean","published_at_utc":"2026-11-06T13:00:17Z","updated_at_utc":"2026-11-06T13:00:17Z","coverage":null},{"station_id":"1","parameter_code":"CO","time_start_utc":"2026-10-07T19:00:00Z","time_end_utc":"2026-10-07T20:00:00Z","value":0.582391755,"unit":"mg.m-3","data_status":"preliminary","aggregation_type":"hourly_mean","published_at_utc":"2026-11-06T13:00:17Z","updated_at_utc":"2026-11-06T13:00:17Z","coverage":null},{"station_id":"1","parameter_code":"CO","time_start_utc":"2026-10-07T20:00:00Z","time_end_utc":"2026-10-07T21:00:00Z","value":0.60640811,"unit":"mg.m-3","data_status":"preliminary","aggregation_type":"hourly_mean","published_at_utc":"2026-11-06T13:00:17Z","updated_at_utc":"2026-11-06T13:00:17Z","coverage":null},{"station_id":"1","parameter_code":"CO","time_start_utc":"2026-10-07T21:00:00Z","time_end_utc":"2026-10-07T22:00:00Z","value":0.5012953,"unit":"mg.m-3","data_status":"preliminary","aggregation_type":"hourly_mean","published_at_utc":"2026-11-06T13:00:17Z","updated_at_utc":"2026-11-06T13:00:17Z","
+--- RES Речник параметара (Компонента B) json https://opendata.kosava.cloud/api/v1/parameters
+
+**Речник параметара (Компонента B)**  
+  Обезбеђује листу свих праћених параметара загађења са описима, јединицама мере и шифрама.
+
+[{"parameter_code":"SO2","parameter_name":"SO2","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"PM10","parameter_name":"PM10","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"O3","parameter_name":"O3","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"NO2","parameter_name":"NO2","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"NOX","parameter_name":"NOX","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"CO","parameter_name":"CO","unit":"mg.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"Benzen","parameter_name":"Benzen","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"Toluene","parameter_name":"Toluene","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"NH3","parameter_name":"NH3","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"NO","parameter_name":"NO","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"Ethyl benzene","parameter_name":"Ethyl benzene","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"mp-Xylene","parameter_name":"mp-Xylene","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"o-Xylene","parameter_name":"o-Xylene","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"PM2.5","parameter_name":"PM2.5","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null},{"parameter_code":"TNx","parameter_name":"TNx","unit":"ug.m-3","averaging_period":"1h","cas_number":null,"description":null}]
+--- RES Метаподаци мерних станица (Компонента A) json https://opendata.kosava.cloud/api/v1/stations
+
+**Метаподаци мерних станица (Компонента A)**  
+  Садржи основне информације о мерним станицама (локација, тип станице, идентификатори и други описни подаци).
+
+
+[{"station_id":"1","station_name":"Kikinda Centar","station_code":"RS1002A","latitude":45.821483,"longitude":20.454008,"municipality":"Kikinda","station_type":null,"operator":"Agencija za zaštitu životne sredine SEPA","active":true,"last_updated_utc":"2026-11-06T13:00:17Z","elevation_m":null,"address":null,"start_date":null,"end_date":null,"notes":null,"network_id":1,"network_code":"RS100A"},{"station_id":"2","station_name":"Novi Sad Rumenačka","station_code":"RS1007A","latitude":45.245065,"longitude":19.84119,"municipality":"Novi Sad","station_type":null,"operator":"Agencija za zaštitu životne sredine SEPA","active":true,"last_updated_utc":"2026-11-06T13:00:17Z","elevation_m":null,"address":null,"start_date":null,"end_date":null,"notes":null,"network_id":1,"network_code":"RS100A"},{"station_id":"3","station_name":"Novi Sad Liman","station_code":"RS1008A","latitude":45.238642,"longitude":19.835704,"municipality":"Novi Sad ","station_type":null,"operator":"Agencija za zaštitu životne sredine SEPA","active":true,"last_updated_utc":"2026-11-06T13:00:17Z","elevation_m":null,"address":null,"start_date":null,"end_date":null,"notes":null,"network_id":1,"network_code":"RS100A"},{"station_id":"4","station_name":"Beočin Centar","station_code":"RS1009A","latitude":45.208386,"longitude":19.721709,"municipality":"Beočin","station_type":null,"operator":"Agencija za zaštitu životne sredine SEPA","active":true,"last_updated_utc":"2026-11-06T13:00:17Z","elevation_m":null,"address":null,"start_date":null,"end_date":null,"notes":null,"network_id":1,"network_code":"RS100A"},{"station_id":"5","station_name":"Sremska Mitrovica","station_code":"RS1010A","latitude":44.972185,"longitude":19.609349,"municipality":"Sremska Mitrovica","station_type":null,"operator":"Agencija za zaštitu životne sredine SEPA","active":true,"last_updated_utc":"2026-11-06T13:00:17Z","elevation_m":null,"address":null,"start_date":null,"end_date":null,"notes":null,"network_id":1,"network_code":"RS100A"},{"station_id":"6","station_name":"Pančevo Sodara","station_code":"RS1014A","latitude":44.862975,"longitude":20.64429,"municipality":"Pančevo ","station_type":null,"operator":"Agencija za zaštitu životne sredine SEPA","active":true,"last_updated_utc":"2026-11-06T13:00:17Z","elevation_m":null,"address":null,"start_date":null,"end_date":null,"notes":null,"network_id":1,"network_code":"RS100A"},{"station_id":"7","station_name":"Beograd Stari grad","station_code":"RS1018A","latitude":44.82112,"l
+
+######## ПОЛЕН - API
+Сет података под називом ПОЛЕН - API представља веб сервис који омогућава приступ различитим врстама података о концентрацијама полена, алергенима и локацијама на којима су мерени. Сет података је доступан преко Swagger API спецификације на платформи за отворене податке. API омогућава приступ следећим ресурсима:
+
+GET /api/opendata/allergen-types/
+
+Враћа све типове алергена који су доступни у систему.
+GET /api/opendata/allergen-types/{id}/
+
+Враћа информације о одређеном типу алергена који је идентификован по id.
+GET /api/opendata/allergens/
+
+Враћа све врсте алергена.
+GET /api/opendata/allergens/{id}/
+
+Враћа детаљне информације о конкретном алергену, идентификованом по id.
+GET /api/opendata/concentrations/
+
+Враћа податке о концентрацијама полена, укључујући све локације и време мерења.
+GET /api/opendata/concentrations/{id}/
+
+Враћа податке о концентрацији полена на одређеној локацији или за одређени период, према id.
+GET /api/opendata/locations/
+
+Враћа све локације на којима су вршена мерења концентрације полена.
+GET /api/opendata/locations/{id}/
+
+Враћа информације о одређеној локацији која је идентификована по id.
+GET /api/opendata/pollens/
+
+Враћа све доступне податке о концентрацијама полена за све године и локације.
+GET /api/opendata/pollens/{id}/
+
+Враћа податке о концентрацијама полена за одређену локацију или годину, на основу id.
+GET /api/opendata/pollens/{year}/
+
+Враћа податке о концентрацијама полена за конкретну годину.
+GET /api/opendata/pollens/{year}/{id}/
+
+Враћа податке о концентрацијама полена за конкретну годину и одређену локацију или врсту полена, на основу year и id.
+Овај API је користан за све који се баве анализом и мониторингом алергена и концентрација полена у ваздуху, као и за истраживаче, научнике и јавне установе које желе да приступе и обрађују податке о поленима.
+--- RES API документација html http://77.46.150.200/api/opendata/schema
+
+{"_type":"document","_meta":{"url":"http://77.46.150.200/api/opendata/schema","title":"Polen API"},"opendata":{"allergen-types":{"list":{"_type":"link","url":"/api/opendata/allergen-types/","action":"get","fields":[{"name":"search","location":"query","schema":{"_type":"string","title":"Претрага","description":"A search term."}},{"name":"id","location":"query","schema":{"_type":"number","title":"","description":""}},{"name":"name","location":"query","schema":{"_type":"string","title":"","description":""}}]},"read":{"_type":"link","url":"/api/opendata/allergen-types/{id}/","action":"get","fields":[{"name":"id","required":true,"location":"path","schema":{"_type":"integer","title":"ID","description":"A unique integer value identifying this allergen type."}},{"name":"search","location":"query","schema":{"_type":"string","title":"Претрага","description":"A search term."}},{"name":"id","location":"query","schema":{"_type":"number","title":"","description":""}},{"name":"name","location":"query","schema":{"_type":"string","title":"","description":""}}]}},"allergens":{"list":{"_type":"link","url":"/api/opendata/allergens/","action":"get","fields":[{"name":"search","location":"query","schema":{"_type":"string","title":"Претрага","description":"A search term."}},{"name":"id","location":"query","schema":{"_type":"number","title":"","description":""}},{"name":"name","location":"query","schema":{"_type":"string","title":"","description":""}},{"name":"type","location":"query","schema":{"_type":"string","title":"","description":""}}]},"read":{"_type":"link","url":"/api/opendata/allergens/{id}/","action":"get","fields":[{"name":"id","required":true,"location":"path","schema":{"_type":"integer","title":"ID","description":"A unique integer value identifying this allergen."}},{"name":"search","location":"query","schema":{"_type":"string","title":"Претрага","description":"A search term."}},{"name":"id","location":"query","schema":{"_type":"number","title":"","description":""}},{"name":"name","location":"query","schema":{"_type":"string","title":"","description":""}},{"name":"type","location":"query","schema":{"_type":"string","title":"","description":""}}]}},"concentrations":{"list":{"_type":"link","url":"/api/opendata/concentrations/","action":"get","fields":[{"name":"page","location":"query","schema":{"_type":"integer","title":"Page","description":"A page number within the paginated result set."}},{"name":"search","location":"query","schema":{"
+--- RES Типови алергена json http://77.46.150.200/api/opendata/allergen-types/
+Типови алергена
+[{"id":1,"name":"Дрвеће"},{"id":3,"name":"Корови"},{"id":2,"name":"Траве"}]
+--- RES Алергени json http://77.46.150.200/api/opendata/allergens/
+Алергени
+[{"id":1,"name":"ACER","localized_name":"ЈАВОР","margine_top":100,"margine_bottom":60,"type":1,"allergenicity":1,"allergenicity_display":"mild"},{"id":2,"name":"ALNUS","localized_name":"ЈОВА","margine_top":100,"margine_bottom":60,"type":1,"allergenicity":3,"allergenicity_display":"high"},{"id":3,"name":"AMBROSIA","localized_name":"АМБРОЗИЈА","margine_top":100,"margine_bottom":31,"type":3,"allergenicity":3,"allergenicity_display":"high"},{"id":4,"name":"ARTEMISIA","localized_name":"ПЕЛИН","margine_top":100,"margine_bottom":60,"type":3,"allergenicity":3,"allergenicity_display":"high"},{"id":5,"name":"BETULA","localized_name":"БРЕЗА","margine_top":100,"margine_bottom":60,"type":1,"allergenicity":3,"allergenicity_display":"high"},{"id":6,"name":"CANNABACEAE","localized_name":"КОНОПЉЕ","margine_top":100,"margine_bottom":60,"type":3,"allergenicity":1,"allergenicity_display":"mild"},{"id":7,"name":"CARPINUS","localized_name":"ГРАБ","margine_top":100,"margine_bottom":60,"type":1,"allergenicity":1,"allergenicity_display":"mild"},{"id":26,"name":"CELTIS","localized_name":"КОПРИВИЋ","margine_top":100,"margine_bottom":60,"type":1,"allergenicity":1,"allergenicity_display":"mild"},{"id":8,"name":"CHENOP/AMAR.","localized_name":"ШТИРЕВИ/ПЕПЕЉУГЕ","margine_top":100,"margine_bottom":60,"type":3,"allergenicity":2,"allergenicity_display":"moderate"},{"id":9,"name":"CORYLUS","localized_name":"ЛЕСКА","margine_top":100,"margine_bottom":60,"type":1,"allergenicity":2,"allergenicity_display":"moderate"},{"id":10,"name":"CUPRESS/TAXA.","localized_name":"ТИСА/ЧЕМПР.","margine_top":100,"margine_bottom":60,"type":1,"allergenicity":2,"allergenicity_display":"moderate"},{"id":11,"name":"FAGUS","localized_name":"БУКВА","margine_top":100,"margine_bottom":60,"type":1,"allergenicity":1,"allergenicity_display":"mild"},{"id":12,"name":"FRAXINUS","localized_name":"ЈАСЕН","margine_top":100,"margine_bottom":60,"type":1,"allergenicity":2,"allergenicity_display":"moderate"},{"id":13,"name":"JUGLANS","localized_name":"ОРАХ","margine_top":100,"margine_bottom":60,"type":1,"allergenicity":2,"allergenicity_display":"moderate"},{"id":14,"name":"MORACEAE","localized_name":"ДУД","margine_top":100,"margine_bottom":60,"type":1,"allergenicity":1,"allergenicity_display":"mild"},{"id":15,"name":"PINACEAE","localized_name":"ЧЕТИНАРИ","margine_top":100,"margine_bottom":60,"type":1,"allergenicity":1,"allergenicity
+--- RES Локације json http://77.46.150.200/api/opendata/locations/
+Локације мерних станица
+[{"id":2,"name":"БЕОГРАД - ЗЕЛЕНО БРДО","latitude":"44.786241","longitude":"20.521657","description":"Zgrada Agencije"},{"id":1,"name":"БЕОГРАД - НОВИ БЕОГРАД","latitude":"44.823174","longitude":"20.412914","description":"Zgrada Opsine"},{"id":32,"name":"БЕОГРАД - ЧУКАРИЦА","latitude":"44.766750","longitude":"20.417120","description":"Завод за биоциде и медицинску екологију"},{"id":17,"name":"БЕЧЕЈ","latitude":"45.613056","longitude":"20.052766","description":"Zgrada sportskog centra Mladost"},{"id":27,"name":"ВАЉЕВО","latitude":"44.270884","longitude":"19.887231","description":"Zgrada Opstine"},{"id":8,"name":"ВРАЊЕ","latitude":"42.551460","longitude":"21.902314","description":"Zgrada Zavoda"},{"id":25,"name":"ВРБАС","latitude":"45.572060","longitude":"19.640300","description":"Zgrada Skupštine opštine"},{"id":9,"name":"ВРШАЦ","latitude":"45.116670","longitude":"21.303610","description":""},{"id":10,"name":"ЗАЈЕЧАР","latitude":"43.906308","longitude":"22.278354","description":"Jugoistok-ogranak ED Zajecar"},{"id":16,"name":"ЗЛАТИБОР","latitude":"43.721861","longitude":"19.708328","description":"Vodovodno postrojenje"},{"id":26,"name":"ЗРЕЊАНИН","latitude":"45.382230","longitude":"20.395474","description":"Institut za javno zdravlje"},{"id":31,"name":"КАЊИЖА","latitude":"46.060880","longitude":"20.037950","description":""},{"id":22,"name":"КИКИНДА","latitude":"45.832550","longitude":"20.478461","description":"Zgrada Opšte bolnice"},{"id":4,"name":"КРАГУЈЕВАЦ","latitude":"44.011812","longitude":"20.915890","description":"Zgrada Instituta"},{"id":12,"name":"КРАЉЕВО","latitude":"43.723994","longitude":"20.688908","description":"JKP Putevi"},{"id":5,"name":"КРУШЕВАЦ","latitude":"43.581566","longitude":"21.320344","description":"Zgrada Zavoda"},{"id":6,"name":"КУЛА","latitude":"45.701588","longitude":"19.381502","description":"Dom kulture"},{"id":14,"name":"ЛОЗНИЦА","latitude":"44.537135","longitude":"19.229862","description":"Zdravstveni centar Dr Milenko Marin"},{"id":15,"name":"НИШ","latitude":"43.316286","longitude":"21.913684","description":"Institut za javno zdravlje"},{"id":20,"name":"НОВИ ПАЗАР","latitude":"43.140807","longitude":"20.518374","description":"Zgrada gradske uprave"},{"id":21,"name":"ОБРЕНОВАЦ","latitude":"44.658181","longitude":"20.20004
+--- RES Полен json http://77.46.150.200/api/opendata/pollens/
+Полен релација ка концентрацији за локацију на дан
+{"count":73453,"next":"http://77.46.150.200/api/opendata/pollens/?page=2","previous":null,"results":[{"id":539,"location":12,"date":"2016-02-01","concentrations":[3002,3003,3004,3005]},{"id":805,"location":3,"date":"2016-02-01","concentrations":[4649,4650,4651]},{"id":1078,"location":4,"date":"2016-02-01","concentrations":[6126,6127,6128]},{"id":1351,"location":20,"date":"2016-02-01","concentrations":[]},{"id":1624,"location":5,"date":"2016-02-01","concentrations":[]},{"id":1897,"location":10,"date":"2016-02-01","concentrations":[10767,10768]},{"id":2170,"location":14,"date":"2016-02-01","concentrations":[12370,12371,12372]},{"id":2686,"location":13,"date":"2016-02-01","concentrations":[15518,15519]},{"id":2965,"location":17,"date":"2016-02-01","concentrations":[17422,17423,17424,17425]},{"id":3238,"location":9,"date":"2016-02-01","concentrations":[19339,19340]},{"id":3511,"location":11,"date":"2016-02-01","concentrations":[21104,21105,21106,21107]},{"id":3994,"location":7,"date":"2016-02-01","concentrations":[24123,24124,24125]},{"id":4266,"location":19,"date":"2016-02-01","concentrations":[26010,26011]},{"id":4777,"location":15,"date":"2016-02-01","concentrations":[29460]},{"id":266,"location":1,"date":"2016-02-02","concentrations":[1480,1481]},{"id":540,"location":12,"date":"2016-02-02","concentrations":[3006,3007,3008,3009]},{"id":806,"location":3,"date":"2016-02-02","concentrations":[4652]},{"id":1079,"location":4,"date":"2016-02-02","concentrations":[6129,6130]},{"id":1352,"location":20,"date":"2016-02-02","concentrations":[]},{"id":1625,"location":5,"date":"2016-02-02","concentrations":[]},{"id":1898,"location":10,"date":"2016-02-02","concentrations":[10769,10770,10771,10772]},{"id":2171,"location":14,"date":"2016-02-02","concentrations":[12373,12374,12375]},{"id":2687,"location":13,"date":"2016-02-02","concentrations":[15520,15521,15522,15523,15524]},{"id":2966,"location":17,"date":"2016-02-02","concentrations":[17426,17427,17428,17429,17430]},{"id":3239,"location":9,"date":"2016-02-02","concentrations":[19341,19342,19343]},{"id":3512,"location":11,"date":"2016-02-02","concentrations":[21108,21109,21110]},{"id":3995,"location":7,"date":"2016-02-02","concentrations":[24126,24127,24128]},{"id":4267,"location":19,"date":"2016-02-02","concentrations":[26012,26013,26014]},{"id":4778,"location":15,"date":"2016-02-02","concentrations":[29461,29462,29463]},{"id":267,"location":1,"date":"2016-02-03","concentrations":[1482,1483,1484,1485,1486]},{"id":541,"lo
+--- RES Концентрације json http://77.46.150.200/api/opendata/concentrations/
+Вредности концентрација по алергену за сваку релацију локације и дана
+{"count":712037,"next":"http://77.46.150.200/api/opendata/concentrations/?page=2","previous":null,"results":[{"id":12688,"allergen":1,"value":19,"pollen":2231},{"id":16255,"allergen":1,"value":1,"pollen":2771},{"id":11233,"allergen":1,"value":126,"pollen":1966},{"id":12679,"allergen":1,"value":24,"pollen":2230},{"id":15767,"allergen":1,"value":1,"pollen":2729},{"id":16245,"allergen":1,"value":1,"pollen":2770},{"id":11024,"allergen":1,"value":2,"pollen":1941},{"id":11221,"allergen":1,"value":117,"pollen":1965},{"id":11316,"allergen":1,"value":15,"pollen":1974},{"id":12671,"allergen":1,"value":5,"pollen":2229},{"id":13935,"allergen":1,"value":1,"pollen":2427},{"id":14595,"allergen":1,"value":1,"pollen":2515},{"id":16120,"allergen":1,"value":6,"pollen":2761},{"id":16232,"allergen":1,"value":1,"pollen":2769},{"id":9780,"allergen":1,"value":1,"pollen":1698},{"id":11005,"allergen":1,"value":1,"pollen":1938},{"id":11132,"allergen":1,"value":354,"pollen":1957},{"id":11209,"allergen":1,"value":214,"pollen":1964},{"id":11281,"allergen":1,"value":22,"pollen":1970},{"id":11306,"allergen":1,"value":16,"pollen":1972},{"id":11643,"allergen":1,"value":1,"pollen":2015},{"id":12659,"allergen":1,"value":8,"pollen":2228},{"id":12841,"allergen":1,"value":1,"pollen":2244},{"id":13928,"allergen":1,"value":3,"pollen":2426},{"id":14315,"allergen":1,"value":7,"pollen":2480},{"id":14521,"allergen":1,"value":1,"pollen":2502},{"id":15904,"allergen":1,"value":19,"pollen":2745},{"id":16105,"allergen":1,"value":6,"pollen":2760},{"id":16208,"allergen":1,"value":9,"pollen":2767},{"id":16221,"allergen":1,"value":1,"pollen":2768},{"id":9683,"allergen":1,"value":42,"pollen":1688},{"id":9770,"allergen":1,"value":1,"pollen":1697},{"id":10844,"allergen":1,"value":5,"pollen":1915},{"id":10997,"allergen":1,"value":1,"pollen":1937},{"id":11079,"allergen":1,"value":1,"pollen":1950},{"id":11123,"allergen":1,"value":296,"pollen":1956},{"id":11174,"allergen":1,"value":329,"pollen":1961},{"id":11197,"allergen":1,"value":163,"pollen":1963},{"id":11244,"allergen":1,"value":10,"pollen":1967},{"id":11268,"allergen":1,"value":54,"pollen":1969},{"id":5202,"allergen":1,"value":3,"pollen":891},{"id":11294,"allergen":1,"value":10,"pollen":1971},{"id":11400,"allergen":1,"value":1,"pollen":1981},{"id":11585,"allergen":1,"value":1,"pollen":2007},{"id":12511,"allergen":1,"value":1,"pollen":2199},{"id":12651,"allergen":1,"value":25,"pollen":2227},{"id":12748,"allergen":1,"value":211,"pollen":2236},{"id":12820,"allerg
+
+######## ПОЛЕН  - ОБЈЕДИЊЕНИ ПОДАЦИ ОД 2016. ГОДИНЕ
+Скуп података садржи обједињене податке о полену прикупљене у оквиру мониторинга који спроводи Агенција за заштиту животне средине од 2016. године. Подаци омогућавају праћење просторне и временске динамике присуства полена у ваздуху, анализу сезонских варијација и процену потенцијалног утицаја алергена на становништво.
+
+Скуп је намењен органима јавне управе, здравственим установама, истраживачима, медијима и грађанима заинтересованим за праћење стања животне средине и фактора који могу утицати на здравље. Подаци се могу користити за анализу трендова, израду извештаја, научна истраживања, развој информативних сервиса и друге облике поновне употребе. Подаци се ажурирају на недељном нивоу и доступни су у машински читљивим форматима погодним за даљу обраду и анализу.
+
+**ИЗДАВАЧ**
+
+Агенција за заштиту животне средине
+
+**ТЕМАТСКА ОБЛАСТ**
+
+HEAL
+
+**ВРЕМЕНСКИ ОБУХВАТ**
+
+Од 01.02.2016.
+
+**ГЕОГРАФСКИ ОБУХВАТ**
+
+Република Србија
+
+**УЧЕСТАЛОСТ АЖУРИРАЊА**
+
+Недељно
+
+**ДИСТРИБУЦИЈЕ**
+
+Назив и формат ресурса:
+
+- Концентрација поленових зрна (CSV)
+- Локације мерних места (XLSX)
+- Типови алергена (XLSX)
+--- RES Концентрација поленових зрна csv https://data.gov.rs/s/resources/polen-objedinjeni-podatsi-od-2016-godine/20261106-092743/pollen-concentration.csv
+Ресурс садржи податке о концентрацијама поленових зрна измереним на различитим локацијама. За свако мерење доступни су датум уноса податка, назив локације на којој је извршено мерење, назив алергена и измерена концентрација полена изражена у пз/м³ (пулсирајући број поленових зрна по кубном метру ваздуха).
+﻿pollen__date,pollen__location__name,allergen__localized_name,value,trend_value
+11/3/2026,ВРШАЦ,АМБРОЗИЈА,1,1
+11/2/2026,БЕОГРАД - НОВИ БЕОГРАД,АМБРОЗИЈА,1,1
+11/2/2026,БЕОГРАД - НОВИ БЕОГРАД,ТИСА/ЧЕМПР.,1,1
+11/2/2026,БЕОГРАД - НОВИ БЕОГРАД,ЧЕТИНАРИ,4,1
+11/2/2026,ВРШАЦ,АМБРОЗИЈА,0,1
+11/2/2026,ВРШАЦ,ЧЕТИНАРИ,1,1
+11/1/2026,БЕОГРАД - ЗЕЛЕНО БРДО,ЛИПА,1,1
+11/1/2026,БЕОГРАД - ЧУКАРИЦА,АМБРОЗИЈА,2,1
+11/1/2026,ВРАЊЕ,АМБРОЗИЈА,0,1
+11/1/2026,ВРАЊЕ,БРЕЗА,0,
+11/1/2026,ВРАЊЕ,БРЕСТ,0,
+11/1/2026,ВРАЊЕ,БУКВА,0,
+11/1/2026,ВРАЊЕ,ВРБА,0,
+11/1/2026,ВРАЊЕ,ГРАБ,0,
+11/1/2026,ВРАЊЕ,ДУД,0,
+11/1/2026,ВРАЊЕ,ЈАВОР,0,
+11/1/2026,ВРАЊЕ,ЈАСЕН,0,
+11/1/2026,ВРАЊЕ,ЈОВА,0,
+11/1/2026,ВРАЊЕ,КИСЕЛИЦЕ,0,
+11/1/2026,ВРАЊЕ,КОНОПЉЕ,0,
+11/1/2026,ВРАЊЕ,КОПРИВА,0,
+11/1/2026,ВРАЊЕ,КОПРИВИЋ,0,
+11/1/2026,ВРАЊЕ,ЛЕСКА,0,
+11/1/2026,ВРАЊЕ,ЛИПА,0,1
+11/1/2026,ВРАЊЕ,ОРАХ,0,
+11/1/2026,ВРАЊЕ,ПЕЛИН,0,
+11/1/2026,ВРАЊЕ,ТИСА/ЧЕМПР.,0,
+11/1/2026,ВРАЊЕ,ТОПОЛА,0,
+11/1/2026,ВРАЊЕ,ТРАВЕ,0,1
+11/1/2026,ВРАЊЕ,ХРАСТ,0,
+11/1/2026,ВРАЊЕ,ЧЕТИНАРИ,0,1
+11/1/2026,ВРАЊЕ,ШТИРЕВИ/ПЕПЕЉУГЕ,0,
+11/1/2026,ЗАЈЕЧАР,АМБРОЗИЈА,1,1
+11/1/2026,ЗЛАТИБОР,ЧЕТИНАРИ,1,1
+11/1/2026,КИКИНДА,АМБРОЗИЈА,1,1
+11/1/2026,КИКИНДА,КОНОПЉЕ,1,1
+11/1/2026,НИШ,ТРАВЕ,2,1
+11/1/2026,НИШ,ЧЕТИНАРИ,1,1
+11/1/2026,ОБРЕНОВАЦ,АМБРОЗИЈА,1,1
+11/1/2026,ОБРЕНОВАЦ,КОПРИВА,1,1
+11/1/2026,ОБРЕНОВАЦ,ЧЕТИНАРИ,1,1
+11/1/2026,ОБРЕНОВАЦ,ШТИРЕВИ/ПЕПЕЉУГЕ,1,1
+11/1/2026,СОМБОР,АМБРОЗИЈА,1,1
+11/1/2026,СОМБОР,КОПРИВА,1,1
+11/1/2026,СОМБОР,ПЕЛИН,1,1
+11/1/2026,ЧАЧАК,АМБРОЗИЈА,1,1
+10/31/2026,БЕОГРАД - ЗЕЛЕНО БРДО,АМБРОЗИЈА,1,1
+10/31/2026,БЕОГРАД - ЗЕЛЕНО БРДО,ЧЕТИНАРИ,1,1
+10/31/2026,БЕОГРАД - ЧУКАРИЦА,АМБРОЗИЈА,2,1
+10/31/2026,БЕОГРАД - ЧУКАРИЦА,ЧЕТИНАРИ,1,1
+10/31/2026,ВАЉЕВО,ЧЕТИНАРИ,1,1
+10/31/2026,ВРАЊЕ,
+--- RES Локације мерних места xlsx https://data.gov.rs/s/resources/alergeni-polen/20250210-182653/polen-lokacije.xlsx
+Ресурс садржи податке о мерним местима на којима се спроводи мониторинг полена. За сваку локацију доступни су назив и скраћени назив локације, географска ширина и дужина мерне станице, као и информација о недељи у години у којој почиње мерење.
+--- RES Типови алергена xlsx https://data.gov.rs/s/resources/alergeni-polen/20250210-182811/polen-alergeni.xlsx
+Ресурс садржи податке о биљним врстама које производе полен и њиховим алергеним карактеристикама. Доступни су научни, народни и енглески називи биљака, тип алергена, доње и горње вредности концентрације поленових зрна, период емитовања полена, степен алергености и одговарајућа слика или линк за приказ полена.
+--- TRY http://77.46.150.200/api/opendata/schema
+{"_type":"document","_meta":{"url":"http://77.46.150.200/api/opendata/schema","title":"Polen API"},"opendata":{"allergen-types":{"list":{"_type":"link","url":"/api/opendata/allergen-types/","action":"get","fields":[{"name":"search","location":"query","schema":{"_type":"string","title":"Претрага","description":"A search term."}},{"name":"id","location":"query","schema":{"_type":"number","title":"","description":""}},{"name":"name","location":"query","schema":{"_type":"string","title":"","description":""}}]},"read":{"_type":"link","url":"/api/opendata/allergen-types/{id}/","action":"get","fields":[{"name":"id","required":true,"location":"path","schema":{"_type":"integer","title":"ID","description":"A unique integer value identifying this allergen type."}},{"name":"search","location":"query","schema":{"_type":"string","title":"Претрага","description":"A search term."}},{"name":"id","location":"query","schema":{"_type":"number","title":"","description":""}},{"name":"name","location":"query","schema":{"_type":"string","title":"","description":""}}]}},"allergens":{"list":{"_type":"link","url":"/api/opendata/allergens/","action":"get","fields":[{"name":"search","location":"query","schema":{"_type":"string","title":"Претрага","description":"A search term."}},{"name":"id","location":"query","schema":{"_type":"number","title":"","description":""}},{"name":"name","location":"query","schema":{"_type":"string","title":"","description":""}},{"name":"type","location":"query","schema":{"_type":"string","title":"","description":""}}]},"read":{"_type":"link","url":"/api/opendata/allergens/{id}/","action":"get","fields":[{"name":"id","required":true,"location":"path","schema":{"_type":"integer","title":"ID","description":"A unique integer value identifying this allergen."}},{"name":"search","location":"query","schema":{"_type":"string","title":"Претрага","description":"A search term."}},{"name":"id","location":"query","schema":{"_type":"number","title":"","description":""}},{"name":"name","location":"query","schema":{"_type":"string","title":"","description":""}},{"name":"type","location":"query","schema":{"_type":"string","title":"","description":""}}]}},"concentrations":{"list":{"_type":"link","url":"/api/opendata/concentrations/","action":"get","fields":[{"name":"page","location":"query","schema":{"_type":"integer","title":"Page","description":"A page number within the paginated result set."}},{"name":"search","location":"query","schema":{"
+--- TRY http://77.46.150.200/api/opendata/stations
+ERR <HTTPError 404: 'Not Found'>
+--- TRY http://77.46.150.200/api/opendata/
+ERR <HTTPError 404: 'Not Found'>
