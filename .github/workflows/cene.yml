@@ -3,7 +3,9 @@ name: Cene iz zvaničnih cenovnika (data.gov.rs)
 on:
   push:
     branches: [claude/personal-assistant-app-3yx3up]
-    paths: ['.github/workflows/cene.yml', 'data/cene/*.py']
+    paths: ['.github/workflows/cene.yml', 'data/cene/build.py']
+  schedule:
+    - cron: '23 5 * * *'   # svako jutro (lanci ažuriraju cenovnike dnevno)
   workflow_dispatch:
 
 permissions:
@@ -14,12 +16,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Uzorci cenovnika velikih lanaca
-        run: python3 data/cene/sample.py
-      - name: Sačuvaj u granu
+        with: { ref: claude/personal-assistant-app-3yx3up }
+      - name: Preuzmi i objedini cenovnike
         run: |
+          mkdir -p /tmp/out
+          python3 data/cene/build.py /tmp/out/cene.json | tee /tmp/out/izvestaj.txt
+      - name: Objavi na granu cene-data (samo poslednji dan, bez istorije)
+        run: |
+          cd /tmp/out
+          git init -q -b cene-data
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/cene
-          git commit -m "Podaci: spisak zvaničnih cenovnika sa data.gov.rs" || exit 0
-          git pull --rebase -q && git push
+          git add cene.json izvestaj.txt
+          git commit -q -m "Cene $(date +%F)"
+          git push -f -q "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" cene-data
