@@ -1,0 +1,21 @@
+UAP: 9
+Agronews: 1
+Google News „"Pokrajinski sekretarijat za poljoprivredu" konkurs“: 6
+Google News „konkurs poljoprivreda Vojvodina bespovratna sredstva“: 2
+Google News „Grad Novi Sad konkurs poljoprivreda subvencije“: 0
+ukupno: 16 poziva: 9
+  2026-11-05 [vest] Kokanović: Uvoz mesa i mleka ugrožava domaće proizvođače, subvencije još nisu isplaćene | rok None | ['Stočarstvo'] | Agronews
+  2026-11-02 [poziv] Raspisan drugi Javni poziv za kreditnu podršku poljoprivrednicima | rok 2026-12-02 | ['Krediti'] | Uprava za agrarna plaćanja
+  2026-10-19 [poziv] Raspisan javni poziv za premiju za mleko za treći kvartal 2026. godine: 19 dinara po litru | rok 2026-11-19 | ['Stočarstvo'] | Uprava za agrarna plaćanja
+  2026-10-07 [vest] ODRŽIVIJE IPARD INVESTICIJE: UAP DEO EVROPSKOG PROJEKTA ZA SMANjENjE UGLjENIČNOG OTISKA | rok None | ['IPARD'] | Uprava za agrarna plaćanja
+  2026-10-07 [poziv] Konkurs za sufinansiranje sertifikacije bezbednosti i kvaliteta hrane | rok None | [] | Pančevac
+  2026-10-06 [vest] Za kontrolu i sertifikaciju organske proizvodnje bespovratno do 200 hiljada dinara | rok None | ['Organska proizvodnja'] | ILoveZrenjanin
+  2026-10-02 [poziv] Raspisan konkurs za sufinansiranje kontrole i sertifikacije organske proizvodnje u Vojvodi | rok None | ['Organska proizvodnja'] | Vojvodjanski
+  2026-10-02 [poziv] Za proizvodnju hrane i do 200.000 dinara - konkurs za dodelu novčanih sredstava traje do 6 | rok 2026-11-06 | [] | https://naslovinet.rs/
+  2026-10-02 [vest] Vojvodina subvencioniše kontrolu i sertifikaciju organske proizvodnje: Podrška do 200.000  | rok None | ['Organska proizvodnja'] | Vojvodina uživo
+  2026-10-01 [poziv] Organska proizvodnja u Vojvodini: Otvoren konkurs - troškovi kontrole i sertifikacija | rok None | ['Organska proizvodnja'] | Agroklub.rs
+  2026-07-28 [isplata] VAŽNO OBAVEŠTENjE ZA IPARD KORISNIKE – Proverite obaveze po osnovu javnih prihoda pre podn | rok None | ['IPARD'] | Uprava za agrarna plaćanja
+  2026-07-14 [poziv] Raspisan Javni poziv za premiju za mleko za drugi kvartal 2026. godine | rok 2026-08-14 | ['Stočarstvo'] | Uprava za agrarna plaćanja
+  2026-07-11 [vest] Važno za poljoprivrednike: Objavljeno Uputstvo za pravdanje osnovnih podsticaja u biljnoj  | rok None | ['Biljna proizvodnja'] | Uprava za agrarna plaćanja
+  2026-06-29 [poziv] Raspisan Javni poziv za krave za uzgoj teladi za tov | rok 2026-07-29 | ['Stočarstvo', 'Ruralni razvoj'] | Uprava za agrarna plaćanja
+  2026-06-24 [isplata] Obrađeni zahtevi podneti u prvih sedam dana Javnog poziva – doneto više od 12.000 rešenja  | rok None | ['Stočarstvo', 'Pčelarstvo'] | Uprava za agrarna plaćanja
