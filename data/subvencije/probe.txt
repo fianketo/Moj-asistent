@@ -1,0 +1,162 @@
+=== https://www.uap.gov.rs/
+status 200 text/html; charset=UTF-8 len 289472
+TITLE Управа за аграрна плаћања - Управа за аграрна плаћања
+KW LINKS (61):
+  Подстицаји -> /#podsticaji
+  Јавни позиви -> /#javni-pozivi
+  Јавни конкурси -> https://uap.gov.rs/konkursi/kategorija-konkursa/konkursi-2023/
+  Директни подстицаји -> https://uap.gov.rs/direktni-podsticaji/
+  Остали подстицаји -> https://uap.gov.rs/pravilnici/kategorija_pravilnik/ostali-podsticaji/
+  Јавни позиви -> https://uap.gov.rs/javni-pozivi-ipard/
+  Јавни позиви -> https://uap.gov.rs/javni-pozivi-ipard-iii/
+  еПодстицаји -> https://epodsticaji.eagrar.gov.rs
+  Јавни конкурси -> https://uap.gov.rs/konkursi/kategorija-konkursa/konkursi-2023/
+  Подстицаји -> #
+  Директни подстицаји -> https://uap.gov.rs/direktni-podsticaji/
+  Остали подстицаји -> https://uap.gov.rs/pravilnici/kategorija_pravilnik/ostali-podsticaji/
+  Јавни позиви ИПАРД -> https://uap.gov.rs/javni-pozivi-ipard/
+  еПодстицаји -> https://epodsticaji.eagrar.gov.rs
+   -> https://uap.gov.rs/raspisan-drugi-javni-poziv-za-kreditnu-podrsku-poljoprivrednicima/
+  Расписан други Јавни позив за кредитну подршку пољопривредницима -> https://uap.gov.rs/raspisan-drugi-javni-poziv-za-kreditnu-podrsku-poljoprivrednicima/
+  Читајте даље -> https://uap.gov.rs/raspisan-drugi-javni-poziv-za-kreditnu-podrsku-poljoprivrednicima/
+   -> https://uap.gov.rs/raspisan-javni-poziv-za-premiju-za-mleko-za-treci-kvartal-2026-godine-19-dinara-po-litru/
+  Расписан јавни позив за премију за млеко за трећи квартал 2026. године: 19 динара по литру -> https://uap.gov.rs/raspisan-javni-poziv-za-premiju-za-mleko-za-treci-kvartal-2026-godine-19-dinara-po-litru/
+  Читајте даље -> https://uap.gov.rs/raspisan-javni-poziv-za-premiju-za-mleko-za-treci-kvartal-2026-godine-19-dinara-po-litru/
+   -> https://uap.gov.rs/vazno-obavestenje-za-ipard-korisnike-proverite-obaveze-po-osnovu-javnih-prihoda-pre-podnosenja-zahteva-za-konacnu-isplatu-ipard-podsticaja/
+  ВАЖНО ОБАВЕШТЕЊЕ ЗА ИПАРД КОРИСНИКЕ &#8211; Проверите обавезе по основу јавних прихода пре подношења захтева за коначну  -> https://uap.gov.rs/vazno-obavestenje-za-ipard-korisnike-proverite-obaveze-po-osnovu-javnih-prihoda-pre-podnosenja-zahteva-za-konacnu-isplatu-ipard-podsticaja/
+  Читајте даље -> https://uap.gov.rs/vazno-obavestenje-za-ipard-korisnike-proverite-obaveze-po-osnovu-javnih-prihoda-pre-podnosenja-zahteva-za-konacnu-isplatu-ipard-podsticaja/
+   -> https://uap.gov.rs/raspisan-javni-poziv-za-premiju-za-mleko-za-drugi-kvartal-2026-godine/
+  Расписан Јавни позив за премију за млеко за други квартал 2026. године -> https://uap.gov.rs/raspisan-javni-poziv-za-premiju-za-mleko-za-drugi-kvartal-2026-godine/
+  Читајте даље -> https://uap.gov.rs/raspisan-javni-poziv-za-premiju-za-mleko-za-drugi-kvartal-2026-godine/
+   -> https://uap.gov.rs/vazno-obavestenje-za-ipard-korisnike-proverite-obaveze-po-osnovu-javnih-prihoda-pre-podnosenja-zahteva-za-konacnu-isplatu-ipard-podsticaja/
+  ВАЖНО ОБАВЕШТЕЊЕ ЗА ИПАРД КОРИСНИКЕ &#8211; Проверите обавезе по основу јавних прихода пре подношења захтева за коначну  -> https://uap.gov.rs/vazno-obavestenje-za-ipard-korisnike-proverite-obaveze-po-osnovu-javnih-prihoda-pre-podnosenja-zahteva-za-konacnu-isplatu-ipard-podsticaja/
+   -> https://uap.gov.rs/vazno-za-poljoprivrednike-objavljeno-uputstvo-za-pravdanje-osnovnih-podsticaja-u-biljnoj-proizvodnji-za-2026-godinu/
+  Важно за пољопривреднике: Објављено Упутство за правдање основних подстицаја у биљној производњи за 2026. годину -> https://uap.gov.rs/vazno-za-poljoprivrednike-objavljeno-uputstvo-za-pravdanje-osnovnih-podsticaja-u-biljnoj-proizvodnji-za-2026-godinu/
+   -> https://uap.gov.rs/objavljena-konacna-rang-lista-za-prvi-javni-poziv-ipard-iii-mera-3/
+  Објављена Коначна ранг – листа за Први јавни позив – ИПАРД III Мера 3 -> https://uap.gov.rs/objavljena-konacna-rang-lista-za-prvi-javni-poziv-ipard-iii-mera-3/
+   -> https://uap.gov.rs/raspisan-javni-poziv-za-unapredjenje-i-razvoj-ruralne-infrastrukture-5/
+  Расписан Jавни позив за унапређење и развој руралне инфраструктуре -> https://uap.gov.rs/raspisan-javni-poziv-za-unapredjenje-i-razvoj-ruralne-infrastrukture-5/
+   -> https://uap.gov.rs/pocela-dostava-resenja-za-podsticaje-za-kvalitetna-priplodna-grla-novac-uskoro-na-racunima-stocara/
+  Почела достава решења за подстицаје за квалитетна приплодна грла, новац ускоро на рачунима сточара -> https://uap.gov.rs/pocela-dostava-resenja-za-podsticaje-za-kvalitetna-priplodna-grla-novac-uskoro-na-racunima-stocara/
+   -> https://uap.gov.rs/raspisan-prvi-javni-poziv-za-podsticaje-u-stocarstvu-za-tov-junadi-svinja-jagnjadi-i-jaradi/
+  Расписан Први јавни позив за подстицаје у сточарству за тов јунади, свиња, јагњади и јаради -> https://uap.gov.rs/raspisan-prvi-javni-poziv-za-podsticaje-u-stocarstvu-za-tov-junadi-svinja-jagnjadi-i-jaradi/
+   -> https://uap.gov.rs/vazno-obavestenje-za-ipard-korisnike-proverite-obaveze-po-osnovu-javnih-prihoda-pre-podnosenja-zahteva-za-konacnu-isplatu-ipard-podsticaja/
+  ВАЖНО ОБАВЕШТЕЊЕ ЗА ИПАРД КОРИСНИКЕ &#8211; Проверите обавезе по основу јавних прихода пре подношења захтева за коначну  -> https://uap.gov.rs/vazno-obavestenje-za-ipard-korisnike-proverite-obaveze-po-osnovu-javnih-prihoda-pre-podnosenja-zahteva-za-konacnu-isplatu-ipard-podsticaja/
+
+=== https://www.uap.gov.rs/feed/
+status 200 application/rss+xml; charset=UTF-8 len 48910
+TITLE Управа за аграрна плаћања
+KW LINKS (19):
+  https://uap.gov.rs/      Mon, 02 Nov 2026 13:43:22 +0000   sr-RS    hourly     1      https://uap.gov.rs/wp-content/uplo -> https://uap.gov.rs/feed/
+  Расписан други Јавни позив за кредитну подршку пољопривредницима -> https://uap.gov.rs/raspisan-drugi-javni-poziv-za-kreditnu-podrsku-poljoprivrednicima/
+  Расписан јавни позив за премију за млеко за трећи квартал 2026. године: 19 динара по литру -> https://uap.gov.rs/raspisan-javni-poziv-za-premiju-za-mleko-za-treci-kvartal-2026-godine-19-dinara-po-litru/
+  Расписан јавни позив за премију за млеко за трећи квартал 2026. године: 19 динара по литру -> https://uap.gov.rs/raspisan-javni-poziv-za-premiju-za-mleko-za-treci-kvartal-2026-godine-19-dinara-po-litru/
+  ВАЖНО ОБАВЕШТЕЊЕ ЗА ИПАРД КОРИСНИКЕ &#8211; Проверите обавезе по основу јавних прихода пре подношења захтева за коначну  -> https://uap.gov.rs/vazno-obavestenje-za-ipard-korisnike-proverite-obaveze-po-osnovu-javnih-prihoda-pre-podnosenja-zahteva-za-konacnu-isplatu-ipard-podsticaja/
+  ВАЖНО ОБАВЕШТЕЊЕ ЗА ИПАРД КОРИСНИКЕ &#8211; Проверите обавезе по основу јавних прихода пре подношења захтева за коначну  -> https://uap.gov.rs/vazno-obavestenje-za-ipard-korisnike-proverite-obaveze-po-osnovu-javnih-prihoda-pre-podnosenja-zahteva-za-konacnu-isplatu-ipard-podsticaja/
+  Расписан Јавни позив за премију за млеко за други квартал 2026. године -> https://uap.gov.rs/raspisan-javni-poziv-za-premiju-za-mleko-za-drugi-kvartal-2026-godine/
+  Расписан Јавни позив за премију за млеко за други квартал 2026. године -> https://uap.gov.rs/raspisan-javni-poziv-za-premiju-za-mleko-za-drugi-kvartal-2026-godine/
+  Важно за пољопривреднике: Објављено Упутство за правдање основних подстицаја у биљној производњи за 2026. годину -> https://uap.gov.rs/vazno-za-poljoprivrednike-objavljeno-uputstvo-za-pravdanje-osnovnih-podsticaja-u-biljnoj-proizvodnji-za-2026-godinu/
+  Важно за пољопривреднике: Објављено Упутство за правдање основних подстицаја у биљној производњи за 2026. годину -> https://uap.gov.rs/vazno-za-poljoprivrednike-objavljeno-uputstvo-za-pravdanje-osnovnih-podsticaja-u-biljnoj-proizvodnji-za-2026-godinu/
+  Расписан Jавни позив за краве за узгој телади за тов -> https://uap.gov.rs/raspisan-javni-poziv-za-krave-za-uzgoj-teladi-za-tov-3/
+  ОВДЕ -> https://uap.gov.rs/pravilnici/stocarstvo/pravilnik-o-uslovima-i-nacinu-ostvarivanja-prava-na-podsticaje-u-stocarstvu-za-krave-za-uzgoj-teladi-za-tov-4/
+  Расписан Jавни позив за краве за узгој телади за тов -> https://uap.gov.rs/raspisan-javni-poziv-za-krave-za-uzgoj-teladi-za-tov-3/
+  Обрађени захтеви поднети у првих седам дана Јавног позива – донето више од 12.000 решења за подстицаје по кошници пчела -> https://uap.gov.rs/obradjeni-zahtevi-podneti-u-prvih-sedam-dana-javnog-poziva-doneto-vise-od-12-000-resenja-za-podsticaje-po-kosnici-pcela/
+  Обрађени захтеви поднети у првих седам дана Јавног позива – донето више од 12.000 решења за подстицаје по кошници пчела -> https://uap.gov.rs/obradjeni-zahtevi-podneti-u-prvih-sedam-dana-javnog-poziva-doneto-vise-od-12-000-resenja-za-podsticaje-po-kosnici-pcela/
+  Објављена Коначна ранг – листа за Први јавни позив – ИПАРД III Мера 3 -> https://uap.gov.rs/objavljena-konacna-rang-lista-za-prvi-javni-poziv-ipard-iii-mera-3/
+  https://uap.gov.rs/javni-pozivi-ipard-iii/ -> https://uap.gov.rs/javni-pozivi-ipard-iii/
+  https://uap.gov.rs/javni-pozivi-ipard-iii/ -> https://uap.gov.rs/javni-pozivi-ipard-iii/
+  Објављена Коначна ранг – листа за Први јавни позив – ИПАРД III Мера 3 -> https://uap.gov.rs/objavljena-konacna-rang-lista-za-prvi-javni-poziv-ipard-iii-mera-3/
+RSS ITEMS:
+  Расписан други Јавни позив за кредитну подршку пољопривредницима
+  Расписан јавни позив за премију за млеко за трећи квартал 2026. године: 19 динара по литру
+  ОДРЖИВИЈЕ ИПАРД ИНВЕСТИЦИЈЕ: УАП ДЕО ЕВРОПСКОГ ПРОЈЕКТА ЗА СМАЊЕЊЕ УГЉЕНИЧНОГ ОТИСКА
+  Анкета за кориснике подршке ИПАРД II програма у оквиру Ex-post евалуације
+  ВАЖНО ОБАВЕШТЕЊЕ ЗА ИПАРД КОРИСНИКЕ &#8211; Проверите обавезе по основу јавних прихода пре подношења захтева за коначну исплату ИПАРД подстицаја
+  Расписан Јавни позив за премију за млеко за други квартал 2026. године
+  Важно за пољопривреднике: Објављено Упутство за правдање основних подстицаја у биљној производњи за 2026. годину
+  Расписан Jавни позив за краве за узгој телади за тов
+  Обрађени захтеви поднети у првих седам дана Јавног позива – донето више од 12.000 решења за подстицаје по кошници пчела
+  Објављена Коначна ранг – листа за Први јавни позив – ИПАРД III Мера 3
+
+=== https://www.uap.gov.rs/javni-pozivi/
+status 200 image/svg+xml len 4752
+TITLE 
+KW LINKS (0):
+
+
+=== https://www.uap.gov.rs/category/javni-pozivi/
+GREŠKA <HTTPError 404: 'Not Found'>
+
+=== https://www.minpolj.gov.rs/
+GREŠKA URLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)'))
+
+=== https://www.minpolj.gov.rs/feed/
+GREŠKA URLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)'))
+
+=== https://www.minpolj.gov.rs/category/vesti/feed/
+GREŠKA URLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)'))
+
+=== https://www.psp.vojvodina.gov.rs/
+GREŠKA URLError(TimeoutError('timed out'))
+
+=== https://www.psp.vojvodina.gov.rs/feed/
+GREŠKA URLError(TimeoutError('timed out'))
+
+=== https://www.psp.vojvodina.gov.rs/konkursi/
+GREŠKA URLError(TimeoutError('timed out'))
+
+=== https://www.psp.vojvodina.gov.rs/category/konkursi/
+GREŠKA URLError(TimeoutError('timed out'))
+
+=== https://www.novisad.rs/konkursi
+GREŠKA <HTTPError 404: 'Not Found'>
+
+=== https://www.novisad.rs/oglasi-i-konkursi
+GREŠKA <HTTPError 404: 'Not Found'>
+
+=== https://www.agronews.rs/feed/
+status 200 application/rss+xml; charset=UTF-8 len 26242
+TITLE AGRO VESTI by agronews.rs
+KW LINKS (2):
+  Kokanović: Uvoz mesa i mleka ugrožava domaće proizvođače, subvencije još nisu isplaćene -> https://www.agronews.rs/kokanovic-uvoz-mesa-i-mleka-ugrozava-domace-proizvodace-subvencije-jos-nisu-isplacene/
+  Subvencije EU i za one koji krše prava radnika? Protest u Briselu zbog novih pravila agrarne politike -> https://www.agronews.rs/subvencije-eu-i-za-one-koji-krse-prava-radnika-protest-u-briselu-zbog-novih-pravila-agrarne-politike/
+RSS ITEMS:
+  Može li veštačka inteligencija da predvidi rod grožđa? Nova platforma dostupna i vinogradarima u Srbiji
+  Donau Soja: Srbija izgubila 53% površina pod sojom, evropski rod u padu, cene rastu
+  Besplatna onlajn edukacija o regenerativnoj i biodinamičkoj poljoprivredi 9. i 10. novembra
+  Cene stoke neujednačene: Tovljenici od 200 do 270 dinara, junad do 550 dinara po kilogramu
+  NALED: Srbija ima neiskorišćen izvozni potencijal od 90 miliona dolara za smrznuto bobičasto voće
+  Kokanović: Uvoz mesa i mleka ugrožava domaće proizvođače, subvencije još nisu isplaćene
+  Može li veštačka inteligencija da smanji gubitke u stočarstvu? Šta su pokazali testovi u Srbiji i Evropi
+  Počeo izlov šarana: Suša povećala troškove proizvodnje, kilogram ribe 620 dinara
+  Danska želi da zabrani ”turbo piliće“: Brz rast ugrožava dobrobit životinja, proizvođači strahuju od uvoza
+  NLB Organic: Pet projekata nagrađeno sa 3,5 miliona dinara, stare sorte u fokusu
+  Srpski AgriTech startap FarmBooker na svetskom takmičenju u San Francisku
+  Subvencije EU i za one koji krše prava radnika? Protest u Briselu zbog novih pravila agrarne politike
+
+=== https://www.ipard.gov.rs/
+status 200 text/html; charset=UTF-8 len 516169
+TITLE IPARD
+KW LINKS (12):
+  План позива -> https://ipard.gov.rs/%d0%bf%d0%bb%d0%b0%d0%bd-%d0%bf%d0%be%d0%b7%d0%b8%d0%b2%d0%b0-2/
+  Јавни позиви -> https://uap.gov.rs/javni-pozivi-ipard-iii/
+  Завршени јавни позиви -> https://ipard.gov.rs/%d0%b7%d0%b0%d0%b2%d1%80%d1%88%d0%b5%d0%bd%d0%b8-%d1%98%d0%b0%d0%b2%d0%bd%d0%b8-%d0%bf%d0%be%d0%b7%d0%b8%d0%b2%d0%b8/
+   -> https://ipard.gov.rs/vazn-obav-ipard-korisnici/
+  ВАЖНО ОБАВЕШТЕЊЕ ЗА ИПАРД КОРИСНИКЕ- Проверите обавезе по основу јавних прихода пре подношења захтева за коначну исплату -> https://ipard.gov.rs/vazn-obav-ipard-korisnici/
+  10 корака до ИПАРД III подстицаја -> 10-корака-до-ипард-iii-подстицаја
+   -> https://uap.gov.rs/javni-pozivi-ipard-iii/
+  Јавни позиви -> https://uap.gov.rs/javni-pozivi-ipard-iii/
+  Завршени јавни позиви -> /завршени-јавни-позиви/
+  Опширније -> /завршени-јавни-позиви/
+  Детаљније -> /александар-тишма-остварио-је-подстиц/
+  Јавни позиви -> https://uap.gov.rs/javni-pozivi-ipard-iii/
+
+=== https://eagrar.gov.rs/
+status 200 text/html; charset=UTF-8 len 59238
+TITLE еАграр
+KW LINKS (5):
+   -> https://epodsticaji.eagrar.gov.rs/
+  16. април 2024.       Расписан јавни позив за субвенције за квалитетна приплодна грла -> /vest/357/raspisan-javni-poziv-za-subvencije-za-kvalitetna-priplodna-grla.php
+  13. март 2024.       Расписан jавни позив за субвенције за тов јунади, свиња, јагњади и јаради -> /vest/321/raspisan-javni-poziv-za-subvencije-za-tov-junadi-svinja-jagnjadi-i-jaradi.php
+  2. фебруар 2024.       Подношење захтева за подстицаје по хектару до 1. марта -> /vest/313/podnosenje-zahteva-za-podsticaje-po-hektaru-do-1-marta.php
+  еПодстицаји -> https://epodsticaji.eagrar.gov.rs/
