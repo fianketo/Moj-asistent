@@ -2,7 +2,7 @@ name: Istraži data.gov.rs (teme za asistenta)
 on:
   push:
     branches: [claude/personal-assistant-app-3yx3up]
-    paths: ['.github/workflows/datagov.yml', 'data/datagov/*.py']
+    paths: ['.github/workflows/datagov.yml', 'data/datagov/*.py', 'data/subvencije/probe.py']
   workflow_dispatch:
 permissions:
   contents: write
@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python3 data/datagov/sepa3.py
+      - run: python3 data/subvencije/probe.py && cp data/subvencije/probe.txt data/datagov/subv-probe.txt
       - run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/datagov
+          git add data/datagov data/subvencije
           git commit -m "Podaci: pregled skupova na data.gov.rs" || exit 0
           git pull --rebase -q && git push
