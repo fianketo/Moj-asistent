@@ -129,7 +129,9 @@ function renderHome() {
     trainTile = `<button class="tile t-train" data-home="treninzi"><small>🏋️ Trening</small><b class="t-title">Izaberi program</b><div class="t-row"><span>18 programa, kod kuće i u teretani</span><span class="t-cta">Pogledaj</span></div></button>`;
   }
 
-  $('#view').innerHTML = notifBanner() + `<div class="bento">${parkTile}${remTile}${shopTile}${whoTile}${mealTile}${trainTile}</div>`;
+  const envTiles = airTileHtml().replace('<button', '<button id="envAir"') + pollenTileHtml().replace('<button', '<button id="envPollen"');
+  $('#view').innerHTML = notifBanner() + `<div class="bento">${parkTile}${remTile}${shopTile}${whoTile}${envTiles}${mealTile}${trainTile}</div>`;
+  refreshEnvHome();
   clearInterval(homeTimer);
   if (A) homeTimer = setInterval(() => { const el = $('#homePark'); if (!el || tab !== 'danas') return clearInterval(homeTimer); el.textContent = parkLeftTxt(A.end - Date.now()); }, 1000);
 }
@@ -140,6 +142,8 @@ document.addEventListener('DOMContentLoaded', () => $('#view').addEventListener(
   const a = b.dataset.home;
   if (a === 'parking' || a === 'podsetnici' || a === 'kupovina') return setTab(a);
   if (a === 'new-rem') return editReminder();
+  if (a === 'air') return loadEnv().then(airSheet).catch(() => toast('Podaci o vazduhu trenutno nisu dostupni'));
+  if (a === 'pollen') return loadEnv().then(pollenSheet).catch(() => toast('Podaci o polenu trenutno nisu dostupni'));
   if (a === 'rem-edit') return editReminder(S.reminders.find((r) => r.id === b.dataset.id));
   if (a === 'rem-done') {
     const r = S.reminders.find((x) => x.id === b.dataset.id); if (!r) return;

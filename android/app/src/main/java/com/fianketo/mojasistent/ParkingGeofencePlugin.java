@@ -244,6 +244,19 @@ public class ParkingGeofencePlugin extends Plugin {
         call.resolve(r);
     }
 
+    /** Vazduh i polen: podešavanja upozorenja + pozadinska provera (WorkManager, svaka 2 sata). */
+    @PluginMethod
+    public void envConfigure(PluginCall call) {
+        prefs(getContext()).edit()
+            .putString("envUrl", call.getString("url", ""))
+            .putInt("envAirAlert", call.getInt("airAlert", 3))
+            .putString("envAllergens", call.getString("allergens", ""))
+            .putBoolean("envPollenAlert", call.getBoolean("pollenAlert", true))
+            .apply();
+        try { EnvWorker.schedule(getContext()); } catch (Exception e) { call.reject(e.getMessage()); return; }
+        call.resolve();
+    }
+
     @PluginMethod
     public void setCarDevice(PluginCall call) {
         prefs(getContext()).edit().putString("carBt", call.getString("address", "")).putString("carBtName", call.getString("name", "")).apply();
