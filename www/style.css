@@ -752,3 +752,24 @@ h2 { font-size: 14px; font-weight: 750; letter-spacing: .02em; text-transform: n
 .sk { display: flex; flex-direction: column; gap: 10px; padding-top: 6px; }
 .sk i { display: block; height: 96px; border-radius: 20px; background: var(--card); opacity: .8; }
 .sk i:nth-child(2) { height: 150px; } .sk i:nth-child(3) { height: 70px; }
+
+/* brzo biranje */
+.t-dial { grid-column: 1 / -1; cursor: default; gap: 4px; padding: 12px 12px 10px 14px; }
+.t-dial.empty { cursor: pointer; }
+.dial-row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 4px 0 2px; margin: 0 -4px; }
+.dial-row::-webkit-scrollbar { display: none; }
+.dial { all: unset; flex: none; width: 72px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+.dial-av { width: 56px; height: 56px; border-radius: 20px; background: var(--c); color: #fff; display: grid; place-items: center; font-size: 21px; font-weight: 850; font-stretch: 110%;
+  transition: border-radius .35s var(--ease), transform .18s var(--ease); box-shadow: 0 4px 10px -6px var(--c); }
+.dial.press .dial-av, .dial:active .dial-av { transform: scale(.9); border-radius: 50%; }
+.dial-nm { font-size: 12.5px; font-weight: 700; max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dial-av.big { width: 64px; height: 64px; font-size: 24px; flex: none; }
+.dm-head { display: flex; gap: 14px; align-items: center; margin-bottom: 12px; }
+.dm-head h3 { margin: 0; }
+.dm-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.dm-b { border: 0; border-radius: 18px; background: var(--card2); color: var(--text); padding: 12px 4px; display: flex; flex-direction: column; align-items: center; gap: 6px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: transform .15s var(--ease); }
+.dm-b span { font-size: 24px; }
+.dm-b.call { background: var(--gc); color: var(--on-gc); }
+.dm-b:active { transform: scale(.94); }
+.dial-col { width: 34px; height: 34px; border-radius: 12px; border: 3px solid transparent; background: var(--c); cursor: pointer; }
+.dial-col.on { border-color: var(--text); border-radius: 50%; }

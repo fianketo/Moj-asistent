@@ -60,6 +60,9 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- brzo biranje: direktan poziv iz aplikacije (radi i na uređajima bez SIM-a – tada otvara brojčanik) -->
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <!-- Tačni alarmi za podsetnike (automatski dozvoljeno na Android 13+) -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />

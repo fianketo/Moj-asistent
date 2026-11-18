@@ -15,7 +15,12 @@ import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import androidx.activity.result.ActivityResult;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.ContactsContract;
 import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
 import com.google.android.gms.location.ActivityRecognition;
@@ -41,7 +46,8 @@ import org.json.JSONObject;
         @Permission(alias = "location", strings = { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }),
         @Permission(alias = "background", strings = { Manifest.permission.ACCESS_BACKGROUND_LOCATION }),
         @Permission(alias = "activity", strings = { Manifest.permission.ACTIVITY_RECOGNITION }),
-        @Permission(alias = "bluetooth", strings = { Manifest.permission.BLUETOOTH_CONNECT })
+        @Permission(alias = "bluetooth", strings = { Manifest.permission.BLUETOOTH_CONNECT }),
+        @Permission(alias = "phone", strings = { Manifest.permission.CALL_PHONE })
     }
 )
 public class ParkingGeofencePlugin extends Plugin {
@@ -242,6 +248,49 @@ public class ParkingGeofencePlugin extends Plugin {
         }
         r.put("devices", list);
         call.resolve(r);
+    }
+
+    /** Brzo biranje: direktan poziv (uz dozvolu za pozive), inače otvori brojčanik sa upisanim brojem. */
+    @PluginMethod
+    public void call(PluginCall call) {
+        if (getPermissionState("phone") != PermissionState.GRANTED && !call.getBoolean("dialOnly", false)) {
+            requestPermissionForAlias("phone", call, "afterPhone");
+            return;
+        }
+        doCall(call);
+    }
+
+    @PermissionCallback
+    private void afterPhone(PluginCall call) { doCall(call); }
+
+    private void doCall(PluginCall call) {
+        String num = call.getString("number", "").replaceAll("[^0-9+*#]", "");
+        if (num.isEmpty()) { call.reject("nema broja"); return; }
+        boolean direct = getPermissionState("phone") == PermissionState.GRANTED && !call.getBoolean("dialOnly", false);
+        Intent i = new Intent(direct ? Intent.ACTION_CALL : Intent.ACTION_DIAL, Uri.parse("tel:" + Uri.encode(num)));
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        try { getContext().startActivity(i); } catch (Exception e) { call.reject(e.getMessage()); return; }
+        JSObject r = new JSObject(); r.put("direct", direct); call.resolve(r);
+    }
+
+    /** Izbor broja iz imenika (sistemski izbornik – aplikaciji ne treba dozvola za čitanje svih kontakata). */
+    @PluginMethod
+    public void pickContact(PluginCall call) {
+        Intent i = new Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI);
+        startActivityForResult(call, i, "afterPickContact");
+    }
+
+    @ActivityCallback
+    private void afterPickContact(PluginCall call, ActivityResult result) {
+        if (call == null) return;
+        if (result.getResultCode() != android.app.Activity.RESULT_OK || result.getData() == null || result.getData().getData() == null) { call.reject("otkazano"); return; }
+        String[] cols = { ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER };
+        try (Cursor c = getContext().getContentResolver().query(result.getData().getData(), cols, null, null, null)) {
+            if (c != null && c.moveToFirst()) {
+                JSObject r = new JSObject(); r.put("name", c.getString(0)); r.put("number", c.getString(1)); call.resolve(r); return;
+            }
+        } catch (Exception e) { call.reject(e.getMessage()); return; }
+        call.reject("kontakt nije pronađen");
     }
 
     /** Subvencije: praćenje novih objava (isti pozadinski posao kao vazduh i polen). */
