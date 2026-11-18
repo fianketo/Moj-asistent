@@ -1,0 +1,20 @@
+{
+  "name": "Moj Asistent",
+  "short_name": "Asistent",
+  "description": "Podsetnici, liste za kupovinu i parking",
+  "lang": "sr",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f2fa",
+  "theme_color": "#6750a4",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Kupovina", "url": "./index.html?tab=kupovina", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Parking", "url": "./index.html?tab=parking", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
